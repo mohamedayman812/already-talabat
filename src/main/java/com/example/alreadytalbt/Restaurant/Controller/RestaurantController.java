@@ -33,4 +33,18 @@ public class RestaurantController {
     public ResponseEntity<List<Restaurant>> getAll() {
         return ResponseEntity.ok(restaurantService.getAllRestaurants());
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Restaurant> updateRestaurant(
+            @PathVariable String id,
+            @RequestBody @Valid RestaurantDTO restaurantDTO) {
+        return ResponseEntity.ok(restaurantService.updateRestaurant(id, restaurantDTO));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteRestaurant(@PathVariable String id) {
+        restaurantService.deleteRestaurant(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

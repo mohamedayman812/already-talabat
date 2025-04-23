@@ -49,5 +49,35 @@ public class RestaurantService {
         return restaurantRepo.findAll();
     }
 
-    // Add, update, delete logic if needed
+    public Restaurant updateRestaurant(String id, RestaurantDTO restaurantDTO) {
+        Restaurant restaurant = restaurantRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        restaurant.setName(restaurantDTO.getName());
+        restaurant.setAddress(restaurantDTO.getAddress());
+        restaurant.setVendorId(restaurantDTO.getVendorId());
+
+        // Update or recreate menu items
+        List<MenuItem> updatedItems = restaurantDTO.getMenuItems().stream().map(dto -> {
+            MenuItem item = new MenuItem();
+            item.setName(dto.getName());
+            item.setPrice(dto.getPrice());
+            item.setDescription(dto.getDescription());
+            return menuItemRepo.save(item);
+        }).toList();
+
+        restaurant.setMenuItems(updatedItems);
+        return restaurantRepo.save(restaurant);
+    }
+    public void deleteRestaurant(String id) {
+        Restaurant restaurant = restaurantRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        // Optionally delete menuItems too
+        restaurant.getMenuItems().forEach(item -> menuItemRepo.deleteById(item.getId()));
+
+        restaurantRepo.deleteById(id);
+    }
+
+
 }
