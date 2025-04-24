@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Already Talbt</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="logo">
+          <h1>Already Talbt</h1>
+        </div>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="restaurants.html">Restaurants</a></li>
+            <li><a href="groceries.html">Groceries</a></li>
+            <li><a href="orders.html">My Orders</a></li>
+          </ul>
+        </nav>
+        <div class="user-actions">
+          <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+          <div class="user-profile" id="user-profile">
+            <img src="img/avatar-placeholder.jpg" alt="User" id="user-avatar">
+            <div class="dropdown-menu">
+              <a href="profile.html">My Profile</a>
+              <a href="orders.html">Order History</a>
+              <a href="#" id="logout-btn">Logout</a>
+            </div>
+          </div>
+        </div>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="restaurants.html">Restaurants</a></li>
+        <li><a href="groceries.html">Groceries</a></li>
+        <li><a href="orders.html">My Orders</a></li>
+      </ul>
+    </div>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+      <div class="container">
+        <h1 class="page-title">Checkout</h1>
+        
+        <div class="checkout-container">
+          <div class="checkout-form-container">
+            <!-- Checkout Steps -->
+            <div class="checkout-steps">
+              <div class="step active" data-step="delivery">
+                <div class="step-number">1</div>
+                <div class="step-label">Delivery</div>
+              </div>
+              <div class="step" data-step="payment">
+                <div class="step-number">2</div>
+                <div class="step-label">Payment</div>
+              </div>
+              <div class="step" data-step="review">
+                <div class="step-number">3</div>
+                <div class="step-label">Review</div>
+              </div>
+            </div>
+            
+            <!-- Delivery Step -->
+            <div class="checkout-step-content active" id="delivery-step">
+              <h2>Delivery Information</h2>
+              
+              <div class="address-selection">
+                <h3>Delivery Address</h3>
+                
+                <div class="saved-addresses" id="saved-addresses">
+                  <div class="address-card selected">
+                    <div class="address-card-header">
+                      <div class="address-type">Home</div>
+                      <div class="address-actions">
+                        <button class="btn-icon"><i class="fas fa-pencil"></i></button>
+                        <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </div>
+                    <div class="address-details">
+                      <p>123 Main Street, Apt 4B</p>
+                      <p>New York, NY 10001</p>
+                    </div>
+                  </div>
+                  
+                  <div class="address-card">
+                    <div class="address-card-header">
+                      <div class="address-type">Work</div>
+                      <div class="address-actions">
+                        <button class="btn-icon"><i class="fas fa-pencil"></i></button>
+                        <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </div>
+                    <div class="address-details">
+                      <p>456 Office Plaza, Floor 8</p>
+                      <p>New York, NY 10002</p>
+                    </div>
+                  </div>
+                  
+                  <button class="btn btn-outline add-address-btn" id="add-address-btn">
+                    <i class="fas fa-plus"></i> Add New Address
+                  </button>
+                </div>
+                
+                <!-- Add New Address Form (Hidden by default) -->
+                <div class="new-address-form" id="new-address-form" style="display: none;">
+                  <h3>Add New Address</h3>
+                  <form id="address-form">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="address-type">Address Type</label>
+                        <select id="address-type" required>
+                          <option value="home">Home</option>
+                          <option value="work">Work</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="street-address">Street Address</label>
+                        <input type="text" id="street-address" required>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="apartment">Apartment, Suite, etc. (optional)</label>
+                        <input type="text" id="apartment">
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" required>
+                      </div>
+                      <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" required>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="zip-code">ZIP Code</label>
+                        <input type="text" id="zip-code" required>
+                      </div>
+                    </div>
+                    <div class="form-actions">
+                      <button type="button" class="btn btn-outline" id="cancel-address-btn">Cancel</button>
+                      <button type="submit" class="btn btn-primary">Save Address</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              
+              <div class="delivery-options">
+                <h3>Delivery Options</h3>
+                <div class="delivery-option">
+                  <input type="radio" id="standard-delivery" name="delivery-option" checked>
+                  <label for="standard-delivery">
+                    <div class="option-details">
+                      <div class="option-title">Standard Delivery</div>
+                      <div class="option-description">Delivery in 30-45 minutes</div>
+                    </div>
+                    <div class="option-price">$2.99</div>
+                  </label>
+                </div>
+                <div class="delivery-option">
+                  <input type="radio" id="express-delivery" name="delivery-option">
+                  <label for="express-delivery">
+                    <div class="option-details">
+                      <div class="option-title">Express Delivery</div>
+                      <div class="option-description">Delivery in 15-20 minutes</div>
+                    </div>
+                    <div class="option-price">$4.99</div>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="delivery-instructions">
+                <h3>Delivery Instructions (Optional)</h3>
+                <textarea id="delivery-instructions" placeholder="Add any special instructions for delivery..."></textarea>
+              </div>
+              
+              <div class="form-actions">
+                <button class="btn btn-primary" id="delivery-next-btn">Continue to Payment</button>
+              </div>
+            </div>
+            
+            <!-- Payment Step -->
+            <div class="checkout-step-content" id="payment-step">
+              <h2>Payment Method</h2>
+              
+              <div class="payment-methods">
+                <div class="payment-method">
+                  <input type="radio" id="credit-card" name="payment-method" checked>
+                  <label for="credit-card">
+                    <div class="method-icon"><i class="far fa-credit-card"></i></div>
+                    <div class="method-title">Credit/Debit Card</div>
+                  </label>
+                </div>
+                <div class="payment-method">
+                  <input type="radio" id="paypal" name="payment-method">
+                  <label for="paypal">
+                    <div class="method-icon"><i class="fab fa-paypal"></i></div>
+                    <div class="method-title">PayPal</div>
+                  </label>
+                </div>
+                <div class="payment-method">
+                  <input type="radio" id="cash" name="payment-method">
+                  <label for="cash">
+                    <div class="method-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="method-title">Cash on Delivery</div>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Credit Card Form -->
+              <div class="credit-card-form" id="credit-card-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="card-number">Card Number</label>
+                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="card-name">Name on Card</label>
+                    <input type="text" id="card-name" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="expiry-date">Expiry Date</label>
+                    <input type="text" id="expiry-date" placeholder="MM/YY" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="save-card">
+                    <span>Save this card for future payments</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button class="btn btn-outline" id="payment-back-btn">Back to Delivery</button>
+                <button class="btn btn-primary" id="payment-next-btn">Review Order</button>
+              </div>
+            </div>
+            
+            <!-- Review Step -->
+            <div class="checkout-step-content" id="review-step">
+              <h2>Review Your Order</h2>
+              
+              <div class="review-section">
+                <h3>Delivery Information</h3>
+                <div class="review-details" id="review-delivery">
+                  <div class="review-item">
+                    <span class="review-label">Address:</span>
+                    <span class="review-value">123 Main Street, Apt 4B, New York, NY 10001</span>
+                  </div>
+                  <div class="review-item">
+                    <span class="review-label">Delivery Option:</span>
+                    <span class="review-value">Standard Delivery (30-45 minutes)</span>
+                  </div>
+                  <div class="review-item">
+                    <span class="review-label">Instructions:</span>
+                    <span class="review-value">Please leave at the door</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="review-section">
+                <h3>Payment Method</h3>
+                <div class="review-details" id="review-payment">
+                  <div class="review-item">
+                    <span class="review-label">Method:</span>
+                    <span class="review-value">Credit Card (ending in 3456)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="review-section">
+                <h3>Order Items</h3>
+                <div class="review-order-items" id="review-items">
+                  <!-- Order items will be loaded dynamically -->
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button class="btn btn-outline" id="review-back-btn">Back to Payment</button>
+                <button class="btn btn-primary" id="place-order-btn">Place Order</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div class="order-from" id="order-from">
+              <img src="img/restaurant-logo.jpg" alt="Restaurant Logo">
+              <div class="restaurant-info">
+                <h3>Restaurant Name</h3>
+                <p>Estimated delivery: 30-45 min</p>
+              </div>
+            </div>
+            
+            <div class="summary-items" id="summary-items">
+              <!-- Order items will be loaded dynamically -->
+            </div>
+            
+            <div class="summary-totals">
+              <div class="summary-item">
+                <span>Subtotal</span>
+                <span id="checkout-subtotal">$24.97</span>
+              </div>
+              <div class="summary-item">
+                <span>Delivery Fee</span>
+                <span id="checkout-delivery-fee">$2.99</span>
+              </div>
+              <div class="summary-item">
+                <span>Tax</span>
+                <span id="checkout-tax">$2.25</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-item total">
+                <span>Total</span>
+                <span id="checkout-total">$30.21</span>
+              </div>
+            </div>
+            
+            <div class="promo-code">
+              <input type="text" placeholder="Enter promo code" id="checkout-promo-code">
+              <button class="btn btn-outline" id="checkout-apply-promo">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Already Talbt</h3>
+            <p>The easiest way to get your favorite food and groceries delivered.</p>
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="restaurants.html">Restaurants</a></li>
+              <li><a href="groceries.html">Groceries</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-map-marker-alt"></i> 123 Main Street, City</p>
+            <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+            <p><i class="fas fa-envelope"></i> info@alreadytalbt.com</p>
+          </div>
+          <div class="footer-section">
+            <h3>Download Our App</h3>
+            <div class="app-links">
+              <a href="#" class="app-link">
+                <img src="img/app-store.png" alt="App Store">
+              </a>
+              <a href="#" class="app-link">
+                <img src="img/google-play.png" alt="Google Play">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2023 Already Talbt. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>

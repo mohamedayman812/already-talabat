@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Dashboard - Already Talbt</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/delivery.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="app" class="delivery-app">
+    <!-- Delivery Sidebar -->
+    <aside class="delivery-sidebar">
+      <div class="delivery-logo">
+        <h1>Already Talbt</h1>
+        <span class="delivery-badge">Delivery</span>
+      </div>
+      <nav class="delivery-nav">
+        <ul>
+          <li>
+            <a href="delivery-dashboard.html" class="active">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="delivery-orders.html">
+              <i class="fas fa-shopping-bag"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li>
+            <a href="delivery-history.html">
+              <i class="fas fa-history"></i>
+              <span>History</span>
+            </a>
+          </li>
+          <li>
+            <a href="delivery-earnings.html">
+              <i class="fas fa-dollar-sign"></i>
+              <span>Earnings</span>
+            </a>
+          </li>
+          <li>
+            <a href="delivery-settings.html">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="delivery-sidebar-footer">
+        <a href="#" id="delivery-logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="delivery-main">
+      <!-- Delivery Header -->
+      <header class="delivery-header">
+        <div class="delivery-header-left">
+          <button class="delivery-menu-toggle" id="delivery-menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h2>Dashboard</h2>
+        </div>
+        <div class="delivery-header-right">
+          <div class="delivery-status">
+            <div class="status-toggle">
+              <span>Status:</span>
+              <label class="switch">
+                <input type="checkbox" id="status-toggle" checked>
+                <span class="slider round"></span>
+              </label>
+              <span id="status-text" class="status-online">Online</span>
+            </div>
+          </div>
+          <div class="delivery-notifications">
+            <button class="delivery-notification-btn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">2</span>
+            </button>
+          </div>
+          <div class="delivery-profile">
+            <img src="img/delivery-avatar.jpg" alt="Delivery Person">
+            <div class="delivery-info">
+              <h4>John Rider</h4>
+              <p>Delivery Partner</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="delivery-content">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stats-card">
+            <div class="stats-card-content">
+              <h3>Today's Deliveries</h3>
+              <div class="stats-value">8</div>
+              <div class="stats-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>2 more than yesterday</span>
+              </div>
+            </div>
+            <div class="stats-card-icon">
+              <i class="fas fa-truck"></i>
+            </div>
+          </div>
+          
+          <div class="stats-card">
+            <div class="stats-card-content">
+              <h3>Today's Earnings</h3>
+              <div class="stats-value">$64.00</div>
+              <div class="stats-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>$12.00 more than yesterday</span>
+              </div>
+            </div>
+            <div class="stats-card-icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+          
+          <div class="stats-card">
+            <div class="stats-card-content">
+              <h3>Average Rating</h3>
+              <div class="stats-value">4.9</div>
+              <div class="stats-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>0.1 from last week</span>
+              </div>
+            </div>
+            <div class="stats-card-icon">
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          
+          <div class="stats-card">
+            <div class="stats-card-content">
+              <h3>Online Hours</h3>
+              <div class="stats-value">5.2</div>
+              <div class="stats-change neutral">
+                <i class="fas fa-minus"></i>
+                <span>Similar to yesterday</span>
+              </div>
+            </div>
+            <div class="stats-card-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Current Order Section -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h3>Current Order</h3>
+          </div>
+          <div class="current-order">
+            <div class="order-map">
+              <div class="map-container" id="delivery-map">
+                <!-- Map will be loaded here -->
+                <div class="map-placeholder">
+                  <i class="fas fa-map-marked-alt"></i>
+                  <p>Map loading...</p>
+                </div>
+              </div>
+            </div>
+            <div class="order-details">
+              <div class="order-header">
+                <div class="order-number">#ORD-12345</div>
+                <div class="order-status">In Progress</div>
+              </div>
+              <div class="order-locations">
+                <div class="location pickup">
+                  <div class="location-icon">
+                    <i class="fas fa-store"></i>
+                  </div>
+                  <div class="location-details">
+                    <div class="location-label">Pickup</div>
+                    <div class="location-name">Pizza Heaven</div>
+                    <div class="location-address">123 Main St, New York, NY 10001</div>
+                  </div>
+                </div>
+                <div class="location-connector">
+                  <div class="connector-line"></div>
+                  <div class="connector-distance">2.3 miles</div>
+                </div>
+                <div class="location dropoff">
+                  <div class="location-icon">
+                    <i class="fas fa-home"></i>
+                  </div>
+                  <div class="location-details">
+                    <div class="location-label">Dropoff</div>
+                    <div class="location-name">John Doe</div>
+                    <div class="location-address">456 Park Ave, New York, NY 10022</div>
+                  </div>
+                </div>
+              </div>
+              <div class="order-items">
+                <h4>Order Items</h4>
+                <ul>
+                  <li>1x Margherita Pizza (Large)</li>
+                  <li>1x Garlic Bread</li>
+                  <li>2x Coke</li>
+                </ul>
+              </div>
+              <div class="order-actions">
+                <button class="btn btn-outline">
+                  <i class="fas fa-phone"></i> Call Customer
+                </button>
+                <button class="btn btn-primary">
+                  <i class="fas fa-check"></i> Mark as Delivered
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Available Orders -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h3>Available Orders</h3>
+            <button class="btn btn-text" id="refresh-orders">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+          <div class="available-orders">
+            <div class="order-card">
+              <div class="order-card-header">
+                <div class="restaurant-info">
+                  <img src="img/restaurant-2.jpg" alt="Restaurant">
+                  <div>
+                    <h4>Pizza Heaven</h4>
+                    <p>2.3 miles away</p>
+                  </div>
+                </div>
+                <div class="order-earnings">$8.50</div>
+              </div>
+              <div class="order-card-content">
+                <div class="order-route">
+                  <div class="route-point pickup">
+                    <i class="fas fa-store"></i>
+                    <span>123 Main St</span>
+                  </div>
+                  <div class="route-line"></div>
+                  <div class="route-point dropoff">
+                    <i class="fas fa-home"></i>
+                    <span>456 Park Ave (3.5 miles)</span>
+                  </div>
+                </div>
+                <div class="order-meta">
+                  <div class="order-time">
+                    <i class="fas fa-clock"></i>
+                    <span>Est. 25 min</span>
+                  </div>
+                  <div class="order-items-count">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>3 items</span>
+                  </div>
+                </div>
+              </div>
+              <div class="order-card-actions">
+                <button class="btn btn-primary btn-block">Accept Order</button>
+              </div>
+            </div>
+            
+            <div class="order-card">
+              <div class="order-card-header">
+                <div class="restaurant-info">
+                  <img src="img/restaurant-1.jpg" alt="Restaurant">
+                  <div>
+                    <h4>Burger Palace</h4>
+                    <p>1.8 miles away</p>
+                  </div>
+                </div>
+                <div class="order-earnings">$7.25</div>
+              </div>
+              <div class="order-card-content">
+                <div class="order-route">
+                  <div class="route-point pickup">
+                    <i class="fas fa-store"></i>
+                    <span>789 Broadway</span>
+                  </div>
+                  <div class="route-line"></div>
+                  <div class="route-point dropoff">
+                    <i class="fas fa-home"></i>
+                    <span>321 5th Ave (2.7 miles)</span>
+                  </div>
+                </div>
+                <div class="order-meta">
+                  <div class="order-time">
+                    <i class="fas fa-clock"></i>
+                    <span>Est. 20 min</span>
+                  </div>
+                  <div class="order-items-count">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>2 items</span>
+                  </div>
+                </div>
+              </div>
+              <div class="order-card-actions">
+                <button class="btn btn-primary btn-block">Accept Order</button>
+              </div>
+            </div>
+            
+            <div class="order-card">
+              <div class="order-card-header">
+                <div class="restaurant-info">
+                  <img src="img/restaurant-3.jpg" alt="Restaurant">
+                  <div>
+                    <h4>Sushi World</h4>
+                    <p>3.1 miles away</p>
+                  </div>
+                </div>
+                <div class="order-earnings">$9.75</div>
+              </div>
+              <div class="order-card-content">
+                <div class="order-route">
+                  <div class="route-point pickup">
+                    <i class="fas fa-store"></i>
+                    <span>567 Lexington Ave</span>
+                  </div>
+                  <div class="route-line"></div>
+                  <div class="route-point dropoff">
+                    <i class="fas fa-home"></i>
+                    <span>890 Madison Ave (4.2 miles)</span>
+                  </div>
+                </div>
+                <div class="order-meta">
+                  <div class="order-time">
+                    <i class="fas fa-clock"></i>
+                    <span>Est. 30 min</span>
+                  </div>
+                  <div class="order-items-count">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>4 items</span>
+                  </div>
+                </div>
+              </div>
+              <div class="order-card-actions">
+                <button class="btn btn-primary btn-block">Accept Order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Weekly Performance -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h3>Weekly Performance</h3>
+            <div class="chart-period">
+              <button class="chart-period-btn">This Week</button>
+              <button class="chart-period-btn active">Last Week</button>
+              <button class="chart-period-btn">Last Month</button>
+            </div>
+          </div>
+          <div class="performance-charts">
+            <div class="chart-container">
+              <h4>Deliveries</h4>
+              <canvas id="deliveriesChart" height="200"></canvas>
+            </div>
+            <div class="chart-container">
+              <h4>Earnings</h4>
+              <canvas id="earningsChart" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/delivery-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Already Talbt</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="app">
+    
+    <header class="header">
+      <div class="container">
+        <div class="logo">
+          <h1>Already Talbt</h1>
+        </div>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="restaurants.html">Restaurants</a></li>
+            <li><a href="groceries.html">Groceries</a></li>
+            <li><a href="orders.html">My Orders</a></li>
+          </ul>
+        </nav>
+        <div class="user-actions">
+          <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+          <div class="user-profile" id="user-profile">
+            <img src="img/avatar-placeholder.jpg" alt="User" id="user-avatar">
+            <div class="dropdown-menu">
+              <a href="profile.html" class="active">My Profile</a>
+              <a href="orders.html">Order History</a>
+              <a href="#" id="logout-btn">Logout</a>
+            </div>
+          </div>
+        </div>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="restaurants.html">Restaurants</a></li>
+        <li><a href="groceries.html">Groceries</a></li>
+        <li><a href="orders.html">My Orders</a></li>
+      </ul>
+    </div>
+
+    
+    <section class="profile-section">
+      <div class="container">
+        <h1 class="page-title">My Profile</h1>
+        
+        <div class="profile-container">
+       
+          <div class="profile-sidebar">
+            <div class="profile-avatar">
+              <img src="img/avatar-placeholder.jpg" alt="User Avatar" id="profile-avatar-img">
+              <button class="btn btn-outline btn-sm change-avatar-btn">
+                <i class="fas fa-camera"></i> Change
+              </button>
+            </div>
+            <div class="profile-menu">
+              <a href="#personal-info" class="profile-menu-item active">
+                <i class="fas fa-user"></i> Personal Information
+              </a>
+              <a href="#addresses" class="profile-menu-item">
+                <i class="fas fa-map-marker-alt"></i> Addresses
+              </a>
+              <a href="#payment-methods" class="profile-menu-item">
+                <i class="fas fa-credit-card"></i> Payment Methods
+              </a>
+              <a href="#preferences" class="profile-menu-item">
+                <i class="fas fa-sliders-h"></i> Preferences
+              </a>
+              <a href="#security" class="profile-menu-item">
+                <i class="fas fa-lock"></i> Security
+              </a>
+            </div>
+          </div>
+          
+       
+          <div class="profile-content">
+           
+            <div class="profile-section-content active" id="personal-info">
+              <h2>Personal Information</h2>
+              <form id="personal-info-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="first-name">First Name</label>
+                    <input type="text" id="first-name" value="John">
+                  </div>
+                  <div class="form-group">
+                    <label for="last-name">Last Name</label>
+                    <input type="text" id="last-name" value="Doe">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" id="email" value="john.doe@example.com">
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input type="tel" id="phone" value="+1 234 567 890">
+                </div>
+                <div class="form-group">
+                  <label for="date-of-birth">Date of Birth</label>
+                  <input type="date" id="date-of-birth" value="1990-01-01">
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+              </form>
+            </div>
+            
+           
+            <div class="profile-section-content" id="addresses">
+              <h2>Addresses</h2>
+              <div class="addresses-container">
+                <div class="address-card">
+                  <div class="address-card-header">
+                    <div class="address-type">Home</div>
+                    <div class="address-actions">
+                      <button class="btn-icon"><i class="fas fa-pencil"></i></button>
+                      <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="address-details">
+                    <p>123 Main Street, Apt 4B</p>
+                    <p>New York, NY 10001</p>
+                  </div>
+                </div>
+                
+                <div class="address-card">
+                  <div class="address-card-header">
+                    <div class="address-type">Work</div>
+                    <div class="address-actions">
+                      <button class="btn-icon"><i class="fas fa-pencil"></i></button>
+                      <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="address-details">
+                    <p>456 Office Plaza, Floor 8</p>
+                    <p>New York, NY 10002</p>
+                  </div>
+                </div>
+                
+                <button class="btn btn-outline add-address-btn" id="add-address-btn-profile">
+                  <i class="fas fa-plus"></i> Add New Address
+                </button>
+              </div>
+              
+              
+              <div class="new-address-form" id="new-address-form-profile" style="display: none;">
+                <h3>Add New Address</h3>
+                <form id="address-form-profile">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="address-type-profile">Address Type</label>
+                      <select id="address-type-profile" required>
+                        <option value="home">Home</option>
+                        <option value="work">Work</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="street-address-profile">Street Address</label>
+                      <input type="text" id="street-address-profile" required>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="apartment-profile">Apartment, Suite, etc. (optional)</label>
+                      <input type="text" id="apartment-profile">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="city-profile">City</label>
+                      <input type="text" id="city-profile" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="state-profile">State</label>
+                      <input type="text" id="state-profile" required>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="zip-code-profile">ZIP Code</label>
+                      <input type="text" id="zip-code-profile" required>
+                    </div>
+                  </div>
+                  <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancel-address-btn-profile">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Address</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            
+          
+            <div class="profile-section-content" id="payment-methods">
+              <h2>Payment Methods</h2>
+              <div class="payment-methods-container">
+                <div class="payment-card">
+                  <div class="payment-card-header">
+                    <div class="payment-card-type">
+                      <i class="fab fa-cc-visa"></i>
+                      <span>Visa ending in 1234</span>
+                    </div>
+                    <div class="payment-card-actions">
+                      <button class="btn-icon"><i class="fas fa-pencil"></i></button>
+                      <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="payment-card-details">
+                    <p>Expires: 12/2025</p>
+                  </div>
+                </div>
+                
+                <div class="payment-card">
+                  <div class="payment-card-header">
+                    <div class="payment-card-type">
+                      <i class="fab fa-cc-mastercard"></i>
+                      <span>Mastercard ending in 5678</span>
+                    </div>
+                    <div class="payment-card-actions">
+                      <button class="btn-icon"><i class="fas fa-pencil"></i></button>
+                      <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="payment-card-details">
+                    <p>Expires: 08/2024</p>
+                  </div>
+                </div>
+                
+                <button class="btn btn-outline add-payment-btn">
+                  <i class="fas fa-plus"></i> Add Payment Method
+                </button>
+              </div>
+            </div>
+            
+            &lt;!-- Preferences Section -->
+            <div class="profile-section-content" id="preferences">
+              <h2>Preferences</h2>
+              <form id="preferences-form">
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="email-notifications" checked>
+                    <span>Email Notifications</span>
+                  </label>
+                  <p class="form-help">Receive order updates and promotional offers via email</p>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="sms-notifications" checked>
+                    <span>SMS Notifications</span>
+                  </label>
+                  <p class="form-help">Receive order updates and delivery status via SMS</p>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="push-notifications">
+                    <span>Push Notifications</span>
+                  </label>
+                  <p class="form-help">Receive notifications on your device</p>
+                </div>
+                <div class="form-group">
+                  <label for="language">Language</label>
+                  <select id="language">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="ar">العربية</option>
+                  </select>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Save Preferences</button>
+                </div>
+              </form>
+            </div>
+            
+           
+            <div class="profile-section-content" id="security">
+              <h2>Security</h2>
+              <form id="security-form">
+                <div class="form-group">
+                  <label for="current-password">Current Password</label>
+                  <input type="password" id="current-password" required>
+                </div>
+                <div class="form-group">
+                  <label for="new-password">New Password</label>
+                  <input type="password" id="new-password" required>
+                </div>
+                <div class="form-group">
+                  <label for="confirm-password">Confirm New Password</label>
+                  <input type="password" id="confirm-password" required>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+              </form>
+              
+              <div class="security-section">
+                <h3>Two-Factor Authentication</h3>
+                <div class="two-factor-status">
+                  <p>Two-factor authentication is currently <span class="status-disabled">disabled</span>.</p>
+                  <button class="btn btn-outline">Enable Two-Factor Authentication</button>
+                </div>
+              </div>
+              
+              <div class="security-section">
+                <h3>Login Sessions</h3>
+                <div class="login-sessions">
+                  <div class="session-item">
+                    <div class="session-info">
+                      <div class="session-device">
+                        <i class="fas fa-laptop"></i>
+                        <span>MacBook Pro - Chrome</span>
+                      </div>
+                      <div class="session-details">
+                        <p>New York, USA - Current Session</p>
+                        <p>Last active: Just now</p>
+                      </div>
+                    </div>
+                    <button class="btn btn-text">End Session</button>
+                  </div>
+                  
+                  <div class="session-item">
+                    <div class="session-info">
+                      <div class="session-device">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>iPhone 13 - Safari</span>
+                      </div>
+                      <div class="session-details">
+                        <p>New York, USA</p>
+                        <p>Last active: 2 hours ago</p>
+                      </div>
+                    </div>
+                    <button class="btn btn-text">End Session</button>
+                  </div>
+                </div>
+                <button class="btn btn-outline btn-danger">Log Out of All Devices</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Already Talbt</h3>
+            <p>The easiest way to get your favorite food and groceries delivered.</p>
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="restaurants.html">Restaurants</a></li>
+              <li><a href="groceries.html">Groceries</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-map-marker-alt"></i> 123 Main Street, City</p>
+            <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+            <p><i class="fas fa-envelope"></i> info@alreadytalbt.com</p>
+          </div>
+          <div class="footer-section">
+            <h3>Download Our App</h3>
+            <div class="app-links">
+              <a href="#" class="app-link">
+                <img src="img/app-store.png" alt="App Store">
+              </a>
+              <a href="#" class="app-link">
+                <img src="img/google-play.png" alt="Google Play">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2023 Already Talbt. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

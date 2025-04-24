@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Name - Already Talbt</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="logo">
+          <h1>Already Talbt</h1>
+        </div>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="restaurants.html" class="active">Restaurants</a></li>
+            <li><a href="groceries.html">Groceries</a></li>
+            <li><a href="orders.html">My Orders</a></li>
+          </ul>
+        </nav>
+        <div class="user-actions">
+          <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+          <a href="login.html" class="btn btn-primary" id="login-btn">Login</a>
+          <div class="user-profile" id="user-profile" style="display: none;">
+            <img src="img/avatar-placeholder.jpg" alt="User" id="user-avatar">
+            <div class="dropdown-menu">
+              <a href="profile.html">My Profile</a>
+              <a href="orders.html">Order History</a>
+              <a href="#" id="logout-btn">Logout</a>
+            </div>
+          </div>
+        </div>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="restaurants.html" class="active">Restaurants</a></li>
+        <li><a href="groceries.html">Groceries</a></li>
+        <li><a href="orders.html">My Orders</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </div>
+
+    <!-- Restaurant Header -->
+    <section class="restaurant-header" id="restaurant-header">
+      <div class="container">
+        <div class="restaurant-info">
+          <h1 id="restaurant-name">Restaurant Name</h1>
+          <div class="restaurant-meta">
+            <div class="rating">
+              <i class="fas fa-star"></i>
+              <span id="restaurant-rating">4.5</span>
+              <span class="review-count">(120+ reviews)</span>
+            </div>
+            <div class="cuisine" id="restaurant-cuisine">Italian, Pizza</div>
+            <div class="price-range" id="restaurant-price">$$</div>
+            <div class="delivery-time">
+              <i class="fas fa-clock"></i>
+              <span id="delivery-time">30-45 min</span>
+            </div>
+          </div>
+          <div class="restaurant-actions">
+            <button class="btn btn-outline">
+              <i class="far fa-heart"></i> Save
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-share-alt"></i> Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Navigation -->
+    <section class="menu-nav">
+      <div class="container">
+        <div class="menu-tabs">
+          <button class="menu-tab active" data-category="all">All</button>
+          <button class="menu-tab" data-category="starters">Starters</button>
+          <button class="menu-tab" data-category="main">Main Courses</button>
+          <button class="menu-tab" data-category="sides">Sides</button>
+          <button class="menu-tab" data-category="desserts">Desserts</button>
+          <button class="menu-tab" data-category="drinks">Drinks</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="menu-section">
+      <div class="container">
+        <div class="menu-container">
+          <div class="menu-sidebar">
+            <div class="menu-categories">
+              <h3>Categories</h3>
+              <ul>
+                <li><a href="#starters" class="active">Starters</a></li>
+                <li><a href="#main-courses">Main Courses</a></li>
+                <li><a href="#sides">Sides</a></li>
+                <li><a href="#desserts">Desserts</a></li>
+                <li><a href="#drinks">Drinks</a></li>
+              </ul>
+            </div>
+            <div class="cart-summary">
+              <h3>Your Cart</h3>
+              <div class="cart-items" id="cart-items-sidebar">
+                <!-- Cart items will be loaded dynamically -->
+                <div class="empty-cart">
+                  <p>Your cart is empty</p>
+                  <p>Add items to get started</p>
+                </div>
+              </div>
+              <div class="cart-total">
+                <div class="subtotal">
+                  <span>Subtotal</span>
+                  <span id="cart-subtotal">$0.00</span>
+                </div>
+                <div class="delivery-fee">
+                  <span>Delivery Fee</span>
+                  <span id="delivery-fee">$0.00</span>
+                </div>
+                <div class="total">
+                  <span>Total</span>
+                  <span id="cart-total">$0.00</span>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block" id="checkout-btn" disabled>
+                Checkout
+              </button>
+            </div>
+          </div>
+          
+          <div class="menu-content">
+            <!-- Starters Section -->
+            <div class="menu-category" id="starters">
+              <h2>Starters</h2>
+              <div class="menu-items">
+                <!-- Menu items will be loaded dynamically -->
+              </div>
+            </div>
+            
+            <!-- Main Courses Section -->
+            <div class="menu-category" id="main-courses">
+              <h2>Main Courses</h2>
+              <div class="menu-items">
+                <!-- Menu items will be loaded dynamically -->
+              </div>
+            </div>
+            
+            <!-- Sides Section -->
+            <div class="menu-category" id="sides">
+              <h2>Sides</h2>
+              <div class="menu-items">
+                <!-- Menu items will be loaded dynamically -->
+              </div>
+            </div>
+            
+            <!-- Desserts Section -->
+            <div class="menu-category" id="desserts">
+              <h2>Desserts</h2>
+              <div class="menu-items">
+                <!-- Menu items will be loaded dynamically -->
+              </div>
+            </div>
+            
+            <!-- Drinks Section -->
+            <div class="menu-category" id="drinks">
+              <h2>Drinks</h2>
+              <div class="menu-items">
+                <!-- Menu items will be loaded dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Already Talbt</h3>
+            <p>The easiest way to get your favorite food and groceries delivered.</p>
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="restaurants.html">Restaurants</a></li>
+              <li><a href="groceries.html">Groceries</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-map-marker-alt"></i> 123 Main Street, City</p>
+            <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+            <p><i class="fas fa-envelope"></i> info@alreadytalbt.com</p>
+          </div>
+          <div class="footer-section">
+            <h3>Download Our App</h3>
+            <div class="app-links">
+              <a href="#" class="app-link">
+                <img src="img/app-store.png" alt="App Store">
+              </a>
+              <a href="#" class="app-link">
+                <img src="img/google-play.png" alt="Google Play">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2023 Already Talbt. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/restaurant-detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Already Talbt - Food & Grocery Ordering</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="logo">
+          <h1>Already Talbt</h1>
+        </div>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="restaurants.html">Restaurants</a></li>
+            <li><a href="groceries.html">Groceries</a></li>
+            <li><a href="orders.html">My Orders</a></li>
+          </ul>
+        </nav>
+        <div class="user-actions">
+          <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+          <a href="login.html" class="btn btn-primary" id="login-btn">Login</a>
+          <div class="user-profile" id="user-profile" style="display: none;">
+            <img src="img/avatar-placeholder.jpg" alt="User" id="user-avatar">
+            <div class="dropdown-menu">
+              <a href="profile.html">My Profile</a>
+              <a href="orders.html">Order History</a>
+              <a href="#" id="logout-btn">Logout</a>
+            </div>
+          </div>
+        </div>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="restaurants.html">Restaurants</a></li>
+        <li><a href="groceries.html">Groceries</a></li>
+        <li><a href="orders.html">My Orders</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h2>Order Food & Groceries Online</h2>
+          <p>Discover the best food and groceries from over 1,000 restaurants and shops</p>
+          <div class="search-container">
+            <input type="text" placeholder="Search for restaurants or groceries...">
+            <button class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+      <div class="container">
+        <h2 class="section-title">Browse Categories</h2>
+        <div class="category-grid">
+          <div class="category-card">
+            <img src="c:\Users\EL TARBISHY STORE\Desktop\tttt\th (2).jpg" alt="Fast Food">
+            <h3>Fast Food</h3>
+          </div>
+          <div class="category-card">
+            <img src="c:\Users\EL TARBISHY STORE\Desktop\tttt\th.jpg" alt="Healthy">
+            <h3>Healthy</h3>
+          </div>
+          <div class="category-card">
+            <img src="c:\Users\EL TARBISHY STORE\Desktop\tttt\th (1).jpg" alt="Desserts">
+            <h3>Desserts</h3>
+          </div>
+          <div class="category-card">
+            <img src="c:\Users\EL TARBISHY STORE\Desktop\tttt\th (3).jpg" alt="Groceries">
+            <h3>Groceries</h3>
+          </div>
+          <div class="category-card">
+            <img src="img/category-beverages.jpg" alt="Beverages">
+            <h3>Beverages</h3>
+          </div>
+          <div class="category-card">
+            <img src="img/category-international.jpg" alt="International">
+            <h3>International</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular Restaurants Section -->
+    <section class="restaurants">
+      <div class="container">
+        <h2 class="section-title">Popular Restaurants</h2>
+        <div class="restaurant-grid" id="restaurant-list">
+          <!-- Restaurant cards will be loaded dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+      <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-container">
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3>Find</h3>
+            <p>Discover restaurants and grocery stores near you</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-utensils"></i>
+            </div>
+            <h3>Choose</h3>
+            <p>Browse menus and select your favorite items</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <h3>Pay</h3>
+            <p>Securely pay online with multiple payment options</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-truck"></i>
+            </div>
+            <h3>Deliver</h3>
+            <p>Track your order and enjoy your delivery</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Already Talbt</h3>
+            <p>The easiest way to get your favorite food and groceries delivered.</p>
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="restaurants.html">Restaurants</a></li>
+              <li><a href="groceries.html">Groceries</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-map-marker-alt"></i> 123 Main Street, City</p>
+            <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+            <p><i class="fas fa-envelope"></i> info@alreadytalbt.com</p>
+          </div>
+          <div class="footer-section">
+            <h3>Download Our App</h3>
+            <div class="app-links">
+              <a href="#" class="app-link">
+                <img src="img/app-store.png" alt="App Store">
+              </a>
+              <a href="#" class="app-link">
+                <img src="img/google-play.png" alt="Google Play">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2023 Already Talbt. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>
