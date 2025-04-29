@@ -1,10 +1,10 @@
-package com.example.alreadytalbt.user.service;
+package com.example.alreadytalbt.User.service;
 
 
 
-import com.example.alreadytalbt.user.model.User;
-import com.example.alreadytalbt.user.dto.UserUpdateDTO;
-import com.example.alreadytalbt.user.repo.UserRepo;
+import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.User.dto.UserUpdateDTO;
+import com.example.alreadytalbt.User.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import java.util.Optional;
-import com.example.alreadytalbt.user.dto.UserRequestDTO;
-import com.example.alreadytalbt.user.dto.UserResponseDTO;
+import com.example.alreadytalbt.User.dto.UserRequestDTO;
+import com.example.alreadytalbt.User.dto.UserResponseDTO;
 
 @Service
 public class UserService {

@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.user.dto;
+package com.example.alreadytalbt.User.dto;
 
 
 public class UserResponseDTO {
@@ -18,9 +18,6 @@ public class UserResponseDTO {
     }
 
     // Getters and Setters
-
-
-
     public String getName() {
         return name;
     }
