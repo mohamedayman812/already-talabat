@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.user.dto;
+package com.example.alreadytalbt.User.dto;
 
 
 public class UserResponseDTO {

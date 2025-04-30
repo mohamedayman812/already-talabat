@@ -57,4 +57,16 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/{order" +
+            "Id}/assign-delivery/{deliveryGuyId}")
+    public ResponseEntity<Order> assignDeliveryGuy(@PathVariable String orderId,
+                                                   @PathVariable String deliveryGuyId) {
+        return ResponseEntity.ok(orderService.assignDeliveryGuy(orderId, deliveryGuyId));
+    }
+
+    @GetMapping("/by-delivery/{deliveryGuyId}")
+    public ResponseEntity<List<Order>> getOrdersByDeliveryGuy(@PathVariable String deliveryGuyId) {
+        return ResponseEntity.ok(orderService.getOrdersByDeliveryGuy(deliveryGuyId));
+    }
 }

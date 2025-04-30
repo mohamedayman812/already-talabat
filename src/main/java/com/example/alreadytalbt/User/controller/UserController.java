@@ -1,11 +1,10 @@
-package com.example.alreadytalbt.user.controller;
+package com.example.alreadytalbt.User.controller;
 
 
-import com.example.alreadytalbt.user.dto.UserRequestDTO;
-import com.example.alreadytalbt.user.dto.UserResponseDTO;
-import com.example.alreadytalbt.user.dto.UserUpdateDTO;
-import com.example.alreadytalbt.user.service.UserService;
-import com.example.alreadytalbt.user.model.User;
+import com.example.alreadytalbt.User.dto.UserRequestDTO;
+import com.example.alreadytalbt.User.dto.UserResponseDTO;
+import com.example.alreadytalbt.User.dto.UserUpdateDTO;
+import com.example.alreadytalbt.User.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

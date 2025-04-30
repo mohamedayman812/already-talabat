@@ -4,6 +4,8 @@ import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
+import com.example.alreadytalbt.User.model.DeliveryGuy;
+import com.example.alreadytalbt.User.repo.DeliveryGuyRepo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -68,5 +70,31 @@ public class OrderService {
 
         String[] result = new String[emptyNames.size()];
         return emptyNames.toArray(result);
+    }
+
+    @Autowired
+    private DeliveryGuyRepo deliveryGuyRepo;
+
+    public Order assignDeliveryGuy(String orderId, String deliveryGuyId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        DeliveryGuy deliveryGuy = (DeliveryGuy) deliveryGuyRepo.findById(deliveryGuyId)
+                .orElseThrow(() -> new RuntimeException("Delivery guy not found"));
+
+        // Assign delivery guy to the order
+        order.setDeliveryGuyId(deliveryGuyId);
+        Order savedOrder = orderRepository.save(order);
+
+        // Append orderId to delivery guy's orderIds list
+        deliveryGuy.addOrderId(orderId);
+        deliveryGuyRepo.save(deliveryGuy);
+
+        return savedOrder;
+    }
+
+
+    public List<Order> getOrdersByDeliveryGuy(String deliveryGuyId) {
+        return orderRepository.findByDeliveryGuyId(deliveryGuyId);
     }
 }

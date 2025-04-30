@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.user.model;
+package com.example.alreadytalbt.User.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,7 +26,14 @@ public class User {
     @NotBlank(message = "Address is required")
     private String address;
 
-    public User() {}
+    public User(String id, String name, String email, String password, String address, UserRole role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.role = role;
+    }
 
     public User(String name, String email, String password, String address) {
         this.name = name;
@@ -35,7 +42,7 @@ public class User {
         this.address = address;
     }
 
-    // Getters and Setters
+// Getters and Setters
 
     public String getId() {
         return id;
@@ -75,6 +82,15 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    private UserRole role;
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
 
