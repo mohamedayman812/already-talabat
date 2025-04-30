@@ -24,7 +24,7 @@ public class RestaurantController {
     }
 
 
-    @GetMapping("/{id}/menu")
+    @GetMapping("/{id}")
     public ResponseEntity<List<MenuItem>> getMenu(@PathVariable String id) {
         return ResponseEntity.ok(restaurantService.getMenu(id));
     }
@@ -34,14 +34,14 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getAllRestaurants());
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Restaurant> updateRestaurant(
             @PathVariable String id,
             @RequestBody @Valid RestaurantDTO restaurantDTO) {
         return ResponseEntity.ok(restaurantService.updateRestaurant(id, restaurantDTO));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRestaurant(@PathVariable String id) {
         restaurantService.deleteRestaurant(id);
         return ResponseEntity.noContent().build();

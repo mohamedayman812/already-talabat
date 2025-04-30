@@ -1,10 +1,13 @@
 package com.example.alreadytalbt.User.model;
 
+import com.example.alreadytalbt.User.Enums.Role;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 
 @Document(collection = "users")
 public class User {
@@ -26,14 +29,10 @@ public class User {
     @NotBlank(message = "Address is required")
     private String address;
 
-    public User(String id, String name, String email, String password, String address, UserRole role) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.address = address;
-        this.role = role;
-    }
+    @NotNull(message = "Role is required")
+    private Role role;
+
+    public User() {}
 
     public User(String name, String email, String password, String address) {
         this.name = name;
@@ -84,14 +83,11 @@ public class User {
         this.address = address;
     }
 
-    private UserRole role;
-    public UserRole getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(Role role) {
         this.role = role;
     }
-
-
 }

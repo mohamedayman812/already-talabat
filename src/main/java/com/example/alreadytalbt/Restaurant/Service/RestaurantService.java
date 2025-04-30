@@ -26,17 +26,21 @@ public class RestaurantService {
         restaurant.setAddress(restaurantDTO.getAddress());
         restaurant.setVendorId(restaurantDTO.getVendorId());
 
-        List<MenuItem> savedItems = restaurantDTO.getMenuItems().stream().map(dto -> {
-            MenuItem item = new MenuItem();
-            item.setName(dto.getName());
-            item.setPrice(dto.getPrice());
-            item.setDescription(dto.getDescription());
-            return menuItemRepo.save(item); // Save each to MongoDB
-        }).toList();
+        List<MenuItem> savedItems = new ArrayList<>();
+        if (restaurantDTO.getMenuItems() != null) {
+            savedItems = restaurantDTO.getMenuItems().stream().map(dto -> {
+                MenuItem item = new MenuItem();
+                item.setName(dto.getName());
+                item.setPrice(dto.getPrice());
+                item.setDescription(dto.getDescription());
+                return menuItemRepo.save(item);
+            }).toList();
+        }
 
         restaurant.setMenuItems(savedItems);
         return restaurantRepo.save(restaurant);
     }
+
 
 
     public List<MenuItem> getMenu(String restaurantId) {
