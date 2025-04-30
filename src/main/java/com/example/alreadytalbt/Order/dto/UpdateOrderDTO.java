@@ -2,18 +2,20 @@ package com.example.alreadytalbt.Order.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.bson.types.ObjectId;
+
 import java.util.List;
 
 public class UpdateOrderDTO {
 
     @Size(min = 1, max = 50, message = "Customer ID must be between 1 and 50 characters")
-    private String customerId;
+    private ObjectId customerId;
 
     @Size(min = 1, max = 50, message = "Restaurant ID must be between 1 and 50 characters")
-    private String restaurantId;
+    private ObjectId restaurantId;
 
     @Size(min = 1, max = 50, message = "Delivery Guy ID must be between 1 and 50 characters")
-    private String deliveryGuyId;
+    private ObjectId deliveryGuyId;
 
     @NotNull(message = "Items list must not be null")
     @Size(min = 1, message = "Items list must contain at least one item")
@@ -29,7 +31,7 @@ public class UpdateOrderDTO {
 
     public UpdateOrderDTO() {}
 
-    public UpdateOrderDTO(String customerId, String restaurantId, String deliveryGuyId, List<String> items, String status, String paymentMethod) {
+    public UpdateOrderDTO(ObjectId customerId, ObjectId restaurantId, ObjectId deliveryGuyId, List<String> items, String status, String paymentMethod) {
         this.customerId = customerId;
         this.restaurantId = restaurantId;
         this.deliveryGuyId = deliveryGuyId;
@@ -38,27 +40,27 @@ public class UpdateOrderDTO {
         this.paymentMethod = paymentMethod;
     }
 
-    public String getCustomerId() {
+    public ObjectId getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(String customerId) {
+    public void setCustomerId(ObjectId customerId) {
         this.customerId = customerId;
     }
 
-    public String getRestaurantId() {
+    public ObjectId getRestaurantId() {
         return restaurantId;
     }
 
-    public void setRestaurantId(String restaurantId) {
+    public void setRestaurantId(ObjectId restaurantId) {
         this.restaurantId = restaurantId;
     }
 
-    public String getDeliveryGuyId() {
+    public ObjectId getDeliveryGuyId() {
         return deliveryGuyId;
     }
 
-    public void setDeliveryGuyId(String deliveryGuyId) {
+    public void setDeliveryGuyId(ObjectId deliveryGuyId) {
         this.deliveryGuyId = deliveryGuyId;
     }
 

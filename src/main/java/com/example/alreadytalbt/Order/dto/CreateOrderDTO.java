@@ -1,18 +1,21 @@
 package com.example.alreadytalbt.Order.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.bson.types.ObjectId;
+
+
 import java.util.List;
 
 public class CreateOrderDTO {
 
     @NotBlank(message = "Customer ID is required")
-    private String customerId;
+    private ObjectId customerId;
 
     @NotBlank(message = "Restaurant ID is required")
-    private String restaurantId;
+    private ObjectId restaurantId;
 
     @NotBlank(message = "Delivery Guy ID is required")
-    private String deliveryGuyId;
+    private ObjectId deliveryGuyId;
 
     @NotNull(message = "Items list is required")
     private List<String> items;
@@ -24,14 +27,14 @@ public class CreateOrderDTO {
     private String paymentMethod;
 
     // Getters and setters
-    public String getCustomerId() { return customerId; }
-    public void setCustomerId(String customerId) { this.customerId = customerId; }
+    public ObjectId getCustomerId() { return customerId; }
+    public void setCustomerId(ObjectId customerId) { this.customerId = customerId; }
 
-    public String getRestaurantId() { return restaurantId; }
-    public void setRestaurantId(String restaurantId) { this.restaurantId = restaurantId; }
+    public ObjectId getRestaurantId() { return restaurantId; }
+    public void setRestaurantId(ObjectId restaurantId) { this.restaurantId = restaurantId; }
 
-    public String getDeliveryGuyId() { return deliveryGuyId; }
-    public void setDeliveryGuyId(String deliveryGuyId) { this.deliveryGuyId = deliveryGuyId; }
+    public ObjectId getDeliveryGuyId() { return deliveryGuyId; }
+    public void setDeliveryGuyId(ObjectId deliveryGuyId) { this.deliveryGuyId = deliveryGuyId; }
 
     public List<String> getItems() { return items; }
     public void setItems(List<String> items) { this.items = items; }

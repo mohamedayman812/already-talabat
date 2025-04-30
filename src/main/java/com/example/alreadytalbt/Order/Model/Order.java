@@ -1,24 +1,29 @@
 package com.example.alreadytalbt.Order.Model;
 
+
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.List;
 
 @Document(collection = "orders")
 public class Order {
 
     @Id
-    private String id;
-    private String customerId;
-    private String restaurantId;
-    private String deliveryGuyId;
+    private ObjectId id;
+    private ObjectId customerId;
+    private ObjectId restaurantId;
+    @Field("deliveryGuyId")
+    private ObjectId deliveryGuyId;
     private List<String> items;
     private String status;
     private String paymentMethod;
 
     public Order() {}
 
-    public Order(String customerId, String restaurantId, String deliveryGuyId, List<String> items, String status, String paymentMethod) {
+    public Order(ObjectId customerId, ObjectId restaurantId, ObjectId deliveryGuyId, List<String> items, String status, String paymentMethod) {
         this.customerId = customerId;
         this.restaurantId = restaurantId;
         this.deliveryGuyId = deliveryGuyId;
@@ -27,19 +32,35 @@ public class Order {
         this.paymentMethod = paymentMethod;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public ObjectId getId() { return id; }
+    public void setId(ObjectId id) { this.id = id; }
 
-    public String getCustomerId() { return customerId; }
-    public void setCustomerId(String customerId) { this.customerId = customerId; }
+    public ObjectId getCustomerId() { return customerId; }
+    public void setCustomerId(ObjectId customerId) { this.customerId = customerId; }
 
-    public String getRestaurantId() { return restaurantId; }
-    public void setRestaurantId(String restaurantId) { this.restaurantId = restaurantId; }
+    public ObjectId getRestaurantId() { return restaurantId; }
+    public void setRestaurantId(ObjectId restaurantId) { this.restaurantId = restaurantId; }
 
-    public String getDeliveryGuyId() { return deliveryGuyId; }
-    public void setDeliveryGuyId(String deliveryGuyId) { this.deliveryGuyId = deliveryGuyId; }
+    public ObjectId getDeliveryGuyId() { return deliveryGuyId; }
+
+
+    public void setDeliveryGuyId(ObjectId deliveryGuyId) { this.deliveryGuyId = deliveryGuyId; }
 
     public List<String> getItems() { return items; }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id='" + id + '\'' +
+                ", customerId='" + customerId + '\'' +
+                ", restaurantId='" + restaurantId + '\'' +
+                ", deliveryGuyId='" + deliveryGuyId + '\'' +
+                ", items=" + items +
+                ", status='" + status + '\'' +
+                ", paymentMethod='" + paymentMethod + '\'' +
+                '}';
+    }
+
     public void setItems(List<String> items) { this.items = items; }
 
     public String getStatus() { return status; }
