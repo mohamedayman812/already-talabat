@@ -5,6 +5,7 @@ package com.example.alreadytalbt.User.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
@@ -12,16 +13,26 @@ import java.util.List;
 
 public class CreateDeliveryGuyDTO {
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
     @Id
-    private String id; // User ID
+    private ObjectId id;
+
+    public ObjectId getUserId() {
+        return userId;
+    }
+
+    public void setUserId(ObjectId userId) {
+        this.userId = userId;
+    }
+
+    private ObjectId userId;
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
@@ -36,7 +47,7 @@ public class CreateDeliveryGuyDTO {
 
     @NotBlank(message = "Address is required")
     private String address;
-    private List<String> orderIds = new ArrayList<>();
+    private List<ObjectId> orderIds = new ArrayList<>();
 
 
 
@@ -73,11 +84,11 @@ public class CreateDeliveryGuyDTO {
     }
 
 
-    public List<String> getOrderIds() {
+    public List<ObjectId> getOrderIds() {
         return orderIds;
     }
 
-    public void setOrderIds(List<String> orderIds) {
+    public void setOrderIds(List<ObjectId> orderIds) {
         this.orderIds = orderIds;
     }
 

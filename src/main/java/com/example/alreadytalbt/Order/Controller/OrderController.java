@@ -4,6 +4,7 @@ import com.example.alreadytalbt.Order.Service.OrderService;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import jakarta.validation.Valid;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable String id) {
+    public ResponseEntity<Order> getOrderById(@PathVariable ObjectId id) {
         Optional<Order> orderOptional = orderService.getById(id);
         return orderOptional.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -40,7 +41,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable String id, @Valid @RequestBody UpdateOrderDTO orderDTO) {
+    public ResponseEntity<Order> updateOrder(@PathVariable ObjectId id, @Valid @RequestBody UpdateOrderDTO orderDTO) {
         try {
             Order updatedOrder = orderService.updateOrder(id, orderDTO);
             return ResponseEntity.ok(updatedOrder);
@@ -50,7 +51,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
+    public ResponseEntity<Void> deleteOrder(@PathVariable ObjectId id) {
         try {
             orderService.deleteOrder(id);
             return ResponseEntity.noContent().build();
@@ -60,8 +61,9 @@ public class OrderController {
     }
 
     @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-    public ResponseEntity<Order> assignOrderToDeliveryGuy(@PathVariable String orderId,
-                                                                    @PathVariable String deliveryGuyId) {
+    public ResponseEntity<Order> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId,
+                                                                    @PathVariable ObjectId deliveryGuyId) {
+        System.out.println("AAAAAAAA");
         // Call the service to assign the delivery guy and update the order's status
         Order updatedOrder = orderService.assignOrderToDelivery(orderId, deliveryGuyId);
         return ResponseEntity.ok(updatedOrder);  // Return the updated order
@@ -71,12 +73,12 @@ public class OrderController {
 
 
     @GetMapping("/by-delivery/{deliveryGuyId}")
-    public ResponseEntity<List<Order>> getOrdersByDeliveryGuy(@PathVariable String deliveryGuyId) {
+    public ResponseEntity<List<Order>> getOrdersByDeliveryGuy(@PathVariable ObjectId deliveryGuyId) {
         return ResponseEntity.ok(orderService.getOrdersByDeliveryGuy(deliveryGuyId));
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable String orderId,
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable ObjectId orderId,
                                                    @RequestParam String status) {
         try {
             Order updatedOrder = orderService.updateOrderStatus(orderId, status);

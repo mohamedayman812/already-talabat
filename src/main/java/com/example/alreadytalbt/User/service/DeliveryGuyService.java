@@ -10,6 +10,7 @@ import com.example.alreadytalbt.User.model.DeliveryGuy;
 import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.repo.DeliveryGuyRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,27 +34,39 @@ public class DeliveryGuyService {
 
 
     public DeliveryGuy createDeliveryGuy(CreateDeliveryGuyDTO dto) {
-        // Create a new DeliveryGuy and set properties using setters
+        // First, create a User object
+        User user = new User();
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setRole(Role.DELIVERY);
+        user.setAddress(dto.getAddress());
+        user.setPassword(dto.getPassword());
+
+        // Save the User and get the generated ID
+        user = userRepo.save(user);
+
+        // Then, create the DeliveryGuy and link it to the User ID
         DeliveryGuy deliveryGuy = new DeliveryGuy();
-        deliveryGuy.setName(dto.getName());
-        deliveryGuy.setEmail(dto.getEmail());
-        deliveryGuy.setRole(Role.DELIVERY);
-        deliveryGuy.setAddress(dto.getAddress());
-        deliveryGuy.setPassword(dto.getPassword());
-        deliveryGuy.setOrderIds(dto.getOrderIds()); // Ensure DTO has orderIds field
+        deliveryGuy.setName(user.getName());
+        deliveryGuy.setEmail(user.getEmail());
+        deliveryGuy.setRole(user.getRole());
+        deliveryGuy.setAddress(user.getAddress());
+        deliveryGuy.setPassword(user.getPassword());
+        deliveryGuy.setOrderIds(dto.getOrderIds());
+        deliveryGuy.setUserId(user.getId()); // reference to user
 
-        // Save the DeliveryGuy
+        // Save to deliveryGuys collection
         deliveryGuyRepo.save(deliveryGuy);
-        userRepo.save(deliveryGuy);
 
-        // Return the mapped DTO
         return deliveryGuy;
     }
 
 
 
 
-    public Order updateOrderStatus(String orderId, String newStatus) {
+
+
+    public Order updateOrderStatus(ObjectId orderId, String newStatus) {
         return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
@@ -63,7 +76,7 @@ public class DeliveryGuyService {
         return deliveryGuyRepo.findAll();
     }
 
-    public Optional<UpdateDeliveryGuyDTO> updateDeliveryGuy(String id, UpdateDeliveryGuyDTO dto) {
+    public Optional<UpdateDeliveryGuyDTO> updateDeliveryGuy(ObjectId id, UpdateDeliveryGuyDTO dto) {
         Optional<DeliveryGuy> optionalDeliveryGuy = deliveryGuyRepo.findById(id);
 
         if (optionalDeliveryGuy.isPresent()) {
@@ -92,8 +105,8 @@ public class DeliveryGuyService {
 
             // Return a response DTO with the updated fields
             return Optional.of(new UpdateDeliveryGuyDTO(
-                    updated.getId(),
                     updated.getName(),
+                    updated.getPassword(),
                     updated.getEmail(),
                     updated.getAddress(),
                     updated.getOrderIds()
@@ -106,7 +119,7 @@ public class DeliveryGuyService {
 
 
 
-    public boolean deleteDeliveryGuy(String id) {
+    public boolean deleteDeliveryGuy(ObjectId id) {
         if (deliveryGuyRepo.existsById(id)) {
             deliveryGuyRepo.deleteById(id);
             return true;
@@ -114,23 +127,23 @@ public class DeliveryGuyService {
         return false;
     }
 
-    private CreateDeliveryGuyDTO mapToDTO(DeliveryGuy deliveryGuy) {
-        CreateDeliveryGuyDTO dto = new CreateDeliveryGuyDTO();
-        dto.setId(deliveryGuy.getId());
-        dto.setName(deliveryGuy.getName());
-        dto.setEmail(deliveryGuy.getEmail());
-        dto.setPassword(deliveryGuy.getPassword());
-        dto.setAddress(deliveryGuy.getAddress());
-        dto.setOrderIds(deliveryGuy.getOrderIds());
-        return dto;
-    }
+//    private CreateDeliveryGuyDTO mapToDTO(DeliveryGuy deliveryGuy) {
+//        CreateDeliveryGuyDTO dto = new CreateDeliveryGuyDTO();
+//        dto.setId(deliveryGuy.getId());
+//        dto.setName(deliveryGuy.getName());
+//        dto.setEmail(deliveryGuy.getEmail());
+//        dto.setPassword(deliveryGuy.getPassword());
+//        dto.setAddress(deliveryGuy.getAddress());
+//        dto.setOrderIds(deliveryGuy.getOrderIds());
+//        return dto;
+//    }
 
 
 
 
 
 
-    public void assignOrderToDeliveryGuy( String deliveryGuyId,String orderId) {
+    public void assignOrderToDeliveryGuy( ObjectId deliveryGuyId,ObjectId orderId) {
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(deliveryGuyId)
                 .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
 

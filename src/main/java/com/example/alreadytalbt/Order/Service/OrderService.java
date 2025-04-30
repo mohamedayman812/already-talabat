@@ -6,6 +6,8 @@ import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
+
+import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -29,7 +31,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public Optional<Order> getById(String id) {
+    public Optional<Order> getById(ObjectId id) {
         return orderRepository.findById(id);
     }
 
@@ -45,7 +47,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Order updateOrder(String id, UpdateOrderDTO orderDTO) {
+    public Order updateOrder(ObjectId id, UpdateOrderDTO orderDTO) {
         Order existingOrder = orderRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Order not found with id: " + id));
 
@@ -54,7 +56,7 @@ public class OrderService {
         return orderRepository.save(existingOrder);
     }
 
-    public void deleteOrder(String id) {
+    public void deleteOrder(ObjectId id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Order not found with id: " + id));
         orderRepository.delete(order);
@@ -94,11 +96,12 @@ public class OrderService {
 //        return getById(orderId); // Assuming you have a method to fetch an order
 //    }
 
-    public Order assignOrderToDelivery(String orderId, String deliveryGuyId) {
+    public Order assignOrderToDelivery(ObjectId orderId, ObjectId deliveryGuyId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-
+        System.out.println("YARAB");
         order.setDeliveryGuyId(deliveryGuyId);
+        System.out.println(order.toString());
         orderRepository.save(order);
 
         // Call DeliveryGuyService to update delivery guy record
@@ -111,11 +114,11 @@ public class OrderService {
 
 
 
-    public List<Order> getOrdersByDeliveryGuy(String deliveryGuyId) {
+    public List<Order> getOrdersByDeliveryGuy(ObjectId deliveryGuyId) {
         return orderRepository.findByDeliveryGuyId(deliveryGuyId);
     }
 
-    public Order updateOrderStatus(String orderId, String status) {
+    public Order updateOrderStatus(ObjectId orderId, String status) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
             throw new NoSuchElementException("Order not found");

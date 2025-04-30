@@ -1,13 +1,15 @@
 package com.example.alreadytalbt.Order.dto;
 
-public class UpdateOrderStatusDTO {
-    private String orderId;
+import org.bson.types.ObjectId;
 
-    public String getOrderId() {
+public class UpdateOrderStatusDTO {
+    private ObjectId orderId;
+
+    public ObjectId getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(ObjectId orderId) {
         this.orderId = orderId;
     }
 
