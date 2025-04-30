@@ -4,13 +4,15 @@ import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
-import com.example.alreadytalbt.User.model.DeliveryGuy;
-import com.example.alreadytalbt.User.repo.DeliveryGuyRepo;
+import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
+import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.beans.PropertyDescriptor;
 import java.util.*;
@@ -20,6 +22,8 @@ public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private DeliveryGuyFeignClient deliveryFeign;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
@@ -72,29 +76,53 @@ public class OrderService {
         return emptyNames.toArray(result);
     }
 
-    @Autowired
-    private DeliveryGuyRepo deliveryGuyRepo;
 
-    public Order assignDeliveryGuy(String orderId, String deliveryGuyId) {
+
+//    public Optional<Order> assignOrderToDelivery(
+//            @PathVariable("orderId") String orderId,
+//            @PathVariable("deliveryGuyId") String deliveryGuyId)
+//           {
+//               Optional<Order> optionalOrder = orderRepository.findById(orderId);
+//
+//               Order order = optionalOrder.get();
+//               order.setDeliveryGuyId(deliveryGuyId);
+//
+//        // 2. Assign the order to the delivery guy by calling the Feign client for the delivery guy service
+//        feign.assignOrderToDelivery(orderId,deliveryGuyId);
+//
+//
+//        return getById(orderId); // Assuming you have a method to fetch an order
+//    }
+
+    public Order assignOrderToDelivery(String orderId, String deliveryGuyId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        DeliveryGuy deliveryGuy = (DeliveryGuy) deliveryGuyRepo.findById(deliveryGuyId)
-                .orElseThrow(() -> new RuntimeException("Delivery guy not found"));
-
-        // Assign delivery guy to the order
         order.setDeliveryGuyId(deliveryGuyId);
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
 
-        // Append orderId to delivery guy's orderIds list
-        deliveryGuy.addOrderId(orderId);
-        deliveryGuyRepo.save(deliveryGuy);
+        // Call DeliveryGuyService to update delivery guy record
+        deliveryFeign.assignOrderToDeliveryGuy(orderId, deliveryGuyId);
 
-        return savedOrder;
+        return order;
     }
+
+
+
 
 
     public List<Order> getOrdersByDeliveryGuy(String deliveryGuyId) {
         return orderRepository.findByDeliveryGuyId(deliveryGuyId);
     }
+
+    public Order updateOrderStatus(String orderId, String status) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            throw new NoSuchElementException("Order not found");
+        }
+        Order order = optionalOrder.get();
+        order.setStatus(status);
+        return orderRepository.save(order);
+    }
+
 }

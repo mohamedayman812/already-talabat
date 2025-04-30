@@ -3,6 +3,7 @@ package com.example.alreadytalbt.User.service;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.User.Enums.Role;
+import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,9 @@ public class DeliveryGuyService {
     private DeliveryGuyRepo deliveryGuyRepo;
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private OrderFeignClient orderFeignClient;
 
 
 
@@ -45,15 +50,11 @@ public class DeliveryGuyService {
         return deliveryGuy;
     }
 
-    @Autowired
-    private OrderRepository orderRepository; // inject OrderRepository here
+
+
 
     public Order updateOrderStatus(String orderId, String newStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        order.setStatus(newStatus);
-        return orderRepository.save(order);
+        return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
 
@@ -123,5 +124,21 @@ public class DeliveryGuyService {
         dto.setOrderIds(deliveryGuy.getOrderIds());
         return dto;
     }
+
+
+
+
+
+
+    public void assignOrderToDeliveryGuy( String deliveryGuyId,String orderId) {
+        DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(deliveryGuyId)
+                .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
+
+        if (!deliveryGuy.getOrderIds().contains(orderId)) {
+            deliveryGuy.getOrderIds().add(orderId);
+            deliveryGuyRepo.save(deliveryGuy);
+        }
+    }
+
 
 }

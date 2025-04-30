@@ -20,6 +20,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+
     @GetMapping
     public ResponseEntity<List<Order>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
@@ -58,14 +59,32 @@ public class OrderController {
         }
     }
 
-    @PutMapping("/{orderId}/assign-delivery/{deliveryGuyId}")
-    public ResponseEntity<Order> assignDeliveryGuy(@PathVariable String orderId,
-                                                   @PathVariable String deliveryGuyId) {
-        return ResponseEntity.ok(orderService.assignDeliveryGuy(orderId, deliveryGuyId));
+    @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
+    public ResponseEntity<Order> assignOrderToDeliveryGuy(@PathVariable String orderId,
+                                                                    @PathVariable String deliveryGuyId) {
+        // Call the service to assign the delivery guy and update the order's status
+        Order updatedOrder = orderService.assignOrderToDelivery(orderId, deliveryGuyId);
+        return ResponseEntity.ok(updatedOrder);  // Return the updated order
     }
+
+
+
 
     @GetMapping("/by-delivery/{deliveryGuyId}")
     public ResponseEntity<List<Order>> getOrdersByDeliveryGuy(@PathVariable String deliveryGuyId) {
         return ResponseEntity.ok(orderService.getOrdersByDeliveryGuy(deliveryGuyId));
     }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<Order> updateOrderStatus(@PathVariable String orderId,
+                                                   @RequestParam String status) {
+        try {
+            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 }
