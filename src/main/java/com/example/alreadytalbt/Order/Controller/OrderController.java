@@ -58,8 +58,7 @@ public class OrderController {
         }
     }
 
-    @PutMapping("/{order" +
-            "Id}/assign-delivery/{deliveryGuyId}")
+    @PutMapping("/{orderId}/assign-delivery/{deliveryGuyId}")
     public ResponseEntity<Order> assignDeliveryGuy(@PathVariable String orderId,
                                                    @PathVariable String deliveryGuyId) {
         return ResponseEntity.ok(orderService.assignDeliveryGuy(orderId, deliveryGuyId));

@@ -5,7 +5,6 @@ import com.example.alreadytalbt.Order.dto.UpdateOrderStatusDTO;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
-import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.service.DeliveryGuyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,11 @@ public class DeliveryGuyController {
     @Autowired
     private DeliveryGuyService deliveryGuyService;
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<DeliveryGuy> register(@RequestBody CreateDeliveryGuyDTO dto) {
         return ResponseEntity.ok(deliveryGuyService.createDeliveryGuy(dto));
     }
+
 
 
     @PutMapping("/update-order-status")
@@ -35,7 +35,7 @@ public class DeliveryGuyController {
 
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<DeliveryGuy>> getAll() {
         return ResponseEntity.ok(deliveryGuyService.getAll());
     }
 
