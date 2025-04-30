@@ -1,7 +1,6 @@
 package com.example.alreadytalbt.User.controller;
 
 import com.example.alreadytalbt.Order.Model.Order;
-import com.example.alreadytalbt.Order.dto.UpdateOrderStatusDTO;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/delivery")
+@RequestMapping("/api")
 public class DeliveryGuyController {
 
     @Autowired
@@ -25,12 +24,20 @@ public class DeliveryGuyController {
     public ResponseEntity<DeliveryGuy> register(@RequestBody CreateDeliveryGuyDTO dto) {
         return ResponseEntity.ok(deliveryGuyService.createDeliveryGuy(dto));
     }
+    @PutMapping("/delivery/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
+    public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable String orderId, @PathVariable String deliveryGuyId) {
+
+        deliveryGuyService.assignOrderToDeliveryGuy(deliveryGuyId, orderId);
+        return ResponseEntity.ok().build();
+    }
 
 
 
-    @PutMapping("/update-order-status")
-    public ResponseEntity<Order> updateOrderStatus(@RequestBody UpdateOrderStatusDTO dto) {
-        return ResponseEntity.ok(deliveryGuyService.updateOrderStatus(dto.getOrderId(), dto.getNewStatus()));
+
+    @PutMapping("/delivery/{orderId}/status")
+    public ResponseEntity<Order> updateStatus(@PathVariable String orderId, @RequestParam String status)
+    {
+        return ResponseEntity.ok(deliveryGuyService.updateOrderStatus(orderId, status));
     }
 
 
@@ -40,7 +47,7 @@ public class DeliveryGuyController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/delivery/{id}")
     public ResponseEntity<UpdateDeliveryGuyDTO> updateDeliveryGuy(@PathVariable String id, @Valid @RequestBody UpdateDeliveryGuyDTO dto) {
 
         return deliveryGuyService.updateDeliveryGuy(id, dto)
@@ -50,7 +57,7 @@ public class DeliveryGuyController {
 
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delivery/{id}")
     public ResponseEntity<String> deleteDeliveryGuy(@PathVariable String id) {
         boolean deleted = deliveryGuyService.deleteDeliveryGuy(id);
         if (deleted) {
