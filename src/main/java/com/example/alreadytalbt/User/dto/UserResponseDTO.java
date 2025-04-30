@@ -1,16 +1,18 @@
 package com.example.alreadytalbt.User.dto;
 
 
+import org.bson.types.ObjectId;
+
 public class UserResponseDTO {
 
-    private String id;
+    private ObjectId id;
     private String name;
     private String email;
     private String address;
 
     public UserResponseDTO() {}
 
-    public UserResponseDTO(String id, String name, String email, String address) {
+    public UserResponseDTO(ObjectId id, String name, String email, String address) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -34,11 +36,11 @@ public class UserResponseDTO {
         this.email = email;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String Id) {
+    public void setId(ObjectId Id) {
         this.id = Id;
     }
 

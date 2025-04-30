@@ -5,6 +5,7 @@ package com.example.alreadytalbt.User.service;
 import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.dto.UserUpdateDTO;
 import com.example.alreadytalbt.User.repo.UserRepo;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +36,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<UserResponseDTO> getUserById(String id) {
+    public Optional<UserResponseDTO> getUserById(ObjectId id) {
         return userRepository.findById(id)
                 .map(user -> new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getAddress()));
     }
 
-    public Optional<UserResponseDTO> updateUser(String id, UserUpdateDTO updateDTO) {
+    public Optional<UserResponseDTO> updateUser(ObjectId id, UserUpdateDTO updateDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
 
         if (optionalUser.isPresent()) {
@@ -63,7 +64,7 @@ public class UserService {
         return Optional.empty();
     }
 
-    public boolean deleteUser(String id) {
+    public boolean deleteUser(ObjectId id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true;

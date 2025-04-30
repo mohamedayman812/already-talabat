@@ -2,7 +2,9 @@ package com.example.alreadytalbt.User.model;
 
 import com.example.alreadytalbt.User.Enums.Role;
 import jakarta.validation.constraints.NotNull;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,10 +12,11 @@ import jakarta.validation.constraints.Size;
 
 
 @Document(collection = "users")
+@TypeAlias("user")
 public class User {
 
     @Id
-    private String id;
+    private ObjectId id;
 
     @NotBlank(message = "Name is required")
     private String name;
@@ -41,13 +44,14 @@ public class User {
         this.address = address;
     }
 
-// Getters and Setters
+    // Getters and Setters
 
-    public String getId() {
+
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 

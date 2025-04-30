@@ -1,54 +1,84 @@
 package com.example.alreadytalbt.Restaurant.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
+import org.bson.types.ObjectId;
+
 import java.util.List;
 
 public class RestaurantDTO {
-    //shofi 3ayzen ta7otha fen ??
-    @Id
-    private  String Id;
-    @NotBlank(message = "Name must not be blank")
+    private String id;
     private String name;
-
-    @NotBlank(message = "Address must not be blank")
     private String address;
+    private ObjectId vendorId;
+    private List<MenuItemDTO> menuItems;
 
-    private List<MenuItemDTO> menuItems= new ArrayList<>();
+    // Constructors
+    public RestaurantDTO(String id, String name, String address, ObjectId vendorId) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.vendorId = vendorId;
+    }
 
-    private String vendorId;
+    public RestaurantDTO(String id, String name, String address, ObjectId vendorId, List<MenuItemDTO> menuItems) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.vendorId = vendorId;
+        this.menuItems = menuItems;
+    }
+    public RestaurantDTO(){}
 
-    // Getters and Setters
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
-
-    public List<MenuItemDTO> getMenuItems() { return menuItems; }
-    public void setMenuItems(List<MenuItemDTO> menuItems) { this.menuItems = menuItems; }
-
-    public String getVendorId() { return vendorId; }
-    public void setVendorId(String vendorId) { this.vendorId = vendorId; }
+    // Getters and setters...
 
     public String getId() {
-        return Id;
+        return id;
     }
 
     public void setId(String id) {
-        Id = id;
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public ObjectId getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(ObjectId vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public List<MenuItemDTO> getMenuItems() {
+        return menuItems;
+    }
+
+    public void setMenuItems(List<MenuItemDTO> menuItems) {
+        this.menuItems = menuItems;
     }
 
     @Override
     public String toString() {
         return "RestaurantDTO{" +
-                "Id='" + Id + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
+                ", vendorId=" + vendorId +
                 ", menuItems=" + menuItems +
-                ", vendorId='" + vendorId + '\'' +
                 '}';
     }
 }
