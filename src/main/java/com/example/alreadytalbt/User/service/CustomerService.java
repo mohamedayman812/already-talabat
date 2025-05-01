@@ -1,9 +1,11 @@
 package com.example.alreadytalbt.User.service;
 
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
+import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
 import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.model.User;
@@ -48,13 +50,17 @@ public class CustomerService {
         return customerRepo.save(customer);
     }
 
-    public List<Customer> getAllCustomers() {
-        return customerRepo.findAll();
+    public List<CustomerResponseDTO> getAllCustomers() {
+        return customerRepo.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Customer> getCustomerById(ObjectId id) {
-        return customerRepo.findById(id);
+
+    public Optional<CustomerResponseDTO> getCustomerById(ObjectId id) {
+        return customerRepo.findById(id).map(this::mapToResponse);
     }
+
 
     public Optional<Customer> updateCustomer(ObjectId id, UpdateCustomerDTO dto) {
         return customerRepo.findById(id).map(customer -> {
@@ -71,7 +77,30 @@ public class CustomerService {
         return false;
     }
 
-    public List<RestaurantDTO> viewAllRestaurants() {
+    public List<RestaurantResponseDTO> viewAllRestaurants() {
         return restaurantClient.getAllRestaurants();
     }
+
+    private CustomerResponseDTO mapToResponse(Customer customer) {
+        User user = userRepo.findById(customer.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found for customer"));
+
+        CustomerResponseDTO dto = new CustomerResponseDTO();
+        dto.setCustomerId(customer.getId().toHexString());
+        dto.setUserId(user.getId().toHexString());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setAddress(user.getAddress());
+        dto.setOrderIds(
+                customer.getOrderIds() != null
+                        ? customer.getOrderIds().stream()
+                        .map(ObjectId::toHexString)
+                        .toList()
+                        : List.of()
+        );
+
+
+        return dto;
+    }
+
 }
