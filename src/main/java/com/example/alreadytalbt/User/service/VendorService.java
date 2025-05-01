@@ -1,9 +1,7 @@
 package com.example.alreadytalbt.User.service;
 
-import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
+import com.example.alreadytalbt.Restaurant.dto.*;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.dto.VendorCreateDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
@@ -30,7 +28,6 @@ public class VendorService {
 
     @Autowired
     private RestaurantClient restaurantClient;
-
 
 
 
@@ -112,8 +109,6 @@ public class VendorService {
         return responseDTO;
     }
 
-
-
     public VendorResponseDTO updateVendor(ObjectId id, VendorUpdateDto dto) {
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
@@ -137,7 +132,7 @@ public class VendorService {
             restaurantUpdateDTO.setAddress(dto.getRestaurantAddress());
 
             try {
-                restaurantClient.updateRestaurant(vendor.getRestaurantId().toHexString(), restaurantUpdateDTO);
+                restaurantClient.updateRestaurants(vendor.getRestaurantId().toHexString(), restaurantUpdateDTO);
             } catch (Exception e) {
                 System.out.println("Failed to update restaurant: " + e.getMessage());
             }
@@ -153,7 +148,7 @@ public class VendorService {
 
         if (vendor.getRestaurantId() != null) {
             try {
-                restaurantClient.deleteRestaurant(vendor.getRestaurantId().toHexString());
+                restaurantClient.deleteRestaurants(vendor.getRestaurantId().toHexString());
             } catch (Exception e) {
                 System.out.println("Failed to delete restaurant: " + e.getMessage());
             }
@@ -169,7 +164,40 @@ public class VendorService {
         vendorRepository.deleteById(id);
     }
 
+    public MenuItemDTO createMenuItem(ObjectId vendorId, MenuItemCreateDTO dto) {
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
+        if (vendor.getRestaurantId() == null)
+            throw new RuntimeException("Vendor does not have a restaurant");
+
+        dto.setRestaurantId(vendor.getRestaurantId().toHexString());
+        return restaurantClient.createMenuItem(dto);
+    }
+
+    public MenuItemDTO updateMenuItem(String menuItemId, MenuItemUpdateDTO dto, String vendorId) {
+        MenuItemDTO menuItem = restaurantClient.getMenuItemById(menuItemId);
+
+
+        RestaurantResponseDTO restaurant = restaurantClient.getRestaurantById(menuItem.getRestauarantId());
+
+        if (!restaurant.getVendorId().equals(vendorId)) {
+            throw new RuntimeException("Unauthorized: Vendor does not own this menu item.");
+        }
+
+        return restaurantClient.updateMenuItems(menuItemId, dto);
+    }
+
+    public void deleteMenuItem(String menuItemId, String vendorId) {
+        MenuItemDTO menuItem = restaurantClient.getMenuItemById(menuItemId);
+
+        RestaurantResponseDTO restaurant = restaurantClient.getRestaurantById(menuItem.getRestauarantId());
+
+        if (!restaurant.getVendorId().equals(vendorId)) {
+            throw new RuntimeException("Unauthorized: Vendor does not own this menu item.");
+        }
+        restaurantClient.deleteMenuItems(menuItemId);
+    }
 
 
     private VendorResponseDTO mapToResponse(Vendor vendor) {

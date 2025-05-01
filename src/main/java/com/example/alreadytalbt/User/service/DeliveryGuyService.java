@@ -4,7 +4,6 @@ import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;

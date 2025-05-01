@@ -1,6 +1,9 @@
 package com.example.alreadytalbt.User.controller;
 
 
+import com.example.alreadytalbt.Restaurant.dto.MenuItemCreateDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemUpdateDTO;
 import com.example.alreadytalbt.User.dto.VendorCreateDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
 import com.example.alreadytalbt.User.dto.VendorUpdateDto;
@@ -55,6 +58,23 @@ public class VendorController {
     }
 
     //ADD-MENUITEM
+    @PostMapping("/{vendorId}/menuitems")
+    public MenuItemDTO createMenuItem(@PathVariable String vendorId, @RequestBody MenuItemCreateDTO dto) {
+        return vendorService.createMenuItem(new ObjectId(vendorId), dto);
+    }
+
+    //UPDATE-MENUITEM
+    @PutMapping("/{vendorId}/menuitems/{menuItemId}")
+    public MenuItemDTO updateMenuItem(@PathVariable String vendorId,@PathVariable String menuItemId, @RequestBody MenuItemUpdateDTO dto) {
+        return vendorService.updateMenuItem(menuItemId, dto,vendorId);
+    }
+
+    //DELETE-MENUITEM
+    @DeleteMapping("/{vendorId}/menuitems/{menuItemId}")
+    public void deleteMenuItem(@PathVariable String menuItemId,@PathVariable String vendorId) {
+        vendorService.deleteMenuItem(menuItemId,vendorId);
+    }
+
 
 }
 

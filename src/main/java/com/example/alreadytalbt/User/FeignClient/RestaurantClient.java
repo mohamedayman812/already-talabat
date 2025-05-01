@@ -1,11 +1,10 @@
 package com.example.alreadytalbt.User.FeignClient;
 
 
-import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
+import com.example.alreadytalbt.Restaurant.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +19,25 @@ public interface RestaurantClient {
     RestaurantResponseDTO createRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO);
 
     @PutMapping("/api/restaurants/{id}")
-    void updateRestaurant(@PathVariable("id") String id, @RequestBody RestaurantUpdateDto dto);
+    void updateRestaurants(@PathVariable("id") String id, @RequestBody RestaurantUpdateDto dto);
 
 
     @DeleteMapping("/api/restaurants/{id}")
-    void deleteRestaurant(@PathVariable("id") String id);
+    void deleteRestaurants(@PathVariable("id") String id);
 
     @GetMapping("/api/restaurants")
-    List<RestaurantDTO> getAllRestaurants();
+    List<RestaurantResponseDTO> getAllRestaurants();
+
+    @PostMapping("/api/menu-items")
+    MenuItemDTO createMenuItem(@RequestBody MenuItemCreateDTO dto);
+
+    @PutMapping("/api/menu-items/{id}")
+    MenuItemDTO updateMenuItems(@PathVariable String id, @RequestBody MenuItemUpdateDTO dto);
+
+    @DeleteMapping("/api/menu-items/{id}")
+    void deleteMenuItems(@PathVariable String id);
+
+    @GetMapping("/api/menu-items/{menuItemId}")
+    MenuItemDTO getMenuItemById(@PathVariable("menuItemId") String menuItemId);
 
 }
