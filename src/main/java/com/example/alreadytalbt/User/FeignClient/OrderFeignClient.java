@@ -1,6 +1,7 @@
 package com.example.alreadytalbt.User.FeignClient;
 
-import com.example.alreadytalbt.Order.Model.Order;
+import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
+import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import org.bson.types.ObjectId;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import java.util.List;
 public interface OrderFeignClient {
 
     @PutMapping("/api/orders/{orderId}/status")
-    Order updateOrderStatus(@PathVariable("orderId") ObjectId orderId,
+    UpdateOrderDTO updateOrderStatus(@PathVariable("orderId") ObjectId orderId,
                             @RequestParam("status") String status);
 
 
@@ -24,6 +25,14 @@ public interface OrderFeignClient {
 
 
 
+        @PutMapping("/api/orders/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
+        void assignOrderToDeliveryGuy(@PathVariable("orderId") ObjectId orderId,
+                                      @PathVariable("deliveryGuyId") ObjectId deliveryGuyId);
+
+
+
+    @GetMapping("/api/orders/summary")
+    List<OrderSummaryDTO> getOrderSummaries();
 }
 
 

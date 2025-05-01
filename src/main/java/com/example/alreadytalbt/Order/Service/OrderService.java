@@ -3,8 +3,9 @@ package com.example.alreadytalbt.Order.Service;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
+import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
-import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
+//import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 
 import org.bson.types.ObjectId;
@@ -18,14 +19,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.beans.PropertyDescriptor;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private DeliveryGuyFeignClient deliveryFeign;
+//    @Autowired
+//    private DeliveryGuyFeignClient deliveryFeign;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
@@ -105,7 +107,7 @@ public class OrderService {
         orderRepository.save(order);
 
         // Call DeliveryGuyService to update delivery guy record
-        deliveryFeign.assignOrderToDeliveryGuy(orderId, deliveryGuyId);
+       // deliveryFeign.assignOrderToDeliveryGuy(orderId, deliveryGuyId);
 
         return order;
     }
@@ -118,14 +120,33 @@ public class OrderService {
         return orderRepository.findByDeliveryGuyId(deliveryGuyId);
     }
 
-    public Order updateOrderStatus(ObjectId orderId, String status) {
+    public UpdateOrderDTO updateOrderStatus(ObjectId orderId, String status) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
             throw new NoSuchElementException("Order not found");
         }
+
         Order order = optionalOrder.get();
         order.setStatus(status);
-        return orderRepository.save(order);
+
+        Order updatedOrder = orderRepository.save(order);
+        return toDTO(updatedOrder);
     }
+
+    public static UpdateOrderDTO toDTO(Order order) {
+        UpdateOrderDTO dto = new UpdateOrderDTO();
+        //dto.setId(order.getId().toString());
+        dto.setStatus(order.getStatus());
+        return dto;
+    }
+
+    public List<OrderSummaryDTO> getAllOrderSummaries() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(order -> new OrderSummaryDTO(order.getId().toHexString(), order.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+
 
 }

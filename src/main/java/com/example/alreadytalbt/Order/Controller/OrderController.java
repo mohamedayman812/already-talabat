@@ -2,6 +2,7 @@ package com.example.alreadytalbt.Order.Controller;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Service.OrderService;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
+import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import jakarta.validation.Valid;
 import org.bson.types.ObjectId;
@@ -61,12 +62,10 @@ public class OrderController {
     }
 
     @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-    public ResponseEntity<Order> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId,
-                                                                    @PathVariable ObjectId deliveryGuyId) {
-        System.out.println("AAAAAAAA");
-        // Call the service to assign the delivery guy and update the order's status
-        Order updatedOrder = orderService.assignOrderToDelivery(orderId, deliveryGuyId);
-        return ResponseEntity.ok(updatedOrder);  // Return the updated order
+    public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId) {
+
+        orderService.assignOrderToDelivery( orderId,deliveryGuyId);
+        return ResponseEntity.ok().build();
     }
 
 
@@ -78,15 +77,19 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<Order> updateOrderStatus(@PathVariable ObjectId orderId,
+    public ResponseEntity<UpdateOrderDTO> updateOrderStatus(@PathVariable ObjectId orderId,
                                                    @RequestParam String status) {
         try {
-            Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+            UpdateOrderDTO updatedOrder = orderService.updateOrderStatus(orderId, status);
             return ResponseEntity.ok(updatedOrder);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    @GetMapping("/summary")
+    public List<OrderSummaryDTO> getOrderSummaries() {
+        return orderService.getAllOrderSummaries(); // returns List<OrderSummaryDTO>
+    }
 
 }

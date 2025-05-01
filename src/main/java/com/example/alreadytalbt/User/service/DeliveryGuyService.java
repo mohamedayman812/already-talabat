@@ -2,6 +2,8 @@ package com.example.alreadytalbt.User.service;
 
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
+import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
+import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
@@ -47,11 +49,11 @@ public class DeliveryGuyService {
 
         // Then, create the DeliveryGuy and link it to the User ID
         DeliveryGuy deliveryGuy = new DeliveryGuy();
-        deliveryGuy.setName(user.getName());
-        deliveryGuy.setEmail(user.getEmail());
-        deliveryGuy.setRole(user.getRole());
-        deliveryGuy.setAddress(user.getAddress());
-        deliveryGuy.setPassword(user.getPassword());
+//        deliveryGuy.setName(user.getName());
+//        deliveryGuy.setEmail(user.getEmail());
+//        deliveryGuy.setRole(user.getRole());
+//        deliveryGuy.setAddress(user.getAddress());
+//        deliveryGuy.setPassword(user.getPassword());
         deliveryGuy.setOrderIds(dto.getOrderIds());
         deliveryGuy.setUserId(user.getId()); // reference to user
 
@@ -66,7 +68,7 @@ public class DeliveryGuyService {
 
 
 
-    public Order updateOrderStatus(ObjectId orderId, String newStatus) {
+    public UpdateOrderDTO updateOrderStatus(ObjectId orderId, String newStatus) {
         return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
@@ -143,7 +145,7 @@ public class DeliveryGuyService {
 
 
 
-    public void assignOrderToDeliveryGuy( ObjectId deliveryGuyId,ObjectId orderId) {
+    public void assignOrderToDeliveryGuy( ObjectId orderId,ObjectId deliveryGuyId) {
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(deliveryGuyId)
                 .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
 
@@ -151,7 +153,13 @@ public class DeliveryGuyService {
             deliveryGuy.getOrderIds().add(orderId);
             deliveryGuyRepo.save(deliveryGuy);
         }
+        orderFeignClient.assignOrderToDeliveryGuy(orderId,deliveryGuyId);
+
+
     }
 
+    public List<OrderSummaryDTO> getAllOrdersForDeliveryGuy() {
+        return orderFeignClient.getOrderSummaries();
+    }
 
 }

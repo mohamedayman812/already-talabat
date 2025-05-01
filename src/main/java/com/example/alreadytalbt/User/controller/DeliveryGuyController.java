@@ -1,6 +1,8 @@
 package com.example.alreadytalbt.User.controller;
 
 import com.example.alreadytalbt.Order.Model.Order;
+import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
+import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
@@ -28,15 +30,22 @@ public class DeliveryGuyController {
     @PutMapping("/delivery/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
     public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId) {
 
-        deliveryGuyService.assignOrderToDeliveryGuy(deliveryGuyId, orderId);
+        deliveryGuyService.assignOrderToDeliveryGuy( orderId, deliveryGuyId);
         return ResponseEntity.ok().build();
     }
 
 
-
+//    @PutMapping("delivery/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
+//    public ResponseEntity<Order> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId,
+//                                                          @PathVariable ObjectId deliveryGuyId) {
+//        System.out.println("AAAAAAAA");
+//        // Call the service to assign the delivery guy and update the order's status
+//        Order updatedOrder = deliveryGuyService.assignOrderToDelivery(orderId, deliveryGuyId);
+//        return ResponseEntity.ok(updatedOrder);  // Return the updated order
+//    }
 
     @PutMapping("/delivery/{orderId}/status")
-    public ResponseEntity<Order> updateStatus(@PathVariable ObjectId orderId, @RequestParam String status)
+    public ResponseEntity<UpdateOrderDTO> updateStatus(@PathVariable ObjectId orderId, @RequestParam String status)
     {
         return ResponseEntity.ok(deliveryGuyService.updateOrderStatus(orderId, status));
     }
@@ -56,7 +65,10 @@ public class DeliveryGuyController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
+    @GetMapping("/delivery/summary")
+    public ResponseEntity<List<OrderSummaryDTO>> getAllOrderSummaries() {
+        return ResponseEntity.ok(deliveryGuyService.getAllOrdersForDeliveryGuy());
+    }
 
     @DeleteMapping("/delivery/{id}")
     public ResponseEntity<String> deleteDeliveryGuy(@PathVariable ObjectId id) {
@@ -67,5 +79,7 @@ public class DeliveryGuyController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Delivery guy not found.");
         }
     }
+
+
 }
 
