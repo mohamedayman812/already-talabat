@@ -10,20 +10,21 @@ import java.util.List;
 
 @Document(collection = "deliveryGuys")
 @TypeAlias("deliveryGuys")
-public class DeliveryGuy extends User {
-   // private ObjectId Did;
+public class DeliveryGuy {
 
+    @Id
+    private ObjectId deliveryId;
     private ObjectId userId;
 
     private List<ObjectId> orderIds = new ArrayList<>();
 
-//    public ObjectId getDid() {
-//        return Did;
-//    }
+    public ObjectId getDeliveryid() {
+        return deliveryId;
+    }
 
-   // public void setDid(ObjectId did) {
-//        Did = did;
-//    }
+    public void setDeliveryId(ObjectId id) {
+        this.deliveryId = id;
+    }
 
     public ObjectId getUserId() {
         return userId;

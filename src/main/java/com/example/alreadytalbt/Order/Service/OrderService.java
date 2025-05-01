@@ -147,6 +147,9 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public List<Order> getOrdersByCustomerId(ObjectId customerId) {
+        return orderRepository.findByCustomerId(customerId);
+    }
 
 
 }

@@ -13,24 +13,11 @@ import java.util.List;
 
 public class CreateDeliveryGuyDTO {
 
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
 
     @Id
     private ObjectId id;
 
-    public ObjectId getUserId() {
-        return userId;
-    }
 
-    public void setUserId(ObjectId userId) {
-        this.userId = userId;
-    }
 
     private ObjectId userId;
     @NotBlank(message = "Name is required")
@@ -47,10 +34,27 @@ public class CreateDeliveryGuyDTO {
 
     @NotBlank(message = "Address is required")
     private String address;
+
+
+
     private List<ObjectId> orderIds = new ArrayList<>();
 
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
 
 
+    public ObjectId getUserId() {
+        return userId;
+    }
+
+    public void setUserId(ObjectId userId) {
+        this.userId = userId;
+    }
     public String getName() {
         return name;
     }
