@@ -1,10 +1,7 @@
 package com.example.alreadytalbt.User.FeignClient;
 
 
-import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
-import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
+import com.example.alreadytalbt.Restaurant.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
