@@ -16,7 +16,7 @@ import java.util.List;
 public class CartService {
 
     @Autowired
-    private CartRepository cartRepository;
+    private CartRepo cartRepository;
 
     public CartDTO createCart(CreateCartDTO dto) {
         Cart cart = new Cart();
