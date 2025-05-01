@@ -2,6 +2,7 @@ package com.example.alreadytalbt.User.FeignClient;
 
 
 import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
 import jakarta.validation.Valid;
@@ -28,5 +29,8 @@ public interface RestaurantClient {
 
     @GetMapping("/api/restaurants")
     List<RestaurantResponseDTO> getAllRestaurants();
+
+    @GetMapping("/api/menu-items/{menuItemId}")
+    MenuItemDTO getMenuItemById(@PathVariable("menuItemId") String menuItemId);
 
 }

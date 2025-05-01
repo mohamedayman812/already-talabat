@@ -1,5 +1,6 @@
 package com.example.alreadytalbt.User.controller;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
 import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
@@ -68,5 +69,11 @@ public class CustomerController {
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable String restaurantId) {
         return ResponseEntity.ok(restaurantClient.getRestaurantById(restaurantId));
+    }
+
+    @GetMapping("/menu/{id}")
+    public ResponseEntity<MenuItemDTO> menuitemById(@PathVariable String id) {
+        MenuItemDTO menuItem = restaurantClient.getMenuItemById(id);
+        return ResponseEntity.ok(menuItem);
     }
 }
