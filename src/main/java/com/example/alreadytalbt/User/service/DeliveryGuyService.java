@@ -4,12 +4,15 @@ import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
+import com.example.alreadytalbt.User.dto.VendorResponseDTO;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
 import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.repo.DeliveryGuyRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DeliveryGuyService {
@@ -49,11 +53,7 @@ public class DeliveryGuyService {
 
         // Then, create the DeliveryGuy and link it to the User ID
         DeliveryGuy deliveryGuy = new DeliveryGuy();
-//        deliveryGuy.setName(user.getName());
-//        deliveryGuy.setEmail(user.getEmail());
-//        deliveryGuy.setRole(user.getRole());
-//        deliveryGuy.setAddress(user.getAddress());
-//        deliveryGuy.setPassword(user.getPassword());
+
         deliveryGuy.setOrderIds(dto.getOrderIds());
         deliveryGuy.setUserId(user.getId()); // reference to user
 
@@ -74,71 +74,71 @@ public class DeliveryGuyService {
 
 
 
-    public List<DeliveryGuy> getAll() {
-        return deliveryGuyRepo.findAll();
-    }
 
-    public Optional<UpdateDeliveryGuyDTO> updateDeliveryGuy(ObjectId id, UpdateDeliveryGuyDTO dto) {
-        Optional<DeliveryGuy> optionalDeliveryGuy = deliveryGuyRepo.findById(id);
+        public UpdateDeliveryGuyDTO getDeliveryGuyById(ObjectId id) {
+            return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
+        }
 
-        if (optionalDeliveryGuy.isPresent()) {
-            DeliveryGuy deliveryGuy = (DeliveryGuy) optionalDeliveryGuy.get();
 
-            // Update only non-null values from the DTO
-            if (dto.getName() != null) {
-                deliveryGuy.setName(dto.getName());
-            }
-            if (dto.getEmail() != null) {
-                deliveryGuy.setEmail(dto.getEmail());
-            }
-            if (dto.getPassword() != null) {
-                deliveryGuy.setPassword(dto.getPassword());
-            }
-            if (dto.getAddress() != null) {
-                deliveryGuy.setAddress(dto.getAddress());
-            }
+
+    public UpdateDeliveryGuyDTO updateDeliveryGuy(ObjectId id, UpdateDeliveryGuyDTO dto) {
+
+        DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
+
+        User user = userRepo.findById(deliveryGuy.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found for DeliveryGuy"));
+
+        if (dto.getName() != null) user.setName(dto.getName());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        if (dto.getPassword() != null) user.setPassword(dto.getPassword());
+        if (dto.getAddress() != null) user.setAddress(dto.getAddress());
+        userRepo.save(user);
+
+
             if (dto.getOrderIds() != null) {
                 deliveryGuy.setOrderIds(dto.getOrderIds());
             }
 
 
             // Save the updated DeliveryGuy entity
-            DeliveryGuy updated = deliveryGuyRepo.save(deliveryGuy);
+          deliveryGuyRepo.save(deliveryGuy);
 
             // Return a response DTO with the updated fields
-            return Optional.of(new UpdateDeliveryGuyDTO(
-                    updated.getName(),
-                    updated.getPassword(),
-                    updated.getEmail(),
-                    updated.getAddress(),
-                    updated.getOrderIds()
-
-            ));
+            return mapToDTO(deliveryGuy);
         }
 
-        return Optional.empty();
-    }
+
 
 
 
     public boolean deleteDeliveryGuy(ObjectId id) {
+        DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
         if (deliveryGuyRepo.existsById(id)) {
+
+            userRepo.deleteById(deliveryGuy.getUserId());
             deliveryGuyRepo.deleteById(id);
+
             return true;
         }
         return false;
     }
 
-//    private CreateDeliveryGuyDTO mapToDTO(DeliveryGuy deliveryGuy) {
-//        CreateDeliveryGuyDTO dto = new CreateDeliveryGuyDTO();
-//        dto.setId(deliveryGuy.getId());
-//        dto.setName(deliveryGuy.getName());
-//        dto.setEmail(deliveryGuy.getEmail());
-//        dto.setPassword(deliveryGuy.getPassword());
-//        dto.setAddress(deliveryGuy.getAddress());
-//        dto.setOrderIds(deliveryGuy.getOrderIds());
-//        return dto;
-//    }
+    private UpdateDeliveryGuyDTO mapToDTO(DeliveryGuy deliveryGuy) {
+        UpdateDeliveryGuyDTO dto = new UpdateDeliveryGuyDTO();
+        User user = userRepo.findById(deliveryGuy.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found for DeliveryGuy"));
+        dto.setDeliveryid(deliveryGuy.getDeliveryid().toHexString());
+        dto.setUserId(deliveryGuy.getUserId().toHexString());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setAddress(user.getAddress());
+        dto.setPassword(user.getPassword());
+        dto.setOrderIds(deliveryGuy.getOrderIds());
+
+        return dto;
+    }
 
 
 

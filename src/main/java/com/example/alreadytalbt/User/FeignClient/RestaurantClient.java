@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @FeignClient(name = "restaurant-service", url = "${restaurant.service.url}")
 public interface RestaurantClient {
 
@@ -24,5 +26,7 @@ public interface RestaurantClient {
     @DeleteMapping("/api/restaurants/{id}")
     void deleteRestaurant(@PathVariable("id") String id);
 
+    @GetMapping("/api/restaurants")
+    List<RestaurantDTO> getAllRestaurants();
 
 }

@@ -15,19 +15,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/delivery")
 public class DeliveryGuyController {
 
     @Autowired
     private DeliveryGuyService deliveryGuyService;
 
-    @PostMapping("/delivery")
+    @PostMapping
     public ResponseEntity<DeliveryGuy> register(@RequestBody CreateDeliveryGuyDTO dto) {
         return ResponseEntity.ok(deliveryGuyService.createDeliveryGuy(dto));
     }
-    @PutMapping("/delivery/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
+    @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
     public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId) {
 
         deliveryGuyService.assignOrderToDeliveryGuy( orderId, deliveryGuyId);
@@ -44,33 +45,47 @@ public class DeliveryGuyController {
 //        return ResponseEntity.ok(updatedOrder);  // Return the updated order
 //    }
 
-    @PutMapping("/delivery/{orderId}/status")
+    @PutMapping("/{orderId}/status")
     public ResponseEntity<UpdateOrderDTO> updateStatus(@PathVariable ObjectId orderId, @RequestParam String status)
     {
         return ResponseEntity.ok(deliveryGuyService.updateOrderStatus(orderId, status));
     }
 
 
-    @GetMapping
-    public ResponseEntity<List<DeliveryGuy>> getAll() {
-        return ResponseEntity.ok(deliveryGuyService.getAll());
+    @GetMapping("/{id}")
+    public ResponseEntity<UpdateDeliveryGuyDTO> getDeliveryGuyById(@PathVariable ObjectId id) {
+        UpdateDeliveryGuyDTO deliveryGuy = deliveryGuyService.getDeliveryGuyById(id);
+
+        if (deliveryGuy == null) {
+            return ResponseEntity.notFound().build(); // Return 404 if not found
+        }
+
+        return ResponseEntity.ok(deliveryGuy); // Return 200 OK with DeliveryGuy
     }
 
 
-    @PutMapping("/delivery/{id}")
-    public ResponseEntity<UpdateDeliveryGuyDTO> updateDeliveryGuy(@PathVariable ObjectId id, @Valid @RequestBody UpdateDeliveryGuyDTO dto) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UpdateDeliveryGuyDTO> updateDeliveryGuy(
+            @PathVariable ObjectId id,
+            @Valid @RequestBody UpdateDeliveryGuyDTO dto) {
 
-        return deliveryGuyService.updateDeliveryGuy(id, dto)
-                .map(updateddeliveryGuy -> new ResponseEntity<>(updateddeliveryGuy, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            UpdateDeliveryGuyDTO updatedDeliveryGuy = deliveryGuyService.updateDeliveryGuy(id, dto);
+            return ResponseEntity.ok(updatedDeliveryGuy);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @GetMapping("/delivery/summary")
+
+    @GetMapping("/summary")
     public ResponseEntity<List<OrderSummaryDTO>> getAllOrderSummaries() {
         return ResponseEntity.ok(deliveryGuyService.getAllOrdersForDeliveryGuy());
     }
 
-    @DeleteMapping("/delivery/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteDeliveryGuy(@PathVariable ObjectId id) {
         boolean deleted = deliveryGuyService.deleteDeliveryGuy(id);
         if (deleted) {

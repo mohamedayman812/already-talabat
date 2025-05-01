@@ -3,11 +3,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateCustomerDTO {
 
+    @Id
     private ObjectId userId;
 
     @NotBlank(message = "Name is required")

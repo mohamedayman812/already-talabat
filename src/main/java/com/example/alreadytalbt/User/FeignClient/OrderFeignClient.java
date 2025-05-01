@@ -33,6 +33,9 @@ public interface OrderFeignClient {
 
     @GetMapping("/api/orders/summary")
     List<OrderSummaryDTO> getOrderSummaries();
+
+    @GetMapping("/api/orders/customer/{customerId}")
+    List<UpdateOrderDTO> getOrdersByCustomerId(@PathVariable("customerId") ObjectId customerId);
 }
 
 
