@@ -6,15 +6,17 @@ import com.example.alreadytalbt.Restaurant.Repository.MenuItemRepository;
 import com.example.alreadytalbt.Restaurant.Repository.RestaurantRepository;
 import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
-import com.example.alreadytalbt.User.dto.UserResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RestaurantService {
@@ -25,128 +27,160 @@ public class RestaurantService {
     @Autowired
     private MenuItemRepository menuItemRepo;
 
-    public RestaurantDTO addRestaurant(CreateRestaurantDTO restaurantDTO) {
+    public RestaurantResponseDTO addRestaurant(CreateRestaurantDTO restaurantDTO) {
+        if (restaurantDTO == null || !StringUtils.hasText(restaurantDTO.getVendorId())) {
+            throw new IllegalArgumentException("Invalid restaurant data");
+        }
+
         Restaurant restaurant = new Restaurant();
-        System.out.println("stri nngg:"+restaurantDTO.toString());
         restaurant.setName(restaurantDTO.getRestaurantName());
         restaurant.setAddress(restaurantDTO.getRestaurantAddress());
-        System.out.println("vendor in rest :"+ restaurantDTO.getVendorId());
         restaurant.setVendorId(new ObjectId(restaurantDTO.getVendorId()));
+        restaurant.setMenuItems(new ArrayList<>());
 
-        List<MenuItem> savedItems = new ArrayList<>();
+        List<MenuItemDTO> menuDTOs = new ArrayList<>();
+
         if (restaurantDTO.getMenuItems() != null) {
-            savedItems = restaurantDTO.getMenuItems().stream().map(dto -> {
+            for (MenuItemDTO dto : restaurantDTO.getMenuItems()) {
                 MenuItem item = new MenuItem();
                 item.setName(dto.getName());
                 item.setPrice(dto.getPrice());
                 item.setDescription(dto.getDescription());
-                return menuItemRepo.save(item);
-            }).toList();
+                item.setRestaurantId(new ObjectId(dto.getRestauarantId()));
+                MenuItem savedItem = menuItemRepo.save(item);
+
+                restaurant.getMenuItems().add(savedItem.getId());
+                menuDTOs.add(mapToMenuItemDTO(savedItem));
+            }
         }
 
-        restaurant.setMenuItems(savedItems);
         Restaurant saved = restaurantRepo.save(restaurant);
-
-
-        List<MenuItemDTO> menuDTOs = savedItems.stream().map(item ->
-                new MenuItemDTO(item.getName(), item.getPrice(), item.getDescription())
-        ).toList();
-
-        return new RestaurantDTO(
-                saved.getId().toHexString(),
-                saved.getName(),
-                saved.getAddress(),
-                saved.getVendorId(),
-                menuDTOs
-        );
+        return mapToRestaurantDTO(saved, menuDTOs);
     }
 
-    public List<MenuItem> getMenu(String restaurantId) {
-        return restaurantRepo.findById(restaurantId)
-                .map(Restaurant::getMenuItems)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+    public List<MenuItemDTO> getMenuItems(String restaurantId) {
+        if (!StringUtils.hasText(restaurantId)) {
+            throw new IllegalArgumentException("Restaurant ID cannot be empty");
+        }
+
+        Restaurant restaurant = restaurantRepo.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + restaurantId));
+
+        // Convert the list of ObjectIds to MenuItemDTOs
+        List<MenuItemDTO> menuItemDTOs = menuItemRepo.findAllById(restaurant.getMenuItems().stream().collect(Collectors.toList())
+                ).stream()
+                .map(this::mapToMenuItemDTO)  // Assuming mapToMenuItemDTO takes a single MenuItem
+                .collect(Collectors.toList());
+
+        return menuItemDTOs;
     }
 
-    public List<RestaurantDTO> getAllRestaurants() {
-            return restaurantRepo.findAll().stream().map(restaurant -> {
-                List<MenuItemDTO> menuDTOs = restaurant.getMenuItems().stream().map(item ->
-                        new MenuItemDTO(item.getName(), item.getPrice(), item.getDescription())
-                ).toList();
+    public List<RestaurantResponseDTO> getAllRestaurants() {
+        return restaurantRepo.findAll().stream()
+                .map(restaurant -> {
+                    List<MenuItem> items = restaurant.getMenuItems() == null ?
+                            new ArrayList<>() :
+                            menuItemRepo.findAllById(
+                                    new ArrayList<>(restaurant.getMenuItems())
+                            );
 
-                return new RestaurantDTO(
-                        restaurant.getId().toHexString(),
-                        restaurant.getName(),
-                        restaurant.getAddress(),
-                        restaurant.getVendorId(),
-                        menuDTOs
-                );
-            }).toList();
+                    List<MenuItemDTO> menuDTOs = items.stream()
+                            .map(this::mapToMenuItemDTO)
+                            .collect(Collectors.toList());
 
-
+                    return mapToRestaurantDTO(restaurant, menuDTOs);
+                })
+                .collect(Collectors.toList());
     }
 
-    public RestaurantDTO updateRestaurant(String id, RestaurantDTO restaurantDTO) {
+    public Optional<RestaurantResponseDTO> getRestaurantById(String id) {
+        if (!StringUtils.hasText(id)) {
+            return Optional.empty();
+        }
+
+        return restaurantRepo.findById(id)
+                .map(restaurant -> {
+                    List<MenuItemDTO> menuDTOs = new ArrayList<>();
+                    if (restaurant.getMenuItems() != null && !restaurant.getMenuItems().isEmpty()) {
+                        List<MenuItem> items = menuItemRepo.findAllById(
+                                new ArrayList<>(restaurant.getMenuItems())
+                        );
+                        menuDTOs = items.stream()
+                                .map(this::mapToMenuItemDTO)
+                                .collect(Collectors.toList());
+                    }
+
+                    return mapToRestaurantDTO(restaurant, menuDTOs);
+                });
+    }
+
+    public RestaurantResponseDTO updateRestaurant(String id, RestaurantUpdateDto restaurantResponseDTO) {
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Restaurant ID cannot be empty");
+        }
+
         Restaurant restaurant = restaurantRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + id));
 
-        restaurant.setName(restaurantDTO.getName());
-        restaurant.setAddress(restaurantDTO.getAddress());
-        restaurant.setVendorId(restaurantDTO.getVendorId());
+        if (StringUtils.hasText(restaurantResponseDTO.getName())) {
+            restaurant.setName(restaurantResponseDTO.getName());
+        }
+        if (restaurantResponseDTO.getAddress() != null) {  // Assuming price is Float/Double wrapper class
+            restaurant.setAddress(restaurantResponseDTO.getAddress());
+        }
 
-        List<MenuItem> updatedItems = restaurantDTO.getMenuItems().stream().map(dto -> {
-            MenuItem item = new MenuItem();
-            item.setName(dto.getName());
-            item.setPrice(dto.getPrice());
-            item.setDescription(dto.getDescription());
-            return menuItemRepo.save(item);
-        }).toList();
 
-        restaurant.setMenuItems(updatedItems);
         Restaurant saved = restaurantRepo.save(restaurant);
 
-        List<MenuItemDTO> menuDTOs = updatedItems.stream().map(item ->
-                new MenuItemDTO(item.getName(), item.getPrice(), item.getDescription())
-        ).toList();
+        List<MenuItemDTO> menuDTOs = new ArrayList<>();
+        if (restaurant.getMenuItems() != null && !restaurant.getMenuItems().isEmpty()) {
+            menuDTOs = menuItemRepo.findAllById(
+                            new ArrayList<>(restaurant.getMenuItems())
+                    ).stream()
+                    .map(item -> new MenuItemDTO(item.getId().toHexString(),item.getName(), item.getPrice(), item.getDescription(),item.getRestaurantId().toHexString()))
+                    .collect(Collectors.toList());
+        }
 
-        return new RestaurantDTO(
+        return new RestaurantResponseDTO(
                 saved.getId().toHexString(),
                 saved.getName(),
                 saved.getAddress(),
-                saved.getVendorId(),
+                saved.getVendorId().toHexString(),
                 menuDTOs
         );
     }
 
     public void deleteRestaurant(String id) {
-        Restaurant restaurant = restaurantRepo.findById(id).orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("Restaurant ID cannot be empty");
+        }
 
-        restaurant.getMenuItems().forEach(item -> menuItemRepo.deleteById(item.getId()));
+        Restaurant restaurant = restaurantRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + id));
+
+        if (restaurant.getMenuItems() != null && !restaurant.getMenuItems().isEmpty()) {
+            menuItemRepo.deleteAllById(
+                    new ArrayList<>(restaurant.getMenuItems())
+            );
+        }
 
         restaurantRepo.deleteById(id);
     }
-    public Optional<RestaurantDTO> getRestaurantById(String id) {
-
-        if (id == null || id.isEmpty()) {
-            return Optional.empty();
-        }
 
 
-        return restaurantRepo.findById(id)
-                .map(restaurant -> {
 
-                    if (restaurant.getId() == null) {
-                        throw new IllegalStateException("Restaurant exists but has null ID");
-                    }
-
-                    return new RestaurantDTO(
-                            restaurant.getId().toHexString(),
-                            restaurant.getName(),
-                            restaurant.getAddress(),
-                            restaurant.getVendorId()
-                    );
-                });
+    // Helper methods
+    private MenuItemDTO mapToMenuItemDTO(MenuItem item) {
+        return new MenuItemDTO(item.getId().toHexString(),item.getName(), item.getPrice(), item.getDescription(),item.getRestaurantId().toHexString());
     }
 
-
-
+    private RestaurantResponseDTO mapToRestaurantDTO(Restaurant restaurant, List<MenuItemDTO> menuItems) {
+        return new RestaurantResponseDTO(
+                restaurant.getId().toString(),
+                restaurant.getName(),
+                restaurant.getAddress(),
+                restaurant.getVendorId().toHexString(),
+                menuItems
+        );
+    }
 }

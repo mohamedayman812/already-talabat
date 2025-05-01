@@ -1,11 +1,11 @@
 package com.example.alreadytalbt.Restaurant.Controller;
 
 import com.example.alreadytalbt.Restaurant.Model.MenuItem;
-import com.example.alreadytalbt.Restaurant.Model.Restaurant;
 import com.example.alreadytalbt.Restaurant.Service.RestaurantService;
 import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
-import com.example.alreadytalbt.User.dto.UserResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @PostMapping("/add")
-    public ResponseEntity<RestaurantDTO> addRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO) {
+    public ResponseEntity<RestaurantResponseDTO> addRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO) {
         return ResponseEntity.ok(restaurantService.addRestaurant(restaurantDTO));
     }
 
@@ -30,21 +30,21 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurantById(id));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<MenuItem>> getMenu(@PathVariable String id) {
-        return ResponseEntity.ok(restaurantService.getMenu(id));
+    @GetMapping("/menuItems/{id}")
+    public ResponseEntity<List<MenuItemDTO>> getMenu(@PathVariable String id) {
+        return ResponseEntity.ok(restaurantService.getMenuItems(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<RestaurantDTO>> getAll() {
+    public ResponseEntity<List<RestaurantResponseDTO>> getAll() {
         return ResponseEntity.ok(restaurantService.getAllRestaurants());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RestaurantDTO> updateRestaurant(
+    public ResponseEntity<RestaurantResponseDTO> updateRestaurant(
             @PathVariable String id,
-            @RequestBody @Valid RestaurantDTO restaurantDTO) {
-        return ResponseEntity.ok(restaurantService.updateRestaurant(id, restaurantDTO));
+            @RequestBody @Valid RestaurantUpdateDto restaurantResponseDTO) {
+        return ResponseEntity.ok(restaurantService.updateRestaurant(id, restaurantResponseDTO));
     }
 
     @DeleteMapping("/{id}")

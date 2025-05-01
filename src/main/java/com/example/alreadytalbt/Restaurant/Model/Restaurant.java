@@ -15,7 +15,7 @@ public class Restaurant {
     private ObjectId id;
     private String name;
     private String address;
-    private List<MenuItem> menuItems;
+    private List<ObjectId> menuItems;
     private ObjectId vendorId;
     public ObjectId getId() {
         return id;
@@ -41,11 +41,11 @@ public class Restaurant {
         this.address = address;
     }
 
-    public List<MenuItem> getMenuItems() {
+    public List<ObjectId> getMenuItems() {
         return menuItems;
     }
 
-    public void setMenuItems(List<MenuItem> menuItems) {
+    public void setMenuItems(List<ObjectId> menuItems) {
         this.menuItems = menuItems;
     }
 
@@ -57,5 +57,14 @@ public class Restaurant {
         this.vendorId = vendorId;
     }
 
-
+    @Override
+    public String toString() {
+        return "Restaurant{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", menuItems=" + menuItems +
+                ", vendorId=" + vendorId +
+                '}';
+    }
 }

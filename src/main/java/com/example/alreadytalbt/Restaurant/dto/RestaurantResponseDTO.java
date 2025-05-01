@@ -5,29 +5,29 @@ import org.bson.types.ObjectId;
 
 import java.util.List;
 
-public class RestaurantDTO {
+public class RestaurantResponseDTO {
     private String id;
     private String name;
     private String address;
-    private ObjectId vendorId;
+    private String vendorId;
     private List<MenuItemDTO> menuItems;
 
     // Constructors
-    public RestaurantDTO(String id, String name, String address, ObjectId vendorId) {
+    public RestaurantResponseDTO(String id, String name, String address, String vendorId) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.vendorId = vendorId;
     }
 
-    public RestaurantDTO(String id, String name, String address, ObjectId vendorId, List<MenuItemDTO> menuItems) {
+    public RestaurantResponseDTO(String id, String name, String address, String vendorId, List<MenuItemDTO> menuItems) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.vendorId = vendorId;
         this.menuItems = menuItems;
     }
-    public RestaurantDTO(){}
+    public RestaurantResponseDTO(){}
 
     // Getters and setters...
 
@@ -55,11 +55,11 @@ public class RestaurantDTO {
         this.address = address;
     }
 
-    public ObjectId getVendorId() {
+    public String getVendorId() {
         return vendorId;
     }
 
-    public void setVendorId(ObjectId vendorId) {
+    public void setVendorId(String vendorId) {
         this.vendorId = vendorId;
     }
 
