@@ -16,7 +16,6 @@ public class VendorResponseDTO {
 
     // Getters and Setters
 
-
     public String getVendorId() {
         return vendorId;
     }

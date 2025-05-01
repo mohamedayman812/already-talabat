@@ -15,7 +15,7 @@ public class CreateRestaurantDTO {
 
     private List<MenuItemDTO> menuItems= new ArrayList<>();
 
-    private ObjectId vendorId;
+    private String vendorId;
 
     // Getters and Setters
     public String getRestaurantName() {
@@ -44,11 +44,11 @@ public class CreateRestaurantDTO {
         this.menuItems = menuItems;
     }
 
-    public ObjectId getVendorId() {
+    public String getVendorId() {
         return vendorId;
     }
 
-    public void setVendorId(ObjectId vendorId) {
+    public void setVendorId(String vendorId) {
         this.vendorId = vendorId;
     }
 
