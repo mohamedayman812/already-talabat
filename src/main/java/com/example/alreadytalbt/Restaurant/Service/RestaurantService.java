@@ -31,7 +31,7 @@ public class RestaurantService {
         restaurant.setName(restaurantDTO.getRestaurantName());
         restaurant.setAddress(restaurantDTO.getRestaurantAddress());
         System.out.println("vendor in rest :"+ restaurantDTO.getVendorId());
-        restaurant.setVendorId(restaurantDTO.getVendorId());
+        restaurant.setVendorId(new ObjectId(restaurantDTO.getVendorId()));
 
         List<MenuItem> savedItems = new ArrayList<>();
         if (restaurantDTO.getMenuItems() != null) {

@@ -54,7 +54,7 @@ public class VendorService {
         CreateRestaurantDTO restaurantDTO = new CreateRestaurantDTO();
         restaurantDTO.setRestaurantName(dto.getRestaurantName());
         restaurantDTO.setRestaurantAddress(dto.getRestaurantAddress());
-        restaurantDTO.setVendorId(savedVendor.getId());
+        restaurantDTO.setVendorId(savedVendor.getId().toHexString());
 
         System.out.println("Rest dto:: "+restaurantDTO.toString());
         RestaurantDTO createdRestaurant = restaurantClient.createRestaurant(restaurantDTO);
