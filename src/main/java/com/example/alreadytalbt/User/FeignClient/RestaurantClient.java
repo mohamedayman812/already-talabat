@@ -27,6 +27,6 @@ public interface RestaurantClient {
     void deleteRestaurant(@PathVariable("id") String id);
 
     @GetMapping("/api/restaurants")
-    List<RestaurantDTO> getAllRestaurants();
+    List<RestaurantResponseDTO> getAllRestaurants();
 
 }

@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.Order.feign;
+package com.example.alreadytalbt.User.FeignClient;
 
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -1,6 +1,5 @@
 package com.example.alreadytalbt.User.controller;
-
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
 import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
@@ -61,16 +60,13 @@ public class CustomerController {
     private RestaurantClient restaurantClient;
 
     @GetMapping("/restaurants")
-    public ResponseEntity<List<RestaurantDTO>> viewAllRestaurants() {
-        List<RestaurantDTO> restaurants = restaurantClient.getAllRestaurants();
+    public ResponseEntity<List<RestaurantResponseDTO>> viewAllRestaurants() {
+        List<RestaurantResponseDTO> restaurants = restaurantClient.getAllRestaurants();
         return ResponseEntity.ok(restaurants);
     }
 
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId) {
+    public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable String restaurantId) {
         return ResponseEntity.ok(restaurantClient.getRestaurantById(restaurantId));
     }
-
-
-
 }

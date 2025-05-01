@@ -1,6 +1,7 @@
 package com.example.alreadytalbt.User.service;
 
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
@@ -76,7 +77,7 @@ public class CustomerService {
         return false;
     }
 
-    public List<RestaurantDTO> viewAllRestaurants() {
+    public List<RestaurantResponseDTO> viewAllRestaurants() {
         return restaurantClient.getAllRestaurants();
     }
 
