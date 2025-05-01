@@ -6,5 +6,5 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface DeliveryGuyRepo extends MongoRepository<DeliveryGuy, ObjectId> {
-    // Your custom queries or methods can go here
+    DeliveryGuy findByDeliveryId(ObjectId id);
 }
