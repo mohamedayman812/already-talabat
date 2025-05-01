@@ -61,10 +61,6 @@ public class RestaurantService {
         );
     }
 
-
-
-
-
     public List<MenuItem> getMenu(String restaurantId) {
         return restaurantRepo.findById(restaurantId)
                 .map(Restaurant::getMenuItems)

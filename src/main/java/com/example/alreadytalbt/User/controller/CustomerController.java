@@ -3,6 +3,7 @@ package com.example.alreadytalbt.User.controller;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
+import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
 import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.service.CustomerService;
@@ -28,18 +29,18 @@ public class CustomerController {
     }
 
     // READ by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable ObjectId id) {
-        return customerService.getCustomerById(id)
-                .map(customer -> new ResponseEntity<>(customer, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    // READ all customers
     @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
+    public ResponseEntity<List<CustomerResponseDTO>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerResponseDTO> getCustomerById(@PathVariable ObjectId id) {
+        return customerService.getCustomerById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
     // UPDATE
     @PutMapping("/{id}")
@@ -64,4 +65,12 @@ public class CustomerController {
         List<RestaurantDTO> restaurants = restaurantClient.getAllRestaurants();
         return ResponseEntity.ok(restaurants);
     }
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId) {
+        return ResponseEntity.ok(restaurantClient.getRestaurantById(restaurantId));
+    }
+
+
+
 }
