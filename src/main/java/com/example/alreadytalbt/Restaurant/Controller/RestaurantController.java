@@ -3,7 +3,9 @@ package com.example.alreadytalbt.Restaurant.Controller;
 import com.example.alreadytalbt.Restaurant.Model.MenuItem;
 import com.example.alreadytalbt.Restaurant.Model.Restaurant;
 import com.example.alreadytalbt.Restaurant.Service.RestaurantService;
+import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
+import com.example.alreadytalbt.User.dto.UserResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,14 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @PostMapping("/add")
-    public ResponseEntity<Restaurant> addRestaurant(@RequestBody @Valid RestaurantDTO restaurantDTO) {
+    public ResponseEntity<RestaurantDTO> addRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO) {
         return ResponseEntity.ok(restaurantService.addRestaurant(restaurantDTO));
     }
 
+    @GetMapping("/single/{id}")
+    public ResponseEntity<?> getRestaurant(@PathVariable String id) {
+        return ResponseEntity.ok(restaurantService.getRestaurantById(id));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<List<MenuItem>> getMenu(@PathVariable String id) {
@@ -30,12 +36,12 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Restaurant>> getAll() {
+    public ResponseEntity<List<RestaurantDTO>> getAll() {
         return ResponseEntity.ok(restaurantService.getAllRestaurants());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Restaurant> updateRestaurant(
+    public ResponseEntity<RestaurantDTO> updateRestaurant(
             @PathVariable String id,
             @RequestBody @Valid RestaurantDTO restaurantDTO) {
         return ResponseEntity.ok(restaurantService.updateRestaurant(id, restaurantDTO));
@@ -46,5 +52,7 @@ public class RestaurantController {
         restaurantService.deleteRestaurant(id);
         return ResponseEntity.noContent().build();
     }
+
+
 
 }

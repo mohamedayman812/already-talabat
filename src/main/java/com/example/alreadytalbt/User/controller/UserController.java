@@ -6,6 +6,7 @@ import com.example.alreadytalbt.User.dto.UserResponseDTO;
 import com.example.alreadytalbt.User.dto.UserUpdateDTO;
 import com.example.alreadytalbt.User.service.UserService;
 import jakarta.validation.Valid;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable ObjectId id) {
         return userService.getUserById(id)
                 .map(user -> new ResponseEntity<>(user, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -44,7 +45,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
-            @PathVariable String id,
+            @PathVariable ObjectId id,
             @Valid @RequestBody UserUpdateDTO updateDTO) {
 
         return userService.updateUser(id, updateDTO)
@@ -54,7 +55,7 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+    public ResponseEntity<String> deleteUser(@PathVariable ObjectId id) {
         boolean deleted = userService.deleteUser(id);
         if (deleted) {
             return ResponseEntity.ok("User deleted successfully.");

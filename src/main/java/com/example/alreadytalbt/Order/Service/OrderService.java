@@ -3,9 +3,12 @@ package com.example.alreadytalbt.Order.Service;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
+import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
-import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
+//import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
+
+import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -16,20 +19,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.beans.PropertyDescriptor;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private DeliveryGuyFeignClient deliveryFeign;
+//    @Autowired
+//    private DeliveryGuyFeignClient deliveryFeign;
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    public Optional<Order> getById(String id) {
+    public Optional<Order> getById(ObjectId id) {
         return orderRepository.findById(id);
     }
 
@@ -45,7 +49,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Order updateOrder(String id, UpdateOrderDTO orderDTO) {
+    public Order updateOrder(ObjectId id, UpdateOrderDTO orderDTO) {
         Order existingOrder = orderRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Order not found with id: " + id));
 
@@ -54,7 +58,7 @@ public class OrderService {
         return orderRepository.save(existingOrder);
     }
 
-    public void deleteOrder(String id) {
+    public void deleteOrder(ObjectId id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Order not found with id: " + id));
         orderRepository.delete(order);
@@ -94,15 +98,16 @@ public class OrderService {
 //        return getById(orderId); // Assuming you have a method to fetch an order
 //    }
 
-    public Order assignOrderToDelivery(String orderId, String deliveryGuyId) {
+    public Order assignOrderToDelivery(ObjectId orderId, ObjectId deliveryGuyId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-
+        System.out.println("YARAB");
         order.setDeliveryGuyId(deliveryGuyId);
+        System.out.println(order.toString());
         orderRepository.save(order);
 
         // Call DeliveryGuyService to update delivery guy record
-        deliveryFeign.assignOrderToDeliveryGuy(orderId, deliveryGuyId);
+       // deliveryFeign.assignOrderToDeliveryGuy(orderId, deliveryGuyId);
 
         return order;
     }
@@ -111,18 +116,37 @@ public class OrderService {
 
 
 
-    public List<Order> getOrdersByDeliveryGuy(String deliveryGuyId) {
+    public List<Order> getOrdersByDeliveryGuy(ObjectId deliveryGuyId) {
         return orderRepository.findByDeliveryGuyId(deliveryGuyId);
     }
 
-    public Order updateOrderStatus(String orderId, String status) {
+    public UpdateOrderDTO updateOrderStatus(ObjectId orderId, String status) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
             throw new NoSuchElementException("Order not found");
         }
+
         Order order = optionalOrder.get();
         order.setStatus(status);
-        return orderRepository.save(order);
+
+        Order updatedOrder = orderRepository.save(order);
+        return toDTO(updatedOrder);
     }
+
+    public static UpdateOrderDTO toDTO(Order order) {
+        UpdateOrderDTO dto = new UpdateOrderDTO();
+        //dto.setId(order.getId().toString());
+        dto.setStatus(order.getStatus());
+        return dto;
+    }
+
+    public List<OrderSummaryDTO> getAllOrderSummaries() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(order -> new OrderSummaryDTO(order.getId().toHexString(), order.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+
 
 }

@@ -1,47 +1,27 @@
 package com.example.alreadytalbt.User.dto;
 
+
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.annotation.Id;
 
-public class VendorDTO {
+public class VendorUpdateDto {
 
-    @Id
-    private String id; // User ID
-
-    @NotBlank(message = "Name is required")
-    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
 
-    @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
+    @Size(min = 6, max = 100)
     private String password;
 
-    @NotBlank(message = "Address is required")
     private String address;
 
-
-    @NotBlank(message = "Restaurant name is required")
     private String restaurantName;
 
-    @NotBlank(message = "Restaurant address is required")
     private String restaurantAddress;
 
-    private String restaurantId;
-
     // Getters and Setters
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -75,14 +55,6 @@ public class VendorDTO {
         this.address = address;
     }
 
-    public String getRestaurantAddress() {
-        return restaurantAddress;
-    }
-
-    public void setRestaurantAddress(String restaurantAddress) {
-        this.restaurantAddress = restaurantAddress;
-    }
-
     public String getRestaurantName() {
         return restaurantName;
     }
@@ -91,11 +63,11 @@ public class VendorDTO {
         this.restaurantName = restaurantName;
     }
 
-    public String getRestaurantId() {
-        return restaurantId;
+    public String getRestaurantAddress() {
+        return restaurantAddress;
     }
 
-    public void setRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurantAddress(String restaurantAddress) {
+        this.restaurantAddress = restaurantAddress;
     }
 }

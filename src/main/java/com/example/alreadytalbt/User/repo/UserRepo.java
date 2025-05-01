@@ -3,11 +3,10 @@ package com.example.alreadytalbt.User.repo;
 
 
 import com.example.alreadytalbt.User.model.User;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
-
-public interface UserRepo extends MongoRepository<User, String> {
-    List<User> findByRole(String role);
+public interface UserRepo extends MongoRepository<User, ObjectId> {
+    boolean existsByEmail(String email);
+    User findByEmail(String email);
 }
-

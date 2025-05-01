@@ -13,6 +13,12 @@ public class MenuItemDTO {
 
     private String description;
 
+    public MenuItemDTO(String name, float price, String description) {
+        this.name=name;
+        this.price=price;
+        this.description=description;
+    }
+
     // Getters and Setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
