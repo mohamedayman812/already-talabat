@@ -1,5 +1,6 @@
 package com.example.alreadytalbt.Restaurant.Model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.*;
@@ -7,17 +8,18 @@ import jakarta.validation.constraints.*;
 @Document(collection = "menuItem")
 public class MenuItem {
     @Id
-    private String id;
+    private ObjectId id;
     private String name;
     private float price;
     private String description;
+    private ObjectId restaurantId;
 
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -45,6 +47,11 @@ public class MenuItem {
         this.description = description;
     }
 
+    public ObjectId getRestaurantId() {
+        return restaurantId;
+    }
 
-
+    public void setRestaurantId(ObjectId restaurantId) {
+        this.restaurantId = restaurantId;
+    }
 }

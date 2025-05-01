@@ -2,7 +2,7 @@ package com.example.alreadytalbt.User.FeignClient;
 
 
 import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 public interface RestaurantClient {
 
     @GetMapping("/api/restaurants/single/{id}")
-    RestaurantDTO getRestaurantById(@PathVariable("id") String id);
+    RestaurantResponseDTO getRestaurantById(@PathVariable("id") String id);
 
     @PostMapping("/api/restaurants/add")
-    RestaurantDTO createRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO);
+    RestaurantResponseDTO createRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO);
 
     @PutMapping("/api/restaurants/{id}")
     void updateRestaurant(@PathVariable("id") String id, @RequestBody RestaurantUpdateDto dto);

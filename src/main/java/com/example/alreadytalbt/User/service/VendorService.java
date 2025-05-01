@@ -3,7 +3,7 @@ package com.example.alreadytalbt.User.service;
 import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantDTO;
+import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.dto.VendorCreateDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
@@ -56,11 +56,7 @@ public class VendorService {
         restaurantDTO.setRestaurantAddress(dto.getRestaurantAddress());
         restaurantDTO.setVendorId(savedVendor.getId().toHexString());
 
-        System.out.println("Rest dto:: "+restaurantDTO.toString());
-        RestaurantDTO createdRestaurant = restaurantClient.createRestaurant(restaurantDTO);
-        System.out.println(createdRestaurant.toString());
-        System.out.println("Rest ID: " + (createdRestaurant.getId() != null ? createdRestaurant.getId() : "null"));
-
+        RestaurantResponseDTO createdRestaurant = restaurantClient.createRestaurant(restaurantDTO);
         ObjectId restID = new ObjectId(createdRestaurant.getId());
         savedVendor.setRestaurantId(restID);
         vendorRepository.save(savedVendor);
@@ -68,7 +64,7 @@ public class VendorService {
         return mapToResponse(savedVendor);
     }
 
-    public RestaurantDTO getVendorRestaurant(String restaurantId) {
+    public RestaurantResponseDTO getVendorRestaurant(String restaurantId) {
         return restaurantClient.getRestaurantById(restaurantId);
     }
 
@@ -86,15 +82,15 @@ public class VendorService {
     }
 
     public VendorResponseDTO getVendorWithUser(ObjectId vendorId) {
-        // Fetch vendor by ID
+
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        // Fetch user by vendor.userId
+
         User user = userRepo.findById(vendor.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found for vendor"));
 
-        // Map to response DTO
+
         VendorResponseDTO responseDTO = new VendorResponseDTO();
         responseDTO.setVendorId(vendor.getId().toHexString());
         responseDTO.setUserId(user.getId().toHexString());
@@ -102,10 +98,10 @@ public class VendorService {
         responseDTO.setEmail(user.getEmail());
         responseDTO.setRestaurantId(vendor.getRestaurantId().toHexString());
 
-        // If you have a restaurant client call here (optional)
+
         if (vendor.getRestaurantId() != null) {
             try {
-                RestaurantDTO restaurant = restaurantClient.getRestaurantById(vendor.getRestaurantId().toHexString());
+                RestaurantResponseDTO restaurant = restaurantClient.getRestaurantById(vendor.getRestaurantId().toHexString());
                 responseDTO.setRestaurantName(restaurant.getName());
                 responseDTO.setRestaurantAddress(restaurant.getAddress());
             } catch (Exception e) {
@@ -122,7 +118,7 @@ public class VendorService {
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        // Update User fields
+
         User user = userRepo.findById(vendor.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found for vendor"));
 
@@ -136,6 +132,7 @@ public class VendorService {
                 (dto.getRestaurantName() != null || dto.getRestaurantAddress() != null)) {
 
             RestaurantUpdateDto restaurantUpdateDTO = new RestaurantUpdateDto();
+
             restaurantUpdateDTO.setName(dto.getRestaurantName());
             restaurantUpdateDTO.setAddress(dto.getRestaurantAddress());
 
@@ -153,7 +150,7 @@ public class VendorService {
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        // Delete restaurant if exists
+
         if (vendor.getRestaurantId() != null) {
             try {
                 restaurantClient.deleteRestaurant(vendor.getRestaurantId().toHexString());
@@ -162,28 +159,18 @@ public class VendorService {
             }
         }
 
-        // Delete user associated with vendor
         try {
             userRepo.deleteById(vendor.getUserId());
         } catch (Exception e) {
             System.out.println("Failed to delete user: " + e.getMessage());
         }
 
-        // Finally, delete vendor
+
         vendorRepository.deleteById(id);
     }
 
 
-//    private VendorCreateDTO mapToDTO(Vendor vendor) {
-//        VendorCreateDTO dto = new VendorCreateDTO();
-//        dto.setId(vendor.getId());
-//        dto.setName(vendor.getName());
-//        dto.setEmail(vendor.getEmail());
-//        dto.setPassword(vendor.getPassword());
-//        dto.setAddress(vendor.getAddress());
-//        dto.setRestaurantId(vendor.getRestaurantId());
-//        return dto;
-//    }
+
 
     private VendorResponseDTO mapToResponse(Vendor vendor) {
         VendorResponseDTO dto = new VendorResponseDTO();
@@ -196,7 +183,7 @@ public class VendorService {
         dto.setRestaurantId(vendor.getRestaurantId().toHexString());
         if (vendor.getRestaurantId() != null) {
             try {
-                RestaurantDTO restaurant = restaurantClient.getRestaurantById(vendor.getRestaurantId().toHexString());
+                RestaurantResponseDTO restaurant = restaurantClient.getRestaurantById(vendor.getRestaurantId().toHexString());
                 dto.setRestaurantName(restaurant.getName());
                 dto.setRestaurantAddress(restaurant.getAddress());
             } catch (Exception e) {

@@ -1,25 +1,44 @@
 package com.example.alreadytalbt.Restaurant.Controller;
 
+
 import com.example.alreadytalbt.Restaurant.Service.MenuItemService;
-import com.example.alreadytalbt.Restaurant.Service.RestaurantService;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemCreateDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemUpdateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/menu")
+@RequestMapping("/api/menu-items")
 public class MenuItemController {
 
     @Autowired
     private MenuItemService menuItemService;
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteMenuItem(@PathVariable String id) {
-        menuItemService.deleteMenuItem(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping
+    public ResponseEntity<MenuItemDTO> addMenuItem(@RequestBody MenuItemCreateDTO dto) {
+        MenuItemDTO created = menuItemService.addMenuItem(dto);
+        return ResponseEntity.ok(created);
+    }
+
+    @PutMapping("/{menuItemId}")
+    public ResponseEntity<MenuItemDTO> updateMenuItem(@PathVariable String menuItemId, @RequestBody MenuItemUpdateDTO dto) {
+        MenuItemDTO updated = menuItemService.updateMenuItem(menuItemId, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{menuItemId}")
+    public ResponseEntity<String> deleteMenuItem(@PathVariable String menuItemId) {
+        menuItemService.deleteMenuItem(menuItemId);
+        return ResponseEntity.ok("Menu item deleted successfully.");
+    }
+
+    @GetMapping("/{menuItemId}")
+    public ResponseEntity<MenuItemDTO> getMenuItem(@PathVariable String menuItemId) {
+        return menuItemService.getMenuItemById(menuItemId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
 
