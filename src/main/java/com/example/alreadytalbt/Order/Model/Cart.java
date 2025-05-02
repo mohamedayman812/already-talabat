@@ -9,44 +9,27 @@ import java.util.List;
 
 @Document(collection = "carts")
 public class Cart {
-//we need the customer id to refrence the customer id in the customer table
-    //the id must be object
-    //it should refrece/hold the menuitems?
     @Id
     private ObjectId id;
 
     private ObjectId customerId;
 
-    private List<MenuItemDTO> items;
+    private List<ObjectId> menuItemIds;
 
     public Cart() {}
 
-    public Cart(ObjectId customerId, List<MenuItemDTO> items) {
+    public Cart(ObjectId customerId, List<ObjectId> menuItemIds) {
         this.customerId = customerId;
-        this.items = items;
+        this.menuItemIds = menuItemIds;
     }
 
-    public ObjectId getId() {
-        return id;
-    }
+    public ObjectId getId() { return id; }
+    public void setId(ObjectId id) { this.id = id; }
 
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
+    public ObjectId getCustomerId() { return customerId; }
+    public void setCustomerId(ObjectId customerId) { this.customerId = customerId; }
 
-    public ObjectId getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(ObjectId customerId) {
-        this.customerId = customerId;
-    }
-
-    public List<MenuItemDTO> getItems() {
-        return items;
-    }
-
-    public void setItems(List<MenuItemDTO> items) {
-        this.items = items;
-    }
+    public List<ObjectId> getMenuItemIds() { return menuItemIds; }
+    public void setMenuItemIds(List<ObjectId> menuItemIds) { this.menuItemIds = menuItemIds; }
 }
+

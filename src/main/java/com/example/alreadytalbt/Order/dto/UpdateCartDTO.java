@@ -4,14 +4,15 @@ import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import java.util.List;
 
 public class UpdateCartDTO {
-    private List<MenuItemDTO> items;
+
+    private List<String> menuItemIds;
 
     // Getters and setters
-    public List<MenuItemDTO> getItems() {
-        return items;
+    public List<String> getMenuItemIds() {
+        return menuItemIds;
     }
 
-    public void setItems(List<MenuItemDTO> items) {
-        this.items = items;
+    public void setMenuItemIds(List<String> menuItemIds) {
+        this.menuItemIds = menuItemIds;
     }
 }

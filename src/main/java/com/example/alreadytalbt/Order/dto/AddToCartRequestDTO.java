@@ -1,13 +1,19 @@
 package com.example.alreadytalbt.Order.dto;
 
-import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
-
-import java.util.Arrays;
 import java.util.List;
 
-public class CreateCartDTO {
+public class AddToCartRequestDTO {
+
     private String customerId;
     private List<String> menuItemIds;
+
+    public AddToCartRequestDTO() {
+    }
+
+    public AddToCartRequestDTO(String customerId, List<String> menuItemIds) {
+        this.customerId = customerId;
+        this.menuItemIds = menuItemIds;
+    }
 
     public String getCustomerId() {
         return customerId;

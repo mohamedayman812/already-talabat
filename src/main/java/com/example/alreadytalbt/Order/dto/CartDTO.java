@@ -6,30 +6,15 @@ import java.util.List;
 public class CartDTO {
     private String id;
     private String customerId;
-    private List<MenuItemDTO> items;
+    private List<String> menuItemIds;
 
-    // Getters and setters
-    public String getId() {
-        return id;
-    }
+    // Getters & Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getCustomerId() { return customerId; }
+    public void setCustomerId(String customerId) { this.customerId = customerId; }
 
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public List<MenuItemDTO> getItems() {
-        return items;
-    }
-
-    public void setItems(List<MenuItemDTO> items) {
-        this.items = items;
-    }
+    public List<String> getMenuItemIds() { return menuItemIds; }
+    public void setMenuItemIds(List<String> menuItemIds) { this.menuItemIds = menuItemIds; }
 }
