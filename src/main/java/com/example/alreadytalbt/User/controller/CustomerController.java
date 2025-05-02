@@ -2,6 +2,7 @@ package com.example.alreadytalbt.User.controller;
 import com.example.alreadytalbt.Order.dto.AddToCartRequestDTO;
 import com.example.alreadytalbt.Order.dto.CartDTO;
 import com.example.alreadytalbt.Order.dto.CartWithItemsDTO;
+import com.example.alreadytalbt.Order.dto.RemoveFromCartRequestDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
@@ -66,12 +67,14 @@ public class CustomerController {
     @Autowired
     private RestaurantClient restaurantClient;
 
-    //view all restraunts
+    //view all restraunts..it shows all the restraunts and the menu items inside it
     @GetMapping("/restaurants")
     public ResponseEntity<List<RestaurantResponseDTO>> viewAllRestaurants() {
         List<RestaurantResponseDTO> restaurants = restaurantClient.getAllRestaurants();
         return ResponseEntity.ok(restaurants);
     }
+
+
      // view a specific restraunt
     @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable String restaurantId) {
@@ -95,6 +98,14 @@ public class CustomerController {
         return ResponseEntity.ok(updatedCart);
     }
 
+    //Delete an item from a cart
+    @PostMapping("/cart/remove-item")
+    public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto) {
+        CartDTO updatedCart = cartClient.removeItemFromCart(dto);
+        return ResponseEntity.ok(updatedCart);
+    }
+
+
     //view a cart with its items details
     @GetMapping("/cart/{customerId}/details")
     public ResponseEntity<CartWithItemsDTO> getCartWithDetails(@PathVariable String customerId) {
@@ -117,6 +128,7 @@ public class CustomerController {
         cartClient.deleteCart(customerId);
         return ResponseEntity.noContent().build();
     }
+
 
 
 

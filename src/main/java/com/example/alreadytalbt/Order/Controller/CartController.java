@@ -44,4 +44,11 @@ public class CartController {
         return ResponseEntity.ok(cartService.addItemsToCart(dto));
     }
 
+    @PostMapping("/remove-item")
+    public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto) {
+        return ResponseEntity.ok(cartService.removeItemFromCart(dto));
+    }
+
+
+
 }

@@ -57,6 +57,10 @@ public interface OrderFeignClient {
     void deleteCart(@PathVariable("customerId") String customerId);
 
 
+    @PostMapping("/api/carts/remove-item")
+    CartDTO removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto);
+
+
 
 
 }
