@@ -54,9 +54,12 @@ public class CartService {
             }
 
             ObjectId menuId = new ObjectId(menuItemId);
-            if (!cart.getMenuItemIds().contains(menuId)) {
-                cart.getMenuItemIds().add(menuId);
+            if (cart.getMenuItemIds().contains(menuId)) {
+                throw new RuntimeException("Menu item already in cart: " + menuItemId);
             }
+
+            cart.getMenuItemIds().add(menuId);
+
         }
 
         return toDTO(cartRepository.save(cart));
