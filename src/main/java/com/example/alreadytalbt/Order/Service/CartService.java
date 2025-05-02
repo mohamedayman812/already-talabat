@@ -118,13 +118,21 @@ public class CartService {
 
     public CartDTO removeItemFromCart(RemoveFromCartRequestDTO dto) {
         Cart cart = cartRepository.findByCustomerId(new ObjectId(dto.getCustomerId()));
-        if (cart == null) throw new RuntimeException("Cart not found");
+        if (cart == null) {
+            throw new RuntimeException("Cart not found for customer ID: " + dto.getCustomerId());
+        }
 
         ObjectId itemId = new ObjectId(dto.getMenuItemId());
-        cart.getMenuItemIds().removeIf(id -> id.equals(itemId));
+
+        if (!cart.getMenuItemIds().contains(itemId)) {
+            throw new RuntimeException("Item not found in cart: " + dto.getMenuItemId());
+        }
+
+        cart.getMenuItemIds().remove(itemId);
 
         return toDTO(cartRepository.save(cart));
     }
+
 
 
 
