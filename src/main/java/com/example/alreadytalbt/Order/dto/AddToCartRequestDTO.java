@@ -5,14 +5,25 @@ import java.util.List;
 public class AddToCartRequestDTO {
 
     private String customerId;
+
+    private String restaurantId;
     private List<String> menuItemIds;
 
     public AddToCartRequestDTO() {
     }
 
-    public AddToCartRequestDTO(String customerId, List<String> menuItemIds) {
+    public AddToCartRequestDTO(String customerId, String restaurantId,List<String> menuItemIds) {
         this.customerId = customerId;
+        this.restaurantId = restaurantId;
         this.menuItemIds = menuItemIds;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     public String getCustomerId() {

@@ -42,6 +42,7 @@ public class OrderService {
                 orderDTO.getCustomerId(),
                 orderDTO.getRestaurantId(),
                 orderDTO.getDeliveryGuyId(),
+                orderDTO.getCartId(),
                 orderDTO.getItems(),
                 orderDTO.getStatus(),
                 orderDTO.getPaymentMethod()
@@ -141,7 +142,9 @@ public class OrderService {
     }
 
     public List<OrderSummaryDTO> getAllOrderSummaries() {
+        System.out.println("ana f service1");
         List<Order> orders = orderRepository.findAll();
+        System.out.println("ana f service");
         return orders.stream()
                 .map(order -> new OrderSummaryDTO(order.getId().toHexString(), order.getStatus()))
                 .collect(Collectors.toList());

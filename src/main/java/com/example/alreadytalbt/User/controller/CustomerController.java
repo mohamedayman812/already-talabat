@@ -1,8 +1,6 @@
 package com.example.alreadytalbt.User.controller;
-import com.example.alreadytalbt.Order.dto.AddToCartRequestDTO;
-import com.example.alreadytalbt.Order.dto.CartDTO;
-import com.example.alreadytalbt.Order.dto.CartWithItemsDTO;
-import com.example.alreadytalbt.Order.dto.RemoveFromCartRequestDTO;
+import com.example.alreadytalbt.Order.Model.Order;
+import com.example.alreadytalbt.Order.dto.*;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
@@ -129,6 +127,12 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @PostMapping("/cart/submit/{cartId}/paymentMethod")
+    public ResponseEntity<CreateOrderDTO> submitOrder(@PathVariable String cartId, @RequestParam String paymentMethod) {
+        CreateOrderDTO order = cartClient.submitOrder(cartId, paymentMethod);
+        return ResponseEntity.ok(order);
+    }
 
 
 

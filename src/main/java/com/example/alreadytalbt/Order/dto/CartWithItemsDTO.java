@@ -6,9 +6,19 @@ import java.util.List;
 public class CartWithItemsDTO {
     private String id;
     private String customerId;
+    private String restaurantId;
     private List<MenuItemDTO> items;
 
     // Getters and setters
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
     public String getId() {
         return id;
     }

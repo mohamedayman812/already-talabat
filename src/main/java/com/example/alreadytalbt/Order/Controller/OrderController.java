@@ -89,6 +89,7 @@ public class OrderController {
 
     @GetMapping("/summary")
     public List<OrderSummaryDTO> getOrderSummaries() {
+        System.out.println("ana f controller");
         return orderService.getAllOrderSummaries(); // returns List<OrderSummaryDTO>
     }
 

@@ -14,11 +14,14 @@ public class CreateOrderDTO {
     @NotBlank(message = "Restaurant ID is required")
     private ObjectId restaurantId;
 
+    @NotBlank(message = "Cart ID is required")
+    private ObjectId cartId;
+
     @NotBlank(message = "Delivery Guy ID is required")
     private ObjectId deliveryGuyId;
 
     @NotNull(message = "Items list is required")
-    private List<String> items;
+    private List<ObjectId> items;
 
     @NotBlank(message = "Status is required")
     private String status;
@@ -27,6 +30,15 @@ public class CreateOrderDTO {
     private String paymentMethod;
 
     // Getters and setters
+
+    public ObjectId getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(ObjectId cartId) {
+        this.cartId = cartId;
+    }
+
     public ObjectId getCustomerId() { return customerId; }
     public void setCustomerId(ObjectId customerId) { this.customerId = customerId; }
 
@@ -36,8 +48,8 @@ public class CreateOrderDTO {
     public ObjectId getDeliveryGuyId() { return deliveryGuyId; }
     public void setDeliveryGuyId(ObjectId deliveryGuyId) { this.deliveryGuyId = deliveryGuyId; }
 
-    public List<String> getItems() { return items; }
-    public void setItems(List<String> items) { this.items = items; }
+    public List<ObjectId> getItems() { return items; }
+    public void setItems(List<ObjectId> items) { this.items = items; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

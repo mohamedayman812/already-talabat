@@ -6,6 +6,7 @@ import java.util.List;
 public class UpdateCartDTO {
 
     private List<String> menuItemIds;
+    private String restaurantId;
 
     // Getters and setters
     public List<String> getMenuItemIds() {
@@ -14,5 +15,13 @@ public class UpdateCartDTO {
 
     public void setMenuItemIds(List<String> menuItemIds) {
         this.menuItemIds = menuItemIds;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

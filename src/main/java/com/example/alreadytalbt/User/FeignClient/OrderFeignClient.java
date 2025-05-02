@@ -1,8 +1,10 @@
 package com.example.alreadytalbt.User.FeignClient;
 
+import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.dto.*;
 import org.bson.types.ObjectId;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -59,6 +61,11 @@ public interface OrderFeignClient {
 
     @PostMapping("/api/carts/remove-item")
     CartDTO removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto);
+
+
+    @PostMapping("/api/carts/submit/{cartId}")
+    CreateOrderDTO submitOrder(@PathVariable("cartId") String cartId,
+                               @RequestParam("paymentMethod") String paymentMethod);
 
 
 

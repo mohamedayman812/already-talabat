@@ -8,6 +8,7 @@ import java.util.List;
 public class CreateCartDTO {
     private String customerId;
     private List<String> menuItemIds;
+    private String restaurantId;
 
     public String getCustomerId() {
         return customerId;
@@ -23,5 +24,13 @@ public class CreateCartDTO {
 
     public void setMenuItemIds(List<String> menuItemIds) {
         this.menuItemIds = menuItemIds;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

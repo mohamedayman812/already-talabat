@@ -14,13 +14,25 @@ public class Cart {
 
     private ObjectId customerId;
 
+    private ObjectId restaurantId;
+
     private List<ObjectId> menuItemIds;
 
     public Cart() {}
 
-    public Cart(ObjectId customerId, List<ObjectId> menuItemIds) {
+    public Cart(ObjectId id, ObjectId customerId, ObjectId restaurantId, List<ObjectId> menuItemIds) {
+        this.id = id;
         this.customerId = customerId;
+        this.restaurantId = restaurantId;
         this.menuItemIds = menuItemIds;
+    }
+
+    public ObjectId getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(ObjectId restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     public ObjectId getId() { return id; }

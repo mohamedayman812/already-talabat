@@ -17,19 +17,31 @@ public class Order {
     private ObjectId restaurantId;
     @Field("deliveryGuyId")
     private ObjectId deliveryGuyId;
-    private List<String> items;
+
+    private ObjectId cartId;
+    private List<ObjectId> items;
     private String status;
     private String paymentMethod;
 
     public Order() {}
 
-    public Order(ObjectId customerId, ObjectId restaurantId, ObjectId deliveryGuyId, List<String> items, String status, String paymentMethod) {
+    public Order(ObjectId customerId, ObjectId restaurantId, ObjectId deliveryGuyId, ObjectId cartId, List<ObjectId> items, String status, String paymentMethod) {
+
         this.customerId = customerId;
         this.restaurantId = restaurantId;
         this.deliveryGuyId = deliveryGuyId;
+        this.cartId = cartId;
         this.items = items;
         this.status = status;
         this.paymentMethod = paymentMethod;
+    }
+
+    public ObjectId getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(ObjectId cartId) {
+        this.cartId = cartId;
     }
 
     public ObjectId getId() { return id; }
@@ -46,7 +58,7 @@ public class Order {
 
     public void setDeliveryGuyId(ObjectId deliveryGuyId) { this.deliveryGuyId = deliveryGuyId; }
 
-    public List<String> getItems() { return items; }
+    public List<ObjectId> getItems() { return items; }
 
     @Override
     public String toString() {
@@ -61,7 +73,7 @@ public class Order {
                 '}';
     }
 
-    public void setItems(List<String> items) { this.items = items; }
+    public void setItems(List<ObjectId> items) { this.items = items; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

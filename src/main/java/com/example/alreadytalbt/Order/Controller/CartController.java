@@ -1,7 +1,9 @@
 package com.example.alreadytalbt.Order.Controller;
 
+import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.dto.*;
 import com.example.alreadytalbt.Order.Service.CartService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,8 @@ public class CartController {
 //    public ResponseEntity<CartDTO> createCart(@RequestBody CreateCartDTO dto) {
 //        return ResponseEntity.ok(cartService.createCart(dto));
 //    }
+
+
 
     @GetMapping("/{customerId}")
     public ResponseEntity<CartWithItemsDTO> getCartByCustomerIdwithdetails(@PathVariable String customerId) {
@@ -36,11 +40,13 @@ public class CartController {
 
     @DeleteMapping("/{customerId}")
     public ResponseEntity<Void> deleteCart(@PathVariable String customerId) {
+        System.out.println("ana fel delete");
         cartService.deleteCart(customerId);
         return ResponseEntity.noContent().build();
     }
     @PostMapping("/add-items")
     public ResponseEntity<CartDTO> addItemsToCart(@RequestBody AddToCartRequestDTO dto) {
+        System.out.println("ana f cpnt cart");
         return ResponseEntity.ok(cartService.addItemsToCart(dto));
     }
 
@@ -48,6 +54,14 @@ public class CartController {
     public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto) {
         return ResponseEntity.ok(cartService.removeItemFromCart(dto));
     }
+
+    @PostMapping("submit/{cartId}")
+    public ResponseEntity<CreateOrderDTO> submitOrder(@PathVariable String cartId,
+                                                      @RequestParam String paymentMethod) {
+        CreateOrderDTO order = cartService.submitOrder(cartId,paymentMethod);
+        return ResponseEntity.ok(order);
+    }
+
 
 
 

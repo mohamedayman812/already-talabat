@@ -11,6 +11,9 @@ public class UpdateOrderDTO {
     @Size(min = 1, max = 50, message = "Customer ID must be between 1 and 50 characters")
     private ObjectId customerId;
 
+    @Size(min = 1, max = 50, message = "Customer ID must be between 1 and 50 characters")
+    private ObjectId cartId;
+
     @Size(min = 1, max = 50, message = "Restaurant ID must be between 1 and 50 characters")
     private ObjectId restaurantId;
 
@@ -31,13 +34,14 @@ public class UpdateOrderDTO {
 
     public UpdateOrderDTO() {}
 
-    public UpdateOrderDTO(ObjectId customerId, ObjectId restaurantId, ObjectId deliveryGuyId, List<String> items, String status, String paymentMethod) {
-        this.customerId = customerId;
-        this.restaurantId = restaurantId;
-        this.deliveryGuyId = deliveryGuyId;
-        this.items = items;
-        this.status = status;
-        this.paymentMethod = paymentMethod;
+
+
+    public ObjectId getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(ObjectId cartId) {
+        this.cartId = cartId;
     }
 
     public ObjectId getCustomerId() {

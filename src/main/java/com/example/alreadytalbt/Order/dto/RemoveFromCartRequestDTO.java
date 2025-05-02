@@ -4,12 +4,15 @@ public class RemoveFromCartRequestDTO {
     private String customerId;
     private String menuItemId;
 
+    private String restaurantId;
+
     // Constructors (optional)
     public RemoveFromCartRequestDTO() {}
 
-    public RemoveFromCartRequestDTO(String customerId, String menuItemId) {
+    public RemoveFromCartRequestDTO(String customerId,String restaurantId ,String menuItemId ) {
         this.customerId = customerId;
         this.menuItemId = menuItemId;
+        this.restaurantId = restaurantId;
     }
 
     // Getters and Setters
@@ -27,5 +30,13 @@ public class RemoveFromCartRequestDTO {
 
     public void setMenuItemId(String menuItemId) {
         this.menuItemId = menuItemId;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }
