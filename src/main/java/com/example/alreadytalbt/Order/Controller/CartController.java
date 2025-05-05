@@ -15,12 +15,6 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-//    @PostMapping
-//    public ResponseEntity<CartDTO> createCart(@RequestBody CreateCartDTO dto) {
-//        return ResponseEntity.ok(cartService.createCart(dto));
-//    }
-
-
 
     @GetMapping("/{customerId}")
     public ResponseEntity<CartWithItemsDTO> getCartByCustomerIdwithdetails(@PathVariable String customerId) {
@@ -46,7 +40,6 @@ public class CartController {
     }
     @PostMapping("/add-items")
     public ResponseEntity<CartDTO> addItemsToCart(@RequestBody AddToCartRequestDTO dto) {
-        System.out.println("ana f cpnt cart");
         return ResponseEntity.ok(cartService.addItemsToCart(dto));
     }
 

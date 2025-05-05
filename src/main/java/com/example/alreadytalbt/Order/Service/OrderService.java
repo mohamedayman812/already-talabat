@@ -3,6 +3,7 @@ package com.example.alreadytalbt.Order.Service;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 //import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
@@ -13,9 +14,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.beans.PropertyDescriptor;
 import java.util.*;
@@ -33,9 +36,12 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public Optional<Order> getById(ObjectId id) {
-        return orderRepository.findById(id);
+    public OrderResponseDTO getById(ObjectId id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        return convertToDto(order);
     }
+
 
     public Order createOrder(CreateOrderDTO orderDTO) {
         Order order = new Order(
@@ -115,30 +121,22 @@ public class OrderService {
 
 
 
-
-
     public List<Order> getOrdersByDeliveryGuy(ObjectId deliveryGuyId) {
         return orderRepository.findByDeliveryGuyId(deliveryGuyId);
     }
 
-    public UpdateOrderDTO updateOrderStatus(ObjectId orderId, String status) {
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+    public OrderResponseDTO updateOrderStatus(String orderId, String status) {
+
+        Optional<Order> optionalOrder = orderRepository.findById(new ObjectId(orderId));
         if (optionalOrder.isEmpty()) {
-            throw new NoSuchElementException("Order not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order with ID " + orderId + " not found");
         }
 
         Order order = optionalOrder.get();
         order.setStatus(status);
 
         Order updatedOrder = orderRepository.save(order);
-        return toDTO(updatedOrder);
-    }
-
-    public static UpdateOrderDTO toDTO(Order order) {
-        UpdateOrderDTO dto = new UpdateOrderDTO();
-        //dto.setId(order.getId().toString());
-        dto.setStatus(order.getStatus());
-        return dto;
+        return convertToDto(updatedOrder);
     }
 
     public List<OrderSummaryDTO> getAllOrderSummaries() {
@@ -153,6 +151,40 @@ public class OrderService {
     public List<Order> getOrdersByCustomerId(ObjectId customerId) {
         return orderRepository.findByCustomerId(customerId);
     }
+
+    public List<OrderResponseDTO> getOrdersByRestaurantId(ObjectId restaurantId) {
+        return orderRepository.findByRestaurantId(restaurantId)
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+
+
+    public static UpdateOrderDTO toDTO(Order order) {
+        UpdateOrderDTO dto = new UpdateOrderDTO();
+        //dto.setId(order.getId().toString());
+        dto.setStatus(order.getStatus());
+        return dto;
+    }
+
+    private OrderResponseDTO convertToDto(Order order) {
+        OrderResponseDTO dto = new OrderResponseDTO();
+        dto.setId(order.getId().toHexString());
+        dto.setRestaurantId(order.getRestaurantId().toHexString());
+        dto.setCustomerId(order.getCustomerId().toHexString());
+        dto.setDeliveryGuyId(order.getDeliveryGuyId()==null? "":order.getDeliveryGuyId().toHexString());
+        dto.setStatus(order.getStatus());
+        List<String> itemIds = order.getItems()
+                .stream()
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toList());
+        dto.setItems(itemIds);
+        dto.setPaymentMethod(order.getPaymentMethod());
+        return dto;
+    }
+
+
 
 
 }

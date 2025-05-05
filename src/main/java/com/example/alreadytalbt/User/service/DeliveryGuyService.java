@@ -2,6 +2,7 @@ package com.example.alreadytalbt.User.service;
 
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
@@ -37,9 +38,8 @@ public class DeliveryGuyService {
 
 
 
-
-
     public DeliveryGuy createDeliveryGuy(CreateDeliveryGuyDTO dto) {
+
         // First, create a User object
         User user = new User();
         user.setName(dto.getName());
@@ -68,16 +68,17 @@ public class DeliveryGuyService {
 
 
 
-    public UpdateOrderDTO updateOrderStatus(ObjectId orderId, String newStatus) {
+    public OrderResponseDTO updateOrderStatus(String orderId, String newStatus) {
+        System.out.println("new staus: "+newStatus);
         return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
 
 
 
-        public UpdateDeliveryGuyDTO getDeliveryGuyById(ObjectId id) {
-            return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
-        }
+    public UpdateDeliveryGuyDTO getDeliveryGuyById(ObjectId id) {
+        return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
+    }
 
 
 

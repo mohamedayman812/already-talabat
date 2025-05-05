@@ -1,6 +1,7 @@
 package com.example.alreadytalbt.User.controller;
 
 import com.example.alreadytalbt.Order.Model.Order;
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
@@ -46,7 +47,7 @@ public class DeliveryGuyController {
 //    }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<UpdateOrderDTO> updateStatus(@PathVariable ObjectId orderId, @RequestParam String status)
+    public ResponseEntity<OrderResponseDTO> updateStatus(@PathVariable String orderId, @RequestParam String status)
     {
         return ResponseEntity.ok(deliveryGuyService.updateOrderStatus(orderId, status));
     }
