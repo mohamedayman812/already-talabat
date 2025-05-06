@@ -12,17 +12,10 @@ import java.util.List;
 public interface OrderFeignClient {
 
     @PutMapping("/api/orders/{orderId}/status")
-    UpdateOrderDTO updateOrderStatus(@PathVariable("orderId") ObjectId orderId,
+    OrderResponseDTO updateOrderStatus(@PathVariable("orderId") String orderId,
                             @RequestParam("status") String status);
 
 
-//    @GetMapping("/by-delivery/{deliveryGuyId}")
-//    List<Order> getOrdersByDeliveryGuy(@PathVariable("deliveryGuyId") ObjectId deliveryGuyId);
-
-//    @PutMapping("/api/orders/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-//    Order assignOrderToDelivery(@PathVariable("deliveryGuyId") String deliveryGuyId,
-//            @PathVariable("orderId") String orderId
-//            );
 
 
     //Order-related
@@ -35,8 +28,6 @@ public interface OrderFeignClient {
 
     @GetMapping("/api/orders/customer/{customerId}")
     List<UpdateOrderDTO> getOrdersByCustomerId(@PathVariable("customerId") ObjectId customerId);
-
-
 
     // Cart-related
     @PostMapping("/api/carts")
@@ -67,8 +58,11 @@ public interface OrderFeignClient {
     CreateOrderDTO submitOrder(@PathVariable("cartId") String cartId,
                                @RequestParam("paymentMethod") String paymentMethod);
 
+    @GetMapping("/api/orders/restaurant/{restaurantId}")
+    List<OrderResponseDTO> getOrdersByRestaurantId(@PathVariable("restaurantId") String restaurantId);
 
-
+    @GetMapping("/api/orders/{id}")
+    OrderResponseDTO getOrderById(@PathVariable String id);
 
 }
 

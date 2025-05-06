@@ -2,6 +2,7 @@ package com.example.alreadytalbt.Order.Controller;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Service.OrderService;
 import com.example.alreadytalbt.Order.dto.CreateOrderDTO;
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import jakarta.validation.Valid;
@@ -29,10 +30,13 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable ObjectId id) {
-        Optional<Order> orderOptional = orderService.getById(id);
-        return orderOptional.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable String id) {
+        try {
+            OrderResponseDTO order = orderService.getById(new ObjectId(id));
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -77,10 +81,10 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<UpdateOrderDTO> updateOrderStatus(@PathVariable ObjectId orderId,
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,
                                                    @RequestParam String status) {
         try {
-            UpdateOrderDTO updatedOrder = orderService.updateOrderStatus(orderId, status);
+            OrderResponseDTO updatedOrder = orderService.updateOrderStatus(orderId, status);
             return ResponseEntity.ok(updatedOrder);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
@@ -98,5 +102,18 @@ public class OrderController {
         List<Order> orders = orderService.getOrdersByCustomerId(customerId);
         return ResponseEntity.ok(orders);
     }
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByRestaurantId(@PathVariable String restaurantId) {
+        try {
+            ObjectId id = new ObjectId(restaurantId);
+            List<OrderResponseDTO> orders = orderService.getOrdersByRestaurantId(id);
+            return ResponseEntity.ok(orders);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
 
 }

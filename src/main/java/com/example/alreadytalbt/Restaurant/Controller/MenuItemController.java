@@ -36,7 +36,6 @@ public class MenuItemController {
 
     @GetMapping("/{menuItemId}")
     public ResponseEntity<MenuItemDTO> getMenuItem(@PathVariable String menuItemId) {
-        System.out.println("hii");
         return menuItemService.getMenuItemById(menuItemId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

@@ -1,6 +1,8 @@
 package com.example.alreadytalbt.User.controller;
 
 
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
+import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemCreateDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemUpdateDTO;
@@ -74,6 +76,20 @@ public class VendorController {
     public void deleteMenuItem(@PathVariable String menuItemId,@PathVariable String vendorId) {
         vendorService.deleteMenuItem(menuItemId,vendorId);
     }
+
+    @GetMapping("/order/{vendorId}")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByVendorId(@PathVariable String vendorId) {
+        List<OrderResponseDTO> orders = vendorService.getOrder(vendorId);
+        return ResponseEntity.ok(orders);
+    }
+
+    @PutMapping("/{vendorId}/status/{orderId}")
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,@PathVariable String vendorId)
+    {
+        System.out.println("ven:"+vendorId);
+        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendorId));
+    }
+
 
 
 }

@@ -153,8 +153,6 @@ public class CartService {
 
 
     public CreateOrderDTO submitOrder(String cartId, String paymentMethod) {
-        System.out.println("yaarab");
-        System.out.println(cartId);
         ObjectId cartIdObject = new ObjectId(cartId);
         Cart cart = cartRepository.findById(cartIdObject)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
