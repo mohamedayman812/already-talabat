@@ -8,7 +8,7 @@ import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
 import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
 import com.example.alreadytalbt.User.model.Customer;
-import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.model.User;
 import com.example.alreadytalbt.User.repo.CustomerRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
@@ -39,7 +39,9 @@ public class CustomerService {
         user.setPassword(dto.getPassword());
         user.setAddress(dto.getAddress());
         user.setRole(Role.CUSTOMER);
-
+        user.setName("Default");
+        user.setAddress("Unknown");
+        user.setPhone("0000000000");
         User savedUser = userRepo.save(user);
 
         // Create and save Customer with reference to User

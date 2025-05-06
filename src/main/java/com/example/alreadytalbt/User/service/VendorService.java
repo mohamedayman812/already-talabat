@@ -6,7 +6,7 @@ import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.dto.VendorCreateDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
 import com.example.alreadytalbt.User.dto.VendorUpdateDto;
-import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.model.User;
 import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import com.example.alreadytalbt.User.repo.VendorRepo;
@@ -39,6 +39,9 @@ public class VendorService {
         //nb2a n hash el password
         user.setPassword(dto.getPassword());
         user.setRole(Role.VENDOR);
+        user.setName("Default");
+        user.setAddress("Unknown");
+        user.setPhone("0000000000");
         User savedUser = userRepo.save(user);
 
         //Create and save the Vendor

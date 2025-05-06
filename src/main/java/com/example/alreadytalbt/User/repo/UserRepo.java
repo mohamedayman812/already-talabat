@@ -2,7 +2,7 @@ package com.example.alreadytalbt.User.repo;
 
 
 
-import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.model.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
