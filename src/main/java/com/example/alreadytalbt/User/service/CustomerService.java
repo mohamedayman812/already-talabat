@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public class CustomerService {
 
     private CustomerResponseDTO mapToResponse(Customer customer) {
         User user = userRepo.findById(customer.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found for customer"));
+                .orElseThrow(() -> new handleEntityNotFound("User not found for customer"));
 
         CustomerResponseDTO dto = new CustomerResponseDTO();
         dto.setCustomerId(customer.getId().toHexString());
