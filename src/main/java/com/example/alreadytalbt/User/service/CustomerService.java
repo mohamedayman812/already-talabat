@@ -4,11 +4,15 @@ import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
+import com.example.alreadytalbt.User.auth.JwtUtil;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
 import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
+import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.model.Customer;
-import com.example.alreadytalbt.model.User;
+
+import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.repo.CustomerRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
@@ -32,25 +36,26 @@ public class CustomerService {
     @Autowired
     private RestaurantClient restaurantClient;
 
-    public Customer createCustomer(CreateCustomerDTO dto) {
-        // Create and save base user
-        User user = new User();
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setAddress(dto.getAddress());
-        user.setRole(Role.CUSTOMER);
-        user.setName("Default");
-        user.setAddress("Unknown");
-        user.setPhone("0000000000");
-        User savedUser = userRepo.save(user);
+    @Autowired
+    private JwtUtil jwtUtil;
 
-        // Create and save Customer with reference to User
+    public CustomerResponseDTO createCustomer(CreateCustomerDTO dto, String token) {
+        String userId = jwtUtil.extractUserId(token);
+
+        // Optional: check that user role is CUSTOMER
+        User user = userRepo.findById(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getRole() != Role.CUSTOMER) {
+            throw new RuntimeException("User is not a customer");
+        }
+
         Customer customer = new Customer();
-        customer.setUserId(savedUser.getId());
+        customer.setUserId(new ObjectId(userId));
         customer.setOrderIds(dto.getOrderIds());
 
-        return customerRepo.save(customer);
+        customerRepo.save(customer);
+
+        return mapToResponse(customer);
     }
 
     public List<CustomerResponseDTO> getAllCustomers() {
@@ -86,12 +91,12 @@ public class CustomerService {
 
     private CustomerResponseDTO mapToResponse(Customer customer) {
         User user = userRepo.findById(customer.getUserId())
-                .orElseThrow(() -> new handleEntityNotFound("User not found for customer"));
+                .orElseThrow(() -> new RuntimeException(("User not found for customer")));
 
         CustomerResponseDTO dto = new CustomerResponseDTO();
         dto.setCustomerId(customer.getId().toHexString());
         dto.setUserId(user.getId().toHexString());
-        dto.setName(user.getName());
+        dto.setName(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setAddress(user.getAddress());
         dto.setOrderIds(
@@ -101,6 +106,7 @@ public class CustomerService {
                         .toList()
                         : List.of()
         );
+        dto.setPhone(user.getPhone());
 
 
         return dto;

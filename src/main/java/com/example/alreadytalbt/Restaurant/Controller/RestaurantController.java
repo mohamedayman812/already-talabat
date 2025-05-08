@@ -8,7 +8,9 @@ import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,9 +23,15 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @PostMapping("/add")
-    public ResponseEntity<RestaurantResponseDTO> addRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO) {
-        return ResponseEntity.ok(restaurantService.addRestaurant(restaurantDTO));
+    public ResponseEntity<?> addRestaurant(@RequestBody @Valid CreateRestaurantDTO restaurantDTO) {
+        try {
+            return ResponseEntity.ok(restaurantService.addRestaurant(restaurantDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
     }
+
+
 
     @GetMapping("/single/{id}")
     public ResponseEntity<?> getRestaurant(@PathVariable String id) {

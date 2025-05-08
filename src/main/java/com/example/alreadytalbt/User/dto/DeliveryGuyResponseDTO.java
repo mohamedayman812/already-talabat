@@ -1,32 +1,55 @@
 package com.example.alreadytalbt.User.dto;
 
 
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 
-public class UserRequestDTO {
+import java.util.ArrayList;
+import java.util.List;
 
-    @NotBlank(message = "Name is required")
+public class DeliveryGuyResponseDTO {
+
+
+    @Id
+    private String id;
+
+
+    private String userId;
     private String name;
 
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
-    private String password;
 
-    @NotBlank(message = "Address is required")
+
     private String address;
 
-    @NotBlank(message = "Phone is required")
+
     private String phone;
 
-    // Getters and Setters
 
 
+    private List<String> orderIds = new ArrayList<>();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
     public String getName() {
         return name;
     }
@@ -43,13 +66,7 @@ public class UserRequestDTO {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getAddress() {
         return address;
@@ -57,6 +74,16 @@ public class UserRequestDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+
+    public List<String> getOrderIds() {
+        return orderIds;
+    }
+
+
+    public void setOrderIds(List<String> orderIds) {
+        this.orderIds = orderIds;
     }
 
     public String getPhone() {
@@ -67,4 +94,3 @@ public class UserRequestDTO {
         this.phone = phone;
     }
 }
-

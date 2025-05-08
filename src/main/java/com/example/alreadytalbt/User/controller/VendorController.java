@@ -6,6 +6,7 @@ import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemCreateDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemUpdateDTO;
+import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.VendorCreateDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
 import com.example.alreadytalbt.User.dto.VendorUpdateDto;
@@ -28,9 +29,16 @@ public class VendorController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<VendorResponseDTO> createVendor(@RequestBody @Valid VendorCreateDTO dto) {
-        VendorResponseDTO vendor = vendorService.createVendor(dto);
-        return new ResponseEntity<>(vendor, HttpStatus.CREATED);
+    public ResponseEntity<?> createVendor(@RequestBody VendorCreateDTO dto,
+                                                          @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            VendorResponseDTO vendor = vendorService.createVendor(dto,token);
+            return new ResponseEntity<>(vendor, HttpStatus.CREATED);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
     }
 
     // READ by ID

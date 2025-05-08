@@ -1,14 +1,12 @@
 package com.example.alreadytalbt.User.controller;
 
-import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
-import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
-import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
-import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
+import com.example.alreadytalbt.User.dto.*;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
 import com.example.alreadytalbt.User.service.DeliveryGuyService;
 import jakarta.validation.Valid;
+import org.aspectj.weaver.patterns.IToken;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,10 +22,16 @@ public class DeliveryGuyController {
 
     @Autowired
     private DeliveryGuyService deliveryGuyService;
-
+    // CREATE
     @PostMapping
-    public ResponseEntity<DeliveryGuy> register(@RequestBody CreateDeliveryGuyDTO dto) {
-        return ResponseEntity.ok(deliveryGuyService.createDeliveryGuy(dto));
+    public ResponseEntity<?> register(@RequestBody CreateDeliveryGuyDTO dto,
+                                                @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            return ResponseEntity.ok(deliveryGuyService.createDeliveryGuy(dto, token));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
     }
     @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
     public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId) {

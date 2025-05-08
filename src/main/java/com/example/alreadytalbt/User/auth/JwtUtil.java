@@ -1,9 +1,11 @@
-package com.example.alreadytalbt.auth;
+package com.example.alreadytalbt.User.auth;
 
+import com.example.alreadytalbt.security.UserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,19 +44,23 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        String userIdFromToken = extractUserId(token);
+        if (userDetails instanceof UserDetails) {
+            String userIdFromDetails = ((UserDetail) userDetails).getUserId();
+            return userIdFromToken.equals(userIdFromDetails) && !isTokenExpired(token);
+        }
+        return false;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(ObjectId id) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, id);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, ObjectId subject) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject)
+                .setSubject(subject.toHexString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -68,4 +74,12 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+    public String extractUserId(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+//    public String extractUserId(String token) {
+//        Claims claims = extractAllClaims(token);
+//        return claims.getSubject(); // Assuming you stored user ID as the subject
+//    }
+
 }

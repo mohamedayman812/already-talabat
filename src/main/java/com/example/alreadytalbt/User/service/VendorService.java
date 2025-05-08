@@ -6,10 +6,11 @@ import com.example.alreadytalbt.Restaurant.dto.*;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.Enums.Role;
-import com.example.alreadytalbt.User.dto.VendorCreateDTO;
-import com.example.alreadytalbt.User.dto.VendorResponseDTO;
-import com.example.alreadytalbt.User.dto.VendorUpdateDto;
-import com.example.alreadytalbt.model.User;
+import com.example.alreadytalbt.User.auth.JwtUtil;
+import com.example.alreadytalbt.User.dto.*;
+
+import com.example.alreadytalbt.User.model.Customer;
+import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import com.example.alreadytalbt.User.repo.VendorRepo;
@@ -35,30 +36,29 @@ public class VendorService {
     @Autowired
     private final OrderFeignClient orderFeignClient;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     public VendorService(OrderFeignClient orderFeignClient, RestaurantClient restaurantClient) {
         this.orderFeignClient = orderFeignClient;
         this.restaurantClient = restaurantClient;
     }
 
 
-    public VendorResponseDTO createVendor(VendorCreateDTO dto) {
-        // Create the User
-        User user = new User();
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        //nb2a n hash el password
-        user.setPassword(dto.getPassword());
-        user.setRole(Role.VENDOR);
-        user.setName("Default");
-        user.setAddress("Unknown");
-        user.setPhone("0000000000");
-        User savedUser = userRepo.save(user);
+    public VendorResponseDTO createVendor(VendorCreateDTO dto,String token) {
+        String userId = jwtUtil.extractUserId(token);
+
+        // Optional: check that user role is CUSTOMER
+        User user = userRepo.findById(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getRole() != Role.VENDOR) {
+            throw new RuntimeException("User is not a vendor");
+        }
 
         //Create and save the Vendor
         Vendor vendor = new Vendor();
-        vendor.setUserId(savedUser.getId());
+        vendor.setUserId(user.getId());
         Vendor savedVendor = vendorRepository.save(vendor);
-        System.out.println("Vendor ID: " + (savedVendor.getId() != null ? savedVendor.getId().toHexString() : "null"));
 
         //Create Restaurant
         CreateRestaurantDTO restaurantDTO = new CreateRestaurantDTO();
@@ -104,7 +104,7 @@ public class VendorService {
         VendorResponseDTO responseDTO = new VendorResponseDTO();
         responseDTO.setVendorId(vendor.getId().toHexString());
         responseDTO.setUserId(user.getId().toHexString());
-        responseDTO.setName(user.getName());
+        responseDTO.setName(user.getUsername());
         responseDTO.setEmail(user.getEmail());
         responseDTO.setRestaurantId(vendor.getRestaurantId().toHexString());
 
@@ -130,7 +130,7 @@ public class VendorService {
         User user = userRepo.findById(vendor.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found for vendor"));
 
-        if (dto.getName() != null) user.setName(dto.getName());
+        if (dto.getName() != null) user.setUsername(dto.getName());
         if (dto.getEmail() != null) user.setEmail(dto.getEmail());
         if (dto.getPassword() != null) user.setPassword(dto.getPassword());
         userRepo.save(user);
@@ -246,7 +246,7 @@ public class VendorService {
                 .orElseThrow(() -> new RuntimeException("User not found for vendor"));
         dto.setVendorId(vendor.getId().toHexString());
         dto.setUserId(vendor.getUserId().toHexString());
-        dto.setName(user.getName());
+        dto.setName(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setRestaurantId(vendor.getRestaurantId().toHexString());
         if (vendor.getRestaurantId() != null) {

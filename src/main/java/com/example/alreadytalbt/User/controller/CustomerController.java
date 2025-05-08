@@ -27,8 +27,15 @@ public class CustomerController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody CreateCustomerDTO dto) {
-        return ResponseEntity.ok(customerService.createCustomer(dto));
+    public ResponseEntity<?> createCustomer(@RequestBody CreateCustomerDTO dto,
+                                            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            CustomerResponseDTO customer = customerService.createCustomer(dto, token);
+            return ResponseEntity.ok(customer);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
     }
 
     // READ by ID

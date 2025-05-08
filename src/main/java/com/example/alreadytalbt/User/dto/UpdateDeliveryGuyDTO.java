@@ -16,15 +16,11 @@ public class UpdateDeliveryGuyDTO {
 
     private String Deliveryid;
     private String UserId;
-    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
 
-    @Email(message = "Email should be valid")
+
     private String email;
-
-    @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
-    private String password;
-
+    private String phone;
     private String address;
     private List<ObjectId> orderIds = new ArrayList<>();
 
@@ -61,13 +57,6 @@ public class UpdateDeliveryGuyDTO {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getAddress() {
         return address;
@@ -93,9 +82,16 @@ public class UpdateDeliveryGuyDTO {
     public UpdateDeliveryGuyDTO(String name, String email, String password, String address, List<ObjectId> orderIds) {
         this.name = name;
         this.email = email;
-        this.password = password;
         this.address = address;
         this.orderIds = orderIds;
 
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

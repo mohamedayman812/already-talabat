@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.auth.dto;
+package com.example.alreadytalbt.User.dto;
 
 import com.example.alreadytalbt.User.Enums.Role;
 

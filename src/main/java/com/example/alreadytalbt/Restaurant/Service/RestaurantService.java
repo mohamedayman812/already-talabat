@@ -8,6 +8,8 @@ import com.example.alreadytalbt.Restaurant.dto.CreateRestaurantDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantUpdateDto;
+import com.example.alreadytalbt.User.Enums.Role;
+import com.example.alreadytalbt.User.model.User;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class RestaurantService {
     @Autowired
     private MenuItemRepository menuItemRepo;
 
-    public RestaurantResponseDTO addRestaurant(CreateRestaurantDTO restaurantDTO) {
+    public RestaurantResponseDTO addRestaurant(CreateRestaurantDTO restaurantDTO ) {
         if (restaurantDTO == null || !StringUtils.hasText(restaurantDTO.getVendorId())) {
             throw new IllegalArgumentException("Invalid restaurant data");
         }

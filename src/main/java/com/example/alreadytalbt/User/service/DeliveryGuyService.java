@@ -1,29 +1,25 @@
 package com.example.alreadytalbt.User.service;
 
-import com.example.alreadytalbt.Order.Model.Order;
-import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
-import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
+import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
+import com.example.alreadytalbt.User.dto.DeliveryGuyResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
-import com.example.alreadytalbt.User.dto.VendorResponseDTO;
+import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
-import com.example.alreadytalbt.model.User;
-import com.example.alreadytalbt.User.model.Vendor;
+import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.repo.DeliveryGuyRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.alreadytalbt.User.auth.JwtUtil;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DeliveryGuyService {
@@ -35,34 +31,30 @@ public class DeliveryGuyService {
 
     @Autowired
     private OrderFeignClient orderFeignClient;
+    @Autowired
+    private JwtUtil jwtUtil;
 
 
 
-    public DeliveryGuy createDeliveryGuy(CreateDeliveryGuyDTO dto) {
 
-        // First, create a User object
-        User user = new User();
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setRole(Role.DELIVERY);
-        user.setAddress(dto.getAddress());
-        user.setPassword(dto.getPassword());
-        user.setName("Default");
-        user.setAddress("Unknown");
-        user.setPhone("0000000000");
-        // Save the User and get the generated ID
-        user = userRepo.save(user);
 
-        // Then, create the DeliveryGuy and link it to the User ID
-        DeliveryGuy deliveryGuy = new DeliveryGuy();
+    public DeliveryGuyResponseDTO createDeliveryGuy(CreateDeliveryGuyDTO dto, String token) {
+        String userId = jwtUtil.extractUserId(token);
 
-        deliveryGuy.setOrderIds(dto.getOrderIds());
-        deliveryGuy.setUserId(user.getId()); // reference to user
+        // Optional: check that user role is CUSTOMER
+        User user = userRepo.findById(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getRole() != Role.DELIVERY) {
+            throw new RuntimeException("User is not a DeliveryGuy");
+        }
 
-        // Save to deliveryGuys collection
-        deliveryGuyRepo.save(deliveryGuy);
+        DeliveryGuy delivery = new DeliveryGuy();
+        delivery.setUserId(new ObjectId(userId));
+        delivery.setOrderIds(dto.getOrderIds());
 
-        return deliveryGuy;
+
+        deliveryGuyRepo.save(delivery);
+        return mapToResponse(delivery);
     }
 
 
@@ -92,9 +84,8 @@ public class DeliveryGuyService {
         User user = userRepo.findById(deliveryGuy.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found for DeliveryGuy"));
 
-        if (dto.getName() != null) user.setName(dto.getName());
+        if (dto.getName() != null) user.setUsername(dto.getName());
         if (dto.getEmail() != null) user.setEmail(dto.getEmail());
-        if (dto.getPassword() != null) user.setPassword(dto.getPassword());
         if (dto.getAddress() != null) user.setAddress(dto.getAddress());
         userRepo.save(user);
 
@@ -134,15 +125,36 @@ public class DeliveryGuyService {
                 .orElseThrow(() -> new RuntimeException("User not found for DeliveryGuy"));
         dto.setDeliveryid(deliveryGuy.getDeliveryid().toHexString());
         dto.setUserId(deliveryGuy.getUserId().toHexString());
-        dto.setName(user.getName());
+        dto.setName(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setAddress(user.getAddress());
-        dto.setPassword(user.getPassword());
         dto.setOrderIds(deliveryGuy.getOrderIds());
+        dto.setPhone(user.getPhone());
 
         return dto;
     }
 
+    private DeliveryGuyResponseDTO mapToResponse(DeliveryGuy deliveryGuy) {
+        User user = userRepo.findById(deliveryGuy.getUserId())
+                .orElseThrow(() -> new RuntimeException(("User not found for customer")));
+
+        DeliveryGuyResponseDTO dto = new DeliveryGuyResponseDTO();
+        dto.setId(deliveryGuy.getDeliveryid().toHexString());
+        dto.setUserId(user.getId().toHexString());
+        dto.setName(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setAddress(user.getAddress());
+        dto.setOrderIds(
+                deliveryGuy.getOrderIds() != null
+                        ? deliveryGuy.getOrderIds().stream()
+                        .map(ObjectId::toHexString)
+                        .toList()
+                        : List.of()
+        );
+
+
+        return dto;
+    }
 
 
 

@@ -18,8 +18,8 @@ public class User {
     @Id
     private ObjectId id;
 
-    @NotBlank(message = "Name is required")
-    private String name;
+    @NotBlank(message = "username is required")
+    private String username;
 
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email is required")
@@ -35,13 +35,18 @@ public class User {
     @NotNull(message = "Role is required")
     private Role role;
 
+    @NotNull(message = "Phone number is required")
+    private String phone;
+
     public User() {}
 
-    public User(String name, String email, String password, String address) {
-        this.name = name;
+    public User(String name, String email, String password, String address,String phone,Role role ) {
+        this.username = name;
         this.email = email;
         this.password = password;
         this.address = address;
+        this.phone=phone;
+        this.role=role;
     }
 
     // Getters and Setters
@@ -55,12 +60,13 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -93,5 +99,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

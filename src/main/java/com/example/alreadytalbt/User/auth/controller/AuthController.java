@@ -1,9 +1,9 @@
-package com.example.alreadytalbt.auth.controller;
+package com.example.alreadytalbt.User.auth.controller;
 import com.example.alreadytalbt.User.Enums.Role;
-import com.example.alreadytalbt.auth.dto.AuthUserResponseDTO;
-import com.example.alreadytalbt.auth.JwtUtil;
-import com.example.alreadytalbt.model.User;
-import com.example.alreadytalbt.auth.repository.UserRepository;
+import com.example.alreadytalbt.User.dto.AuthUserResponseDTO;
+import com.example.alreadytalbt.User.auth.JwtUtil;
+import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.User.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepo userRepository;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -28,7 +28,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String username = body.get("username");
-        String name = body.get("name");
         String email = body.get("email");
         String password = body.get("password");
         String address = body.get("address");
@@ -37,7 +36,7 @@ public class AuthController {
 
         // Check for existing username
         if (userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user  already exists");
         }
 
         Role role;
@@ -51,11 +50,11 @@ public class AuthController {
         String hashedPassword = passwordEncoder.encode(password);
 
         // Create and save user with full details
-        User user = new User(username, name, email, hashedPassword, address, phone, role);
+        User user = new User(username, email, hashedPassword, address, phone, role);
         userRepository.save(user);
 
         // Generate JWT token
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getId());
 
         // Return response DTO
         AuthUserResponseDTO response = new AuthUserResponseDTO(username, email, role, token);
@@ -78,7 +77,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         }
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getId());
 
         AuthUserResponseDTO response = new AuthUserResponseDTO(
                 user.getUsername(),

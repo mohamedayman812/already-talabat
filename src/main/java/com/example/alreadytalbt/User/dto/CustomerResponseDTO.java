@@ -9,6 +9,7 @@ public class CustomerResponseDTO {
     private String email;
     private String address;
     private List<String> orderIds;
+    private String phone;
 
     // Getters and Setters
 
@@ -58,5 +59,13 @@ public class CustomerResponseDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
