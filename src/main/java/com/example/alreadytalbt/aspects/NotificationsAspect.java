@@ -1,23 +1,23 @@
+
 package com.example.alreadytalbt.aspects;
+
+import com.example.alreadytalbt.Notifications.Service.NotificationService;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.*;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 @Aspect
 @Component
 public class NotificationsAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationsAspect.class);
-
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @AfterReturning(
             pointcut = "execution(* com.example.alreadytalbt.Order.Service.OrderService.updateOrderStatus(..))",
@@ -31,8 +31,7 @@ public class NotificationsAspect {
         Order order = orderRepository.findById(new ObjectId(orderId)).orElse(null);
         if (order != null) {
             String customerId = order.getCustomerId().toHexString();
-
-            logger.info(" Notifying customer {}: Your order {} status is now '{}'", customerId, orderId, newStatus);
+            notificationService.notifyCustomer(customerId, "Your order status has been updated to: " + newStatus);
         }
     }
 }

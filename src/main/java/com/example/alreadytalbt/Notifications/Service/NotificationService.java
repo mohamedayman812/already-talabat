@@ -5,6 +5,8 @@ import com.example.alreadytalbt.Notifications.repo.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class NotificationService {
 
@@ -15,4 +17,9 @@ public class NotificationService {
         Notification notification = new Notification(customerId, message);
         notificationRepository.save(notification);
     }
+
+    public List<Notification> getNotificationsByCustomerId(String customerId) {
+        return notificationRepository.findByCustomerId(customerId);
+    }
+
 }
