@@ -1,7 +1,6 @@
 package com.example.alreadytalbt.User.repo;
 
 import com.example.alreadytalbt.User.model.DeliveryGuy;
-import com.example.alreadytalbt.User.model.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

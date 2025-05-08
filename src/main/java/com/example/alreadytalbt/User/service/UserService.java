@@ -1,8 +1,7 @@
 package com.example.alreadytalbt.User.service;
 
-
-
-import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.User.Enums.Role;
+import com.example.alreadytalbt.model.User;
 import com.example.alreadytalbt.User.dto.UserUpdateDTO;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
@@ -24,21 +23,31 @@ public class UserService {
     private UserRepo userRepository;
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
-        User user = new User(dto.getName(), dto.getEmail(), dto.getPassword(), dto.getAddress());
+        String username = dto.getEmail();
+        String phone = "0000000000";
+        Role role = Role.CUSTOMER;
+        User user = new User(username, dto.getName(), dto.getEmail(), dto.getPassword(), dto.getAddress(), phone, role);
         User savedUser = userRepository.save(user);
-        return new UserResponseDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getAddress());
+
+        return new UserResponseDTO(
+                savedUser.getId().toString(),
+                savedUser.getName(),
+                savedUser.getEmail(),
+                savedUser.getAddress()
+        );
     }
+
 
     public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getAddress()))
+                .map(user -> new UserResponseDTO(user.getId().toString(), user.getName(), user.getEmail(), user.getAddress()))
                 .collect(Collectors.toList());
     }
 
     public Optional<UserResponseDTO> getUserById(ObjectId id) {
         return userRepository.findById(id)
-                .map(user -> new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getAddress()));
+                .map(user -> new UserResponseDTO(user.getId().toString(), user.getName(), user.getEmail(), user.getAddress()));
     }
 
     public Optional<UserResponseDTO> updateUser(ObjectId id, UserUpdateDTO updateDTO) {
@@ -54,7 +63,7 @@ public class UserService {
             User updated = userRepository.save(user);
 
             return Optional.of(new UserResponseDTO(
-                    updated.getId(),
+                    updated.getId().toString(),
                     updated.getName(),
                     updated.getEmail(),
                     updated.getAddress()

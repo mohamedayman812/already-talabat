@@ -2,6 +2,7 @@ package com.example.alreadytalbt.User.service;
 
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
@@ -11,7 +12,7 @@ import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.UpdateDeliveryGuyDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
 import com.example.alreadytalbt.User.model.DeliveryGuy;
-import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.model.User;
 import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.repo.DeliveryGuyRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
@@ -37,9 +38,8 @@ public class DeliveryGuyService {
 
 
 
-
-
     public DeliveryGuy createDeliveryGuy(CreateDeliveryGuyDTO dto) {
+
         // First, create a User object
         User user = new User();
         user.setName(dto.getName());
@@ -47,7 +47,9 @@ public class DeliveryGuyService {
         user.setRole(Role.DELIVERY);
         user.setAddress(dto.getAddress());
         user.setPassword(dto.getPassword());
-
+        user.setName("Default");
+        user.setAddress("Unknown");
+        user.setPhone("0000000000");
         // Save the User and get the generated ID
         user = userRepo.save(user);
 
@@ -68,16 +70,17 @@ public class DeliveryGuyService {
 
 
 
-    public UpdateOrderDTO updateOrderStatus(ObjectId orderId, String newStatus) {
+    public OrderResponseDTO updateOrderStatus(String orderId, String newStatus) {
+        System.out.println("new staus: "+newStatus);
         return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
 
 
 
-        public UpdateDeliveryGuyDTO getDeliveryGuyById(ObjectId id) {
-            return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
-        }
+    public UpdateDeliveryGuyDTO getDeliveryGuyById(ObjectId id) {
+        return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
+    }
 
 
 

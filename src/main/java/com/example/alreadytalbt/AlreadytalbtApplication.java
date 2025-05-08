@@ -11,5 +11,4 @@ public class AlreadytalbtApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AlreadytalbtApplication.class, args);
 	}
-
 }

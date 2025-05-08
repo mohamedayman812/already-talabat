@@ -1,12 +1,15 @@
 package com.example.alreadytalbt.User.service;
 
+import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
+import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.*;
+import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.dto.VendorCreateDTO;
 import com.example.alreadytalbt.User.dto.VendorResponseDTO;
 import com.example.alreadytalbt.User.dto.VendorUpdateDto;
-import com.example.alreadytalbt.User.model.User;
+import com.example.alreadytalbt.model.User;
 import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import com.example.alreadytalbt.User.repo.VendorRepo;
@@ -29,6 +32,13 @@ public class VendorService {
     @Autowired
     private RestaurantClient restaurantClient;
 
+    @Autowired
+    private final OrderFeignClient orderFeignClient;
+
+    public VendorService(OrderFeignClient orderFeignClient, RestaurantClient restaurantClient) {
+        this.orderFeignClient = orderFeignClient;
+        this.restaurantClient = restaurantClient;
+    }
 
 
     public VendorResponseDTO createVendor(VendorCreateDTO dto) {
@@ -39,6 +49,9 @@ public class VendorService {
         //nb2a n hash el password
         user.setPassword(dto.getPassword());
         user.setRole(Role.VENDOR);
+        user.setName("Default");
+        user.setAddress("Unknown");
+        user.setPhone("0000000000");
         User savedUser = userRepo.save(user);
 
         //Create and save the Vendor
@@ -199,6 +212,33 @@ public class VendorService {
         restaurantClient.deleteMenuItems(menuItemId);
     }
 
+    public List<OrderResponseDTO> getOrder(String vendorId) {
+        Vendor vendor = vendorRepository.findById(new ObjectId(vendorId))
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+
+        String restaurantId = vendor.getRestaurantId().toHexString();
+
+        // Step 2: Get all orders for this restaurant from the order service
+        return orderFeignClient.getOrdersByRestaurantId(restaurantId);
+    }
+
+    public OrderResponseDTO updateOrderStatus(String orderId, String  vendorId){
+        System.out.println("vendor id: "+ vendorId);
+        Vendor vendor = vendorRepository.findById(new ObjectId(vendorId))
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+        String newStatus ="Prepared";
+
+        OrderResponseDTO order = orderFeignClient.getOrderById(orderId);
+
+        if (!vendor.getRestaurantId().toHexString().equals(order.getRestaurantId())) {
+            throw new RuntimeException("You are not authorized to update this order's status.");
+        }
+
+        return orderFeignClient.updateOrderStatus(orderId, newStatus);
+    }
+
+
+
 
     private VendorResponseDTO mapToResponse(Vendor vendor) {
         VendorResponseDTO dto = new VendorResponseDTO();
@@ -221,6 +261,8 @@ public class VendorService {
 
         return dto;
     }
+
+
 
 
 }
