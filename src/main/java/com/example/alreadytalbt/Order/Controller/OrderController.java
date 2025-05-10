@@ -46,7 +46,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable ObjectId id, @Valid @RequestBody UpdateOrderDTO orderDTO) {
+    public ResponseEntity<Order> updateOrder(@PathVariable ObjectId id, @Valid @RequestBody UpdateOrderDTO orderDTO, String token) {
         try {
             Order updatedOrder = orderService.updateOrder(id, orderDTO);
             return ResponseEntity.ok(updatedOrder);
@@ -66,7 +66,7 @@ public class OrderController {
     }
 
     @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-    public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId) {
+    public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId, String token) {
 
         orderService.assignOrderToDelivery( orderId,deliveryGuyId);
         return ResponseEntity.ok().build();
@@ -92,7 +92,7 @@ public class OrderController {
     }
 
     @GetMapping("/summary")
-    public List<OrderSummaryDTO> getOrderSummaries() {
+    public List<OrderSummaryDTO> getOrderSummaries(String token) {
         System.out.println("ana f controller");
         return orderService.getAllOrderSummaries(); // returns List<OrderSummaryDTO>
     }

@@ -4,17 +4,15 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
-
-
-
 @Aspect
 @Component
 public class ExceptionHandlingAspect {
 
-    @AfterThrowing(pointcut = "execution(* com.yourpackage..*(..))", throwing = "ex")
+    // Match any method in your base package, excluding security filters
+    @AfterThrowing(
+            pointcut = "execution(* com.example.alreadytalbt..*(..)) && !within(com.example.alreadytalbt.security..*)",
+            throwing = "ex")
     public void logRuntimeExceptions(RuntimeException ex) {
-        System.err.println("❗ Exception caught in aspect: " + ex.getMessage());
-        // Optional: send to logger, monitoring service, etc.
+        System.err.println("AspectEH:❗ Exception caught in aspect: " + ex.getMessage());
     }
 }
-

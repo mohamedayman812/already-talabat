@@ -41,7 +41,7 @@ public class DeliveryGuyService {
     public DeliveryGuyResponseDTO createDeliveryGuy(CreateDeliveryGuyDTO dto, String token) {
         String userId = jwtUtil.extractUserId(token);
 
-        // Optional: check that user role is CUSTOMER
+
         User user = userRepo.findById(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if (user.getRole() != Role.DELIVERY) {
@@ -62,9 +62,11 @@ public class DeliveryGuyService {
 
 
 
-    public OrderResponseDTO updateOrderStatus(String orderId, String newStatus) {
+    public OrderResponseDTO updateOrderStatus(String orderId, String newStatus, String token) {
         System.out.println("new staus: "+newStatus);
-        return orderFeignClient.updateOrderStatus(orderId, newStatus);
+
+
+        return orderFeignClient.updateOrderStatus(orderId, newStatus, "Bearer " + token);
     }
 
 
@@ -76,12 +78,12 @@ public class DeliveryGuyService {
 
 
 
-    public UpdateDeliveryGuyDTO updateDeliveryGuy(ObjectId id, UpdateDeliveryGuyDTO dto) {
-
+    public UpdateDeliveryGuyDTO updateDeliveryGuy(ObjectId id, UpdateDeliveryGuyDTO dto, String token) {
+        String UserId = jwtUtil.extractUserId(token);
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
 
-        User user = userRepo.findById(deliveryGuy.getUserId())
+        User user = userRepo.findById(new ObjectId(UserId))
                 .orElseThrow(() -> new RuntimeException("User not found for DeliveryGuy"));
 
         if (dto.getName() != null) user.setUsername(dto.getName());
@@ -106,12 +108,13 @@ public class DeliveryGuyService {
 
 
 
-    public boolean deleteDeliveryGuy(ObjectId id) {
+    public boolean deleteDeliveryGuy(ObjectId id, String token) {
+        String UserId = jwtUtil.extractUserId(token);
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
         if (deliveryGuyRepo.existsById(id)) {
 
-            userRepo.deleteById(deliveryGuy.getUserId());
+            userRepo.deleteById(new ObjectId(UserId));
             deliveryGuyRepo.deleteById(id);
 
             return true;
@@ -160,21 +163,30 @@ public class DeliveryGuyService {
 
 
 
-    public void assignOrderToDeliveryGuy( ObjectId orderId,ObjectId deliveryGuyId) {
+    public void assignOrderToDeliveryGuy( ObjectId orderId,ObjectId deliveryGuyId ,String token) {
+        String UserId = jwtUtil.extractUserId(token);
+        System.out.println("fel service");
+        System.out.println(UserId);
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(deliveryGuyId)
-                .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
+                .orElseThrow(() -> new RuntimeException("Delivery guy not found"));
+
+        if (!deliveryGuy.getUserId().toHexString().equals(UserId)) {
+            throw new RuntimeException("You are not authorized to update this customer");
+        }
+
 
         if (!deliveryGuy.getOrderIds().contains(orderId)) {
             deliveryGuy.getOrderIds().add(orderId);
             deliveryGuyRepo.save(deliveryGuy);
         }
-        orderFeignClient.assignOrderToDeliveryGuy(orderId,deliveryGuyId);
+        orderFeignClient.assignOrderToDeliveryGuy(orderId, deliveryGuyId, "Bearer " + token);
+
 
 
     }
 
-    public List<OrderSummaryDTO> getAllOrdersForDeliveryGuy() {
-        return orderFeignClient.getOrderSummaries();
+    public List<OrderSummaryDTO> getAllOrdersForDeliveryGuy(String token) {
+        return orderFeignClient.getOrderSummaries("Bearer " + token);
     }
 
 }
