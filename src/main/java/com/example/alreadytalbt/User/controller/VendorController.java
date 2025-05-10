@@ -92,10 +92,12 @@ public class VendorController {
     }
 
     @PutMapping("/{vendorId}/status/{orderId}")
-    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,@PathVariable String vendorId)
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,@PathVariable String vendorId,
+                                                                @RequestHeader("Authorization") String authHeader)
     {
+        String token = authHeader.replace("Bearer ", "");
         System.out.println("ven:"+vendorId);
-        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendorId));
+        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendorId, token));
     }
 
 

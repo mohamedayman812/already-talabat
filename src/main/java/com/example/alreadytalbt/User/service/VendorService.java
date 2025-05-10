@@ -222,7 +222,7 @@ public class VendorService {
         return orderFeignClient.getOrdersByRestaurantId(restaurantId);
     }
 
-    public OrderResponseDTO updateOrderStatus(String orderId, String  vendorId){
+    public OrderResponseDTO updateOrderStatus(String orderId, String  vendorId, String token){
         System.out.println("vendor id: "+ vendorId);
         Vendor vendor = vendorRepository.findById(new ObjectId(vendorId))
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
@@ -234,7 +234,7 @@ public class VendorService {
             throw new RuntimeException("You are not authorized to update this order's status.");
         }
 
-        return orderFeignClient.updateOrderStatus(orderId, newStatus);
+        return orderFeignClient.updateOrderStatus(orderId, newStatus, token);
     }
 
 
