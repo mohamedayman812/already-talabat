@@ -1,18 +1,14 @@
 package com.example.alreadytalbt.User.service;
 
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
-import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.auth.JwtUtil;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
 import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
-import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.model.Customer;
-
 import com.example.alreadytalbt.User.model.User;
-import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.repo.CustomerRepo;
 import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
@@ -41,7 +37,6 @@ public class CustomerService {
 
     public CustomerResponseDTO createCustomer(CreateCustomerDTO dto, String token) {
         String userId = jwtUtil.extractUserId(token);
-
         // Optional: check that user role is CUSTOMER
         User user = userRepo.findById(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -70,20 +65,33 @@ public class CustomerService {
     }
 
 
-    public Optional<Customer> updateCustomer(ObjectId id, UpdateCustomerDTO dto) {
-        return customerRepo.findById(id).map(customer -> {
-            customer.setOrderIds(dto.getOrderIds());
-            return customerRepo.save(customer);
-        });
+    public Optional<Customer> updateCustomer(ObjectId id, UpdateCustomerDTO dto, String token) {
+        String userId = jwtUtil.extractUserId(token);
+        Customer customer = customerRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (!customer.getUserId().toHexString().equals(userId)) {
+            throw new RuntimeException("You are not authorized to update this customer");
+        }
+
+        customer.setOrderIds(dto.getOrderIds());
+        return Optional.of(customerRepo.save(customer));
     }
 
-    public boolean deleteCustomer(ObjectId id) {
-        if (customerRepo.existsById(id)) {
-            customerRepo.deleteById(id);
-            return true;
+
+    public boolean deleteCustomer(ObjectId id, String token) {
+        String userId = jwtUtil.extractUserId(token);
+        Customer customer = customerRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (!customer.getUserId().toHexString().equals(userId)) {
+            throw new RuntimeException("You are not authorized to delete this customer");
         }
-        return false;
+
+        customerRepo.deleteById(id);
+        return true;
     }
+
 
     public List<RestaurantResponseDTO> viewAllRestaurants() {
         return restaurantClient.getAllRestaurants();
