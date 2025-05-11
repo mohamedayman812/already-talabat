@@ -234,7 +234,7 @@ public class VendorService {
             throw new RuntimeException("You are not authorized to update this order's status.");
         }
 
-        return orderFeignClient.updateOrderStatus(orderId, newStatus, token);
+        return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
 

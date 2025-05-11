@@ -66,7 +66,7 @@ public class DeliveryGuyService {
         System.out.println("new staus: "+newStatus);
 
 
-        return orderFeignClient.updateOrderStatus(orderId, newStatus, "Bearer " + token);
+        return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 
 
@@ -179,14 +179,14 @@ public class DeliveryGuyService {
             deliveryGuy.getOrderIds().add(orderId);
             deliveryGuyRepo.save(deliveryGuy);
         }
-        orderFeignClient.assignOrderToDeliveryGuy(orderId, deliveryGuyId, "Bearer " + token);
+        orderFeignClient.assignOrderToDeliveryGuy(orderId, deliveryGuyId);
 
 
 
     }
 
     public List<OrderSummaryDTO> getAllOrdersForDeliveryGuy(String token) {
-        return orderFeignClient.getOrderSummaries("Bearer " + token);
+        return orderFeignClient.getOrderSummaries();
     }
 
 }
