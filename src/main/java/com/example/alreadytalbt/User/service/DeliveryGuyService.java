@@ -72,14 +72,17 @@ public class DeliveryGuyService {
 
 
 
-    public UpdateDeliveryGuyDTO getDeliveryGuyById(ObjectId id) {
+    public UpdateDeliveryGuyDTO getDeliveryGuyById(String token) {
+        String UserId = jwtUtil.extractUserId(token);
+        ObjectId id = getDeliveryGuyIdFromUserId(UserId);
         return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
     }
 
 
 
-    public UpdateDeliveryGuyDTO updateDeliveryGuy(ObjectId id, UpdateDeliveryGuyDTO dto, String token) {
+    public UpdateDeliveryGuyDTO updateDeliveryGuy( UpdateDeliveryGuyDTO dto, String token) {
         String UserId = jwtUtil.extractUserId(token);
+        ObjectId id = getDeliveryGuyIdFromUserId(UserId);
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
 
@@ -108,8 +111,9 @@ public class DeliveryGuyService {
 
 
 
-    public boolean deleteDeliveryGuy(ObjectId id, String token) {
+    public boolean deleteDeliveryGuy(String token) {
         String UserId = jwtUtil.extractUserId(token);
+        ObjectId id = getDeliveryGuyIdFromUserId(UserId);
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Delivery guy not found"));
         if (deliveryGuyRepo.existsById(id)) {
@@ -162,11 +166,25 @@ public class DeliveryGuyService {
 
 
 
+    public ObjectId getDeliveryGuyIdFromUserId(String userIdStr) {
+        ObjectId userId;
+        try {
+            userId = new ObjectId(userIdStr);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid userId format: " + userIdStr);
+        }
 
-    public void assignOrderToDeliveryGuy( ObjectId orderId,ObjectId deliveryGuyId ,String token) {
+        return deliveryGuyRepo.findByUserId(userId)
+                .map(DeliveryGuy::getDeliveryid)
+                .orElseThrow(() -> new RuntimeException("Delivery guy not found for userId: " + userIdStr));
+    }
+
+    public void assignOrderToDeliveryGuy( ObjectId orderId ,String token) {
         String UserId = jwtUtil.extractUserId(token);
         System.out.println("fel service");
         System.out.println(UserId);
+        ObjectId deliveryGuyId = getDeliveryGuyIdFromUserId(UserId);
+        System.out.println(deliveryGuyId);
         DeliveryGuy deliveryGuy = deliveryGuyRepo.findById(deliveryGuyId)
                 .orElseThrow(() -> new RuntimeException("Delivery guy not found"));
 
