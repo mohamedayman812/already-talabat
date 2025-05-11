@@ -38,10 +38,14 @@ public class CartController {
         cartService.deleteCart(customerId);
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/add-items")
-    public ResponseEntity<CartDTO> addItemsToCart(@RequestBody AddToCartRequestDTO dto) {
-        return ResponseEntity.ok(cartService.addItemsToCart(dto));
+    public ResponseEntity<CartDTO> addItemsToCart(@RequestBody AddToCartRequestDTO dto,
+                                                  @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return ResponseEntity.ok(cartService.addItemsToCart(dto, token));
     }
+
 
     @PostMapping("/remove-item")
     public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto) {
