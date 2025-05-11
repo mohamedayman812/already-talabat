@@ -13,7 +13,7 @@ public interface OrderFeignClient {
 
     @PutMapping("/api/orders/{orderId}/status")
     OrderResponseDTO updateOrderStatus(@PathVariable("orderId") String orderId,
-                            @RequestParam("status") String status,  @RequestHeader("Authorization") String token);
+                            @RequestParam("status") String status);
 
 
 
@@ -21,10 +21,10 @@ public interface OrderFeignClient {
     //Order-related
     @PutMapping("/api/orders/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
         void assignOrderToDeliveryGuy(@PathVariable("orderId") ObjectId orderId,
-                                      @PathVariable("deliveryGuyId") ObjectId deliveryGuyId, @RequestHeader("Authorization") String token);
+                                      @PathVariable("deliveryGuyId") ObjectId deliveryGuyId);
 
     @GetMapping("/api/orders/summary")
-    List<OrderSummaryDTO> getOrderSummaries(@RequestHeader("Authorization") String token);
+    List<OrderSummaryDTO> getOrderSummaries();
 
     @GetMapping("/api/orders/customer/{customerId}")
     List<UpdateOrderDTO> getOrdersByCustomerId(@PathVariable("customerId") ObjectId customerId);
