@@ -77,9 +77,6 @@ public class JwtUtil {
     public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-//    public String extractUserId(String token) {
-//        Claims claims = extractAllClaims(token);
-//        return claims.getSubject(); // Assuming you stored user ID as the subject
-//    }
+
 
 }

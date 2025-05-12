@@ -84,6 +84,13 @@ public class VendorService {
         return mapToResponse(vendor);
     }
 
+
+    public Vendor getVendorByUserId(String userId) {
+        ObjectId userObjectId = new ObjectId(userId);
+        return vendorRepository.findByUserId(userObjectId);
+    }
+
+
     public List<VendorResponseDTO> getAllVendors() {
         return vendorRepository.findAll()
                 .stream()
@@ -132,7 +139,6 @@ public class VendorService {
 
         if (dto.getName() != null) user.setUsername(dto.getName());
         if (dto.getEmail() != null) user.setEmail(dto.getEmail());
-        if (dto.getPassword() != null) user.setPassword(dto.getPassword());
         userRepo.save(user);
 
 
@@ -218,7 +224,7 @@ public class VendorService {
 
         String restaurantId = vendor.getRestaurantId().toHexString();
 
-        // Step 2: Get all orders for this restaurant from the order service
+
         return orderFeignClient.getOrdersByRestaurantId(restaurantId);
     }
 

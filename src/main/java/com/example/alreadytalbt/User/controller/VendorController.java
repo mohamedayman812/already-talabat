@@ -6,10 +6,9 @@ import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemCreateDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemUpdateDTO;
-import com.example.alreadytalbt.User.dto.CreateDeliveryGuyDTO;
-import com.example.alreadytalbt.User.dto.VendorCreateDTO;
-import com.example.alreadytalbt.User.dto.VendorResponseDTO;
-import com.example.alreadytalbt.User.dto.VendorUpdateDto;
+import com.example.alreadytalbt.User.auth.JwtUtil;
+import com.example.alreadytalbt.User.dto.*;
+import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.service.VendorService;
 import jakarta.validation.Valid;
 import org.bson.types.ObjectId;
@@ -27,6 +26,9 @@ public class VendorController {
     @Autowired
     private VendorService vendorService;
 
+    @Autowired
+    private JwtUtil JwtUtils;
+
     // CREATE
     @PostMapping
     public ResponseEntity<?> createVendor(@RequestBody VendorCreateDTO dto,
@@ -41,63 +43,90 @@ public class VendorController {
         }
     }
 
+
     // READ by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<VendorResponseDTO> getVendor(@PathVariable ObjectId id) {
-        return ResponseEntity.ok(vendorService.getVendorById(id));
+    @GetMapping
+    public ResponseEntity<VendorResponseDTO> getVendor(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        System.out.println("user id: "+userId);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        System.out.println("vendor"+ vendor.toString());
+        return ResponseEntity.ok(vendorService.getVendorById(vendor.getId()));
     }
 
     // READ all vendors
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<VendorResponseDTO>> getAllVendors() {
         return ResponseEntity.ok(vendorService.getAllVendors());
     }
 
     // UPDATE
-    @PutMapping("/{id}")
-    public ResponseEntity<VendorResponseDTO> updateVendor(@PathVariable ObjectId id, @RequestBody @Valid VendorUpdateDto dto) {
-        VendorResponseDTO updated = vendorService.updateVendor(id, dto);
+    @PutMapping
+    public ResponseEntity<VendorResponseDTO> updateVendor(@RequestHeader("Authorization") String authHeader,
+                                                          @RequestBody @Valid VendorUpdateDto dto) {
+
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        VendorResponseDTO updated = vendorService.updateVendor(vendor.getId(), dto);
         return ResponseEntity.ok(updated);
     }
 
     // DELETE
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVendor(@PathVariable ObjectId id) {
-        vendorService.deleteVendor(id);
+    @DeleteMapping
+    public ResponseEntity<Void> deleteVendor(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        vendorService.deleteVendor(vendor.getId());
         return ResponseEntity.noContent().build();
     }
 
     //ADD-MENUITEM
-    @PostMapping("/{vendorId}/menuitems")
-    public MenuItemDTO createMenuItem(@PathVariable String vendorId, @RequestBody MenuItemCreateDTO dto) {
-        return vendorService.createMenuItem(new ObjectId(vendorId), dto);
+    @PostMapping("/vendorAdd/menuitems")
+    public MenuItemDTO createMenuItem(@RequestHeader("Authorization") String authHeader, @RequestBody MenuItemCreateDTO dto) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        return vendorService.createMenuItem(vendor.getId(), dto);
     }
 
     //UPDATE-MENUITEM
-    @PutMapping("/{vendorId}/menuitems/{menuItemId}")
-    public MenuItemDTO updateMenuItem(@PathVariable String vendorId,@PathVariable String menuItemId, @RequestBody MenuItemUpdateDTO dto) {
-        return vendorService.updateMenuItem(menuItemId, dto,vendorId);
+    @PutMapping("/vendorUpdate/menuitems/{menuItemId}")
+    public MenuItemDTO updateMenuItem( @RequestHeader("Authorization") String authHeader,@PathVariable String menuItemId, @RequestBody MenuItemUpdateDTO dto) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        return vendorService.updateMenuItem(menuItemId, dto,vendor.getId().toHexString());
     }
 
     //DELETE-MENUITEM
-    @DeleteMapping("/{vendorId}/menuitems/{menuItemId}")
-    public void deleteMenuItem(@PathVariable String menuItemId,@PathVariable String vendorId) {
-        vendorService.deleteMenuItem(menuItemId,vendorId);
+    @DeleteMapping("/vendorDelete/menuitems/{menuItemId}")
+    public void deleteMenuItem(@PathVariable String menuItemId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        vendorService.deleteMenuItem(menuItemId, vendor.getId().toHexString());
     }
 
-    @GetMapping("/order/{vendorId}")
-    public ResponseEntity<List<OrderResponseDTO>> getOrdersByVendorId(@PathVariable String vendorId) {
-        List<OrderResponseDTO> orders = vendorService.getOrder(vendorId);
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByVendorId(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        List<OrderResponseDTO> orders = vendorService.getOrder(vendor.getId().toHexString());
         return ResponseEntity.ok(orders);
     }
 
-    @PutMapping("/{vendorId}/status/{orderId}")
-    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,@PathVariable String vendorId,
+    @PutMapping("/status/{orderId}")
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,
                                                                 @RequestHeader("Authorization") String authHeader)
     {
         String token = authHeader.replace("Bearer ", "");
-        System.out.println("ven:"+vendorId);
-        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendorId, token));
+        String userId = JwtUtils.extractUserId(token);
+        Vendor vendor = vendorService.getVendorByUserId(userId);
+        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendor.getId().toHexString(), token));
     }
 
 

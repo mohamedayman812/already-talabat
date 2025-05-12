@@ -61,10 +61,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                System.out.println("🟢 Authentication context set: "
+                System.out.println("Authentication context set: "
                         + SecurityContextHolder.getContext().getAuthentication());
             } else {
-                System.out.println("❌ JWT token is invalid or expired");
+                System.out.println("JWT token is invalid or expired");
             }
         }
 

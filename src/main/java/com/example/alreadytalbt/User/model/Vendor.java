@@ -44,4 +44,13 @@ public class Vendor{
     public void setRestaurantId(ObjectId restaurantId) {
         this.restaurantId = restaurantId;
     }
+
+    @Override
+    public String toString() {
+        return "Vendor{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", restaurantId=" + restaurantId +
+                '}';
+    }
 }

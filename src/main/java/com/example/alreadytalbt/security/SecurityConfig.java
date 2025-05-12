@@ -15,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Configuration
 @EnableMethodSecurity()
@@ -59,6 +61,19 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/restaurants/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/restaurants/**").permitAll()
+
+                        // Add menu-items endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/menu-items").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/menu-items/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/menu-items/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/menu-items/**").permitAll()
+
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/restaurant/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
+
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
