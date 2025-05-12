@@ -34,13 +34,13 @@ public class DeliveryGuyController {
         }
     }
 
-    @PutMapping("/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-    public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId, @PathVariable ObjectId deliveryGuyId,
+    @PutMapping("/assign-order/{orderId}/to-deliveryGuy")
+    public ResponseEntity<Object> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId,
                                                            @RequestHeader("Authorization") String authHeader) {
 
         System.out.println("fel controller");
         String token = authHeader.replace("Bearer ", "");
-        deliveryGuyService.assignOrderToDeliveryGuy( orderId, deliveryGuyId, token);
+        deliveryGuyService.assignOrderToDeliveryGuy( orderId, token);
         return ResponseEntity.ok().build();
     }
 
@@ -63,9 +63,10 @@ public class DeliveryGuyController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UpdateDeliveryGuyDTO> getDeliveryGuyById(@PathVariable ObjectId id) {
-        UpdateDeliveryGuyDTO deliveryGuy = deliveryGuyService.getDeliveryGuyById(id);
+    @GetMapping
+    public ResponseEntity<UpdateDeliveryGuyDTO> getDeliveryGuyById( @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        UpdateDeliveryGuyDTO deliveryGuy = deliveryGuyService.getDeliveryGuyById(token);
 
         if (deliveryGuy == null) {
             return ResponseEntity.notFound().build(); // Return 404 if not found
@@ -75,14 +76,13 @@ public class DeliveryGuyController {
     }
 
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update")
     public ResponseEntity<UpdateDeliveryGuyDTO> updateDeliveryGuy(
-            @PathVariable ObjectId id,
             @Valid @RequestBody UpdateDeliveryGuyDTO dto, @RequestHeader("Authorization") String authHeader) {
 
         try {
             String token = authHeader.replace("Bearer ", "");
-            UpdateDeliveryGuyDTO updatedDeliveryGuy = deliveryGuyService.updateDeliveryGuy(id, dto, token);
+            UpdateDeliveryGuyDTO updatedDeliveryGuy = deliveryGuyService.updateDeliveryGuy(dto, token);
             return ResponseEntity.ok(updatedDeliveryGuy);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -98,10 +98,10 @@ public class DeliveryGuyController {
         return ResponseEntity.ok(deliveryGuyService.getAllOrdersForDeliveryGuy(token));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteDeliveryGuy(@PathVariable ObjectId id, @RequestHeader("Authorization") String authHeader) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteDeliveryGuy(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        boolean deleted = deliveryGuyService.deleteDeliveryGuy(id,token);
+        boolean deleted = deliveryGuyService.deleteDeliveryGuy(token);
         if (deleted) {
             return ResponseEntity.ok("Delivery guy deleted successfully.");
         } else {

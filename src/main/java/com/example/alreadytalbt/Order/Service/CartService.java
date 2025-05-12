@@ -6,6 +6,9 @@ import com.example.alreadytalbt.Order.Repositories.CartRepo;
 import com.example.alreadytalbt.Order.dto.*;
 import com.example.alreadytalbt.Order.feign.RestrauntClient;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
+import com.example.alreadytalbt.User.auth.JwtUtil;
+import com.example.alreadytalbt.User.model.Customer;
+import com.example.alreadytalbt.User.repo.CustomerRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,47 +40,60 @@ public class CartService {
 
     @Autowired
     private RestrauntClient menuItemClient;
-    //add a menu item to a cart, the cart is created automatically in this fucntion if cart doesnt already exists
-    public CartDTO addItemsToCart(AddToCartRequestDTO dto) {
+
+
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private CustomerRepo customerRepo;
+
+    public CartDTO addItemsToCart(AddToCartRequestDTO dto, String token) {
+        // Extract userId from token
+        String userId = jwtUtil.extractUserId(token);
+
+        // Find the corresponding customer
+        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
+
+        ObjectId customerId = customer.getId();
+        ObjectId restaurantId;
+
         try {
-            System.out.println("ana f create service cart");
-            ObjectId customerObjId = new ObjectId(dto.getCustomerId());
-            Cart cart = cartRepository.findByCustomerId(customerObjId);
-            if (cart == null) {
-                System.out.println("ana f create service cart2");
-                cart = new Cart();
-                cart.setCustomerId(customerObjId);
-                cart.setMenuItemIds(new ArrayList<>());
-                ObjectId restaurantId = new ObjectId(dto.getRestaurantId());
-                cart.setRestaurantId(restaurantId);
-            }
-
-            for (String menuItemId : dto.getMenuItemIds()) {
-                //  Validate that the item exists
-                try {
-                    menuItemClient.getMenuItemById(menuItemId); // if it throws 404, catch it
-                    System.out.println(" validating menu item");
-                } catch (Exception e) {
-                    throw new RuntimeException("Menu item does not exist: " + menuItemId);
-                }
-
-                ObjectId menuId = new ObjectId(menuItemId);
-                if (cart.getMenuItemIds().contains(menuId)) {
-                    throw new RuntimeException("Menu item already in cart: " + menuItemId);
-                }
-                System.out.println("ana add menu item");
-                cart.getMenuItemIds().add(menuId);
-
-            }
-
-            return toDTO(cartRepository.save(cart));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid customerId format: " + dto.getCustomerId());
+            restaurantId = new ObjectId(dto.getRestaurantId());
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException("Invalid restaurantId format");
         }
 
+        // Fetch or create cart
+        Cart cart = cartRepository.findByCustomerId(customerId);
+        if (cart == null) {
+            cart = new Cart();
+            cart.setCustomerId(customerId);
+            cart.setMenuItemIds(new ArrayList<>());
+            cart.setRestaurantId(restaurantId);
+        }
 
+        // Add menu items
+        for (String menuItemIdStr : dto.getMenuItemIds()) {
+            ObjectId menuItemId;
 
+            try {
+                menuItemClient.getMenuItemById(menuItemIdStr); // validate item exists
+                menuItemId = new ObjectId(menuItemIdStr);
+            } catch (Exception ex) {
+                throw new RuntimeException("Invalid menu item: " + menuItemIdStr);
+            }
+
+            if (cart.getMenuItemIds().contains(menuItemId)) {
+                throw new RuntimeException("Item already in cart: " + menuItemIdStr);
+            }
+
+            cart.getMenuItemIds().add(menuItemId);
+        }
+
+        return toDTO(cartRepository.save(cart));
     }
+
 
 
     //get cart with all the item details inside it

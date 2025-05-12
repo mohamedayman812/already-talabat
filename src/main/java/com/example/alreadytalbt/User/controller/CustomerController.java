@@ -30,41 +30,44 @@ public class CustomerController {
 
 
     // CREATE
-    @PostMapping
+    @PostMapping("/me")
     public ResponseEntity<?> createCustomer(@RequestBody CreateCustomerDTO dto,
                                             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         try {
-            CustomerResponseDTO customer = customerService.createCustomer(dto, token);
+            CustomerResponseDTO customer = customerService.createCustomerFromToken(dto, token);
             return ResponseEntity.ok(customer);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
 
+
     // READ by ID
-    @GetMapping
-    public ResponseEntity<List<CustomerResponseDTO>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
-    }
+//    @GetMapping
+//    public ResponseEntity<List<CustomerResponseDTO>> getAllCustomers() {
+//        return ResponseEntity.ok(customerService.getAllCustomers());
+//    }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponseDTO> getCustomerById(@PathVariable ObjectId id) {
-        return customerService.getCustomerById(id)
+    @GetMapping("/me")
+    public ResponseEntity<CustomerResponseDTO> getMyCustomerProfile(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String userId = jwtUtil.extractUserId(token);
+        return customerService.getCustomerByUserId(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
 
+
     // UPDATE
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@PathVariable ObjectId id,
-                                            @RequestBody UpdateCustomerDTO dto,
+    @PutMapping("/me")
+    public ResponseEntity<?> updateCustomer(@RequestBody UpdateCustomerDTO dto,
                                             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         try {
-            Customer updated = customerService.updateCustomer(id, dto, token)
+            Customer updated = customerService.updateCustomerFromToken(dto, token)
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
@@ -73,19 +76,20 @@ public class CustomerController {
     }
 
 
+
     // DELETE
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable ObjectId id,
-                                            @RequestHeader("Authorization") String authHeader) {
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteCustomer(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         try {
-            boolean deleted = customerService.deleteCustomer(id, token);
+            boolean deleted = customerService.deleteCustomerFromToken(token);
             if (deleted) return ResponseEntity.noContent().build();
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: " + e.getMessage());
         }
     }
+
 
 
 
@@ -108,9 +112,11 @@ public class CustomerController {
     public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable String restaurantId,
                                                                    @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        jwtUtil.extractUserId(token); // optional: to validate token
+        jwtUtil.extractUserId(token); // just to confirm it's a valid token
         return ResponseEntity.ok(restaurantClient.getRestaurantById(restaurantId));
     }
+
+    //NOT WORKING IDK HWYYY  12/5
 
     //view a specific menu item
     @GetMapping("/menu/{id}")
@@ -132,10 +138,15 @@ public class CustomerController {
     public ResponseEntity<CartDTO> addItemToCart(@RequestBody AddToCartRequestDTO request,
                                                  @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        // optionally validate customerId in request matches token
+        String userId = jwtUtil.extractUserId(token);
+
+        // Inject customerId from token
+        request.setCustomerId(userId);
+
         CartDTO updatedCart = cartClient.addItemsToCart(request);
         return ResponseEntity.ok(updatedCart);
     }
+
 
 
     //Delete an item from a cart
@@ -143,54 +154,50 @@ public class CustomerController {
     public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto,
                                                       @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        // optionally validate customerId in dto matches token
+        String userId = jwtUtil.extractUserId(token);
+
+        // Inject customerId from token
+        dto.setCustomerId(userId);
+
         CartDTO updatedCart = cartClient.removeItemFromCart(dto);
         return ResponseEntity.ok(updatedCart);
     }
 
 
+
     //view a cart with its items details
-    @GetMapping("/cart/{customerId}/details")
-    public ResponseEntity<CartWithItemsDTO> getCartWithDetails(@PathVariable String customerId,
-                                                               @RequestHeader("Authorization") String authHeader) {
+    @GetMapping("/cart/details")
+    public ResponseEntity<CartWithItemsDTO> getCartWithDetails(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         String userId = jwtUtil.extractUserId(token);
-        if (!userId.equals(customerId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        CartWithItemsDTO cart = cartClient.getCartByCustomerIdwithdetails(customerId);
+        CartWithItemsDTO cart = cartClient.getCartByCustomerIdwithdetails(userId);
         return ResponseEntity.ok(cart);
     }
+
 
 
 
     //view cart wiht no items details
-    @GetMapping("/cart/{customerId}/ids-only")
-    public ResponseEntity<CartDTO> getCartWithIdsOnly(@PathVariable String customerId,
-                                                      @RequestHeader("Authorization") String authHeader) {
+    @GetMapping("/cart/ids-only")
+    public ResponseEntity<CartDTO> getCartWithIdsOnly(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         String userId = jwtUtil.extractUserId(token);
-        if (!userId.equals(customerId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        CartDTO cart = cartClient.getCartWithIdsOnly(customerId);
+        CartDTO cart = cartClient.getCartWithIdsOnly(userId);
         return ResponseEntity.ok(cart);
     }
 
 
 
+
     //delete a cart
-    @DeleteMapping("/cart/{customerId}")
-    public ResponseEntity<Void> deleteCart(@PathVariable String customerId,
-                                           @RequestHeader("Authorization") String authHeader) {
+    @DeleteMapping("/cart")
+    public ResponseEntity<Void> deleteCart(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         String userId = jwtUtil.extractUserId(token);
-        if (!userId.equals(customerId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        cartClient.deleteCart(customerId);
+        cartClient.deleteCart(userId);
         return ResponseEntity.noContent().build();
     }
+
 
 
 
