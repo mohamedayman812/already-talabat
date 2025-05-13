@@ -100,8 +100,9 @@ public class AuthController {
                 user.getNotificationId(),
                 token
         );
-        notificationController.getNotificationsForCustomer(getCustomerIdFromUserId(user.getId().toHexString()).toHexString(), response);
-
+        if(response.getRole()==Role.CUSTOMER) {
+            notificationController.getNotificationsForCustomer(getCustomerIdFromUserId(user.getId().toHexString()).toHexString(), response);
+        }
 
         return ResponseEntity.ok(response);
     }
