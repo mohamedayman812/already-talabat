@@ -35,9 +35,6 @@ public class DeliveryGuyService {
     private JwtUtil jwtUtil;
 
 
-
-
-
     public DeliveryGuyResponseDTO createDeliveryGuy(CreateDeliveryGuyDTO dto, String userId) {
 
 
@@ -56,11 +53,6 @@ public class DeliveryGuyService {
         return mapToResponse(delivery);
     }
 
-
-
-
-
-
     public OrderResponseDTO updateOrderStatus(String orderId, String newStatus) {
         System.out.println("new staus: "+newStatus);
 
@@ -69,13 +61,10 @@ public class DeliveryGuyService {
     }
 
 
-
-
     public UpdateDeliveryGuyDTO getDeliveryGuyById(String UserId) {
         ObjectId id = getDeliveryGuyIdFromUserId(UserId);
         return mapToDTO(deliveryGuyRepo.findByDeliveryId(id));
     }
-
 
 
     public UpdateDeliveryGuyDTO updateDeliveryGuy( UpdateDeliveryGuyDTO dto, String UserId) {
@@ -103,9 +92,6 @@ public class DeliveryGuyService {
             // Return a response DTO with the updated fields
             return mapToDTO(deliveryGuy);
         }
-
-
-
 
 
     public boolean deleteDeliveryGuy(String UserId) {
@@ -158,9 +144,6 @@ public class DeliveryGuyService {
 
         return dto;
     }
-
-
-
 
     public ObjectId getDeliveryGuyIdFromUserId(String userIdStr) {
         ObjectId userId;

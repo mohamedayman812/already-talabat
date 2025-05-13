@@ -29,7 +29,6 @@ public class DeliveryGuyController {
     @RequireAuthentication
     public ResponseEntity<?> register(@RequestBody CreateDeliveryGuyDTO dto,
                                                 HttpServletRequest request) {
-        //String token = authHeader.replace("Bearer ", "");
         String userId = (String) request.getAttribute("userId");
         try {
             return ResponseEntity.ok(deliveryGuyService.createDeliveryGuy(dto, userId));
@@ -48,22 +47,13 @@ public class DeliveryGuyController {
     }
 
 
-//    @PutMapping("delivery/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-//    public ResponseEntity<Order> assignOrderToDeliveryGuy(@PathVariable ObjectId orderId,
-//                                                          @PathVariable ObjectId deliveryGuyId) {
-//        System.out.println("AAAAAAAA");
-//        // Call the service to assign the delivery guy and update the order's status
-//        Order updatedOrder = deliveryGuyService.assignOrderToDelivery(orderId, deliveryGuyId);
-//        return ResponseEntity.ok(updatedOrder);  // Return the updated order
-//    }
 
     @PutMapping("/{orderId}/status")
     @RequireAuthentication
     public ResponseEntity<OrderResponseDTO> updateStatus(@PathVariable String orderId,
                                                          @RequestParam String status, HttpServletRequest request)
     {
-        //String token = authHeader.replace("Bearer ", "");
-        //String userId = (String) request.getAttribute("userId");
+
         return ResponseEntity.ok(deliveryGuyService.updateOrderStatus(orderId, status));
     }
 
@@ -71,7 +61,6 @@ public class DeliveryGuyController {
     @GetMapping
     @RequireAuthentication
     public ResponseEntity<UpdateDeliveryGuyDTO> getDeliveryGuyById( HttpServletRequest request) {
-        //String token = authHeader.replace("Bearer ", "");
         String userId = (String) request.getAttribute("userId");
         UpdateDeliveryGuyDTO deliveryGuy = deliveryGuyService.getDeliveryGuyById(userId);
 
@@ -88,7 +77,6 @@ public class DeliveryGuyController {
     public ResponseEntity<UpdateDeliveryGuyDTO> updateDeliveryGuy(
             @Valid @RequestBody UpdateDeliveryGuyDTO dto, HttpServletRequest request) {
         try {
-            //String token = authHeader.replace("Bearer ", "");
             String userId = (String) request.getAttribute("userId");
             UpdateDeliveryGuyDTO updatedDeliveryGuy = deliveryGuyService.updateDeliveryGuy(dto, userId);
             return ResponseEntity.ok(updatedDeliveryGuy);
@@ -103,15 +91,12 @@ public class DeliveryGuyController {
     @GetMapping("/summary")
     @RequireAuthentication
     public ResponseEntity<List<OrderSummaryDTO>> getAllOrderSummaries( HttpServletRequest request) {
-        //String token = authHeader.replace("Bearer ", "");
-//        String userId = (String) request.getAttribute("userId");
         return ResponseEntity.ok(deliveryGuyService.getAllOrdersForDeliveryGuy());
     }
 
     @DeleteMapping("/delete")
     @RequireAuthentication
     public ResponseEntity<String> deleteDeliveryGuy(HttpServletRequest request) {
-        //String token = authHeader.replace("Bearer ", "");
         String userId = (String) request.getAttribute("userId");
         boolean deleted = deliveryGuyService.deleteDeliveryGuy(userId);
         if (deleted) {
