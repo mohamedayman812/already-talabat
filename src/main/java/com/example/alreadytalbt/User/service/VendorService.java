@@ -45,8 +45,8 @@ public class VendorService {
     }
 
 
-    public VendorResponseDTO createVendor(VendorCreateDTO dto,String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public VendorResponseDTO createVendor(VendorCreateDTO dto,String userId) {
+        //String userId = jwtUtil.extractUserId(token);
 
         // Optional: check that user role is CUSTOMER
         User user = userRepo.findById(new ObjectId(userId))
@@ -228,8 +228,7 @@ public class VendorService {
         return orderFeignClient.getOrdersByRestaurantId(restaurantId);
     }
 
-    public OrderResponseDTO updateOrderStatus(String orderId, String  vendorId, String token){
-        System.out.println("vendor id: "+ vendorId);
+    public OrderResponseDTO updateOrderStatus(String orderId, String  vendorId){
         Vendor vendor = vendorRepository.findById(new ObjectId(vendorId))
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
         String newStatus ="Prepared";

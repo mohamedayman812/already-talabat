@@ -2,14 +2,15 @@ package com.example.alreadytalbt.User.controller;
 
 
 import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
-import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemCreateDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemUpdateDTO;
 import com.example.alreadytalbt.User.auth.JwtUtil;
+import com.example.alreadytalbt.User.auth.RequireAuthentication;
 import com.example.alreadytalbt.User.dto.*;
 import com.example.alreadytalbt.User.model.Vendor;
 import com.example.alreadytalbt.User.service.VendorService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,13 @@ public class VendorController {
 
     // CREATE
     @PostMapping
+    @RequireAuthentication
     public ResponseEntity<?> createVendor(@RequestBody VendorCreateDTO dto,
-                                                          @RequestHeader("Authorization") String authHeader) {
+                                          HttpServletRequest request) {
 
-        String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         try {
-            VendorResponseDTO vendor = vendorService.createVendor(dto,token);
+            VendorResponseDTO vendor = vendorService.createVendor(dto,userId);
             return new ResponseEntity<>(vendor, HttpStatus.CREATED);
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
@@ -46,12 +48,11 @@ public class VendorController {
 
     // READ by ID
     @GetMapping
-    public ResponseEntity<VendorResponseDTO> getVendor(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
-        System.out.println("user id: "+userId);
+    @RequireAuthentication
+    public ResponseEntity<VendorResponseDTO> getVendor(HttpServletRequest request) {
+//        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
-        System.out.println("vendor"+ vendor.toString());
         return ResponseEntity.ok(vendorService.getVendorById(vendor.getId()));
     }
 
@@ -63,11 +64,12 @@ public class VendorController {
 
     // UPDATE
     @PutMapping
-    public ResponseEntity<VendorResponseDTO> updateVendor(@RequestHeader("Authorization") String authHeader,
+    @RequireAuthentication
+    public ResponseEntity<VendorResponseDTO> updateVendor(HttpServletRequest request,
                                                           @RequestBody @Valid VendorUpdateDto dto) {
 
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
         VendorResponseDTO updated = vendorService.updateVendor(vendor.getId(), dto);
         return ResponseEntity.ok(updated);
@@ -75,9 +77,10 @@ public class VendorController {
 
     // DELETE
     @DeleteMapping
-    public ResponseEntity<Void> deleteVendor(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+    @RequireAuthentication
+    public ResponseEntity<Void> deleteVendor(HttpServletRequest request) {
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
         vendorService.deleteVendor(vendor.getId());
         return ResponseEntity.noContent().build();
@@ -85,48 +88,53 @@ public class VendorController {
 
     //ADD-MENUITEM
     @PostMapping("/vendorAdd/menuitems")
-    public MenuItemDTO createMenuItem(@RequestHeader("Authorization") String authHeader, @RequestBody MenuItemCreateDTO dto) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+    @RequireAuthentication
+    public MenuItemDTO createMenuItem(HttpServletRequest request, @RequestBody MenuItemCreateDTO dto) {
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
         return vendorService.createMenuItem(vendor.getId(), dto);
     }
 
     //UPDATE-MENUITEM
     @PutMapping("/vendorUpdate/menuitems/{menuItemId}")
-    public MenuItemDTO updateMenuItem( @RequestHeader("Authorization") String authHeader,@PathVariable String menuItemId, @RequestBody MenuItemUpdateDTO dto) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+    @RequireAuthentication
+    public MenuItemDTO updateMenuItem( HttpServletRequest request,@PathVariable String menuItemId, @RequestBody MenuItemUpdateDTO dto) {
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
         return vendorService.updateMenuItem(menuItemId, dto,vendor.getId().toHexString());
     }
 
     //DELETE-MENUITEM
     @DeleteMapping("/vendorDelete/menuitems/{menuItemId}")
-    public void deleteMenuItem(@PathVariable String menuItemId, @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+    @RequireAuthentication
+    public void deleteMenuItem(@PathVariable String menuItemId, HttpServletRequest request) {
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
         vendorService.deleteMenuItem(menuItemId, vendor.getId().toHexString());
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponseDTO>> getOrdersByVendorId(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+    @RequireAuthentication
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByVendorId(HttpServletRequest request) {
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
         List<OrderResponseDTO> orders = vendorService.getOrder(vendor.getId().toHexString());
         return ResponseEntity.ok(orders);
     }
 
     @PutMapping("/status/{orderId}")
+    @RequireAuthentication
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable String orderId,
-                                                                @RequestHeader("Authorization") String authHeader)
+                                                              HttpServletRequest request)
     {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtils.extractUserId(token);
+        //String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         Vendor vendor = vendorService.getVendorByUserId(userId);
-        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendor.getId().toHexString(), token));
+        return ResponseEntity.ok(vendorService.updateOrderStatus(orderId,vendor.getId().toHexString()));
     }
 
 
