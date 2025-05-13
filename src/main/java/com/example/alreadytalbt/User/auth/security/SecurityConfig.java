@@ -1,5 +1,9 @@
 package com.example.alreadytalbt.security;
 
+import com.example.alreadytalbt.User.auth.security.AuthEntryPointJwt;
+import com.example.alreadytalbt.User.auth.security.CustomAccessDeniedHandler;
+import com.example.alreadytalbt.User.auth.security.JwtAuthenticationFilter;
+import com.example.alreadytalbt.User.auth.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
