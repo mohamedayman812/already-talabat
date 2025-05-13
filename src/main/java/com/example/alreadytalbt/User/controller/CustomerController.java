@@ -1,5 +1,4 @@
 package com.example.alreadytalbt.User.controller;
-import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.dto.*;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
@@ -11,7 +10,6 @@ import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
 import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.service.CustomerService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +25,10 @@ public class CustomerController {
     private CustomerService customerService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private OrderFeignClient cartClient;
+    @Autowired
+    private RestaurantClient restaurantClient;
 
 
     // CREATE
@@ -49,7 +51,6 @@ public class CustomerController {
 //        return ResponseEntity.ok(customerService.getAllCustomers());
 //    }
 
-
     @GetMapping("/me")
     public ResponseEntity<CustomerResponseDTO> getMyCustomerProfile(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
@@ -58,8 +59,6 @@ public class CustomerController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-
 
     // UPDATE
     @PutMapping("/me")
@@ -75,8 +74,6 @@ public class CustomerController {
         }
     }
 
-
-
     // DELETE
     @DeleteMapping("/me")
     public ResponseEntity<?> deleteCustomer(@RequestHeader("Authorization") String authHeader) {
@@ -90,13 +87,7 @@ public class CustomerController {
         }
     }
 
-
-
-
     //RESTRAUNT RELATED STUFF
-    @Autowired
-    private RestaurantClient restaurantClient;
-
     //view all restraunts..it shows all the restraunts and the menu items inside it
     @GetMapping("/restaurants")
     public ResponseEntity<List<RestaurantResponseDTO>> viewAllRestaurants(@RequestHeader("Authorization") String authHeader) {
@@ -105,7 +96,6 @@ public class CustomerController {
         List<RestaurantResponseDTO> restaurants = restaurantClient.getAllRestaurants();
         return ResponseEntity.ok(restaurants);
     }
-
 
     // view a specific restraunt
     @GetMapping("/restaurant/{restaurantId}")
@@ -117,7 +107,6 @@ public class CustomerController {
     }
 
     //NOT WORKING IDK HWYYY  12/5
-
     //view a specific menu item
     @GetMapping("/menu/{id}")
     public ResponseEntity<MenuItemDTO> menuitemById(@PathVariable String id,
@@ -130,10 +119,8 @@ public class CustomerController {
 
 
     ///CART RELATED STUFF
-
     /// add item to a cart
-    @Autowired
-    private OrderFeignClient cartClient;
+
     @PostMapping("/cart/add-item")
     public ResponseEntity<CartDTO> addItemToCart(@RequestBody AddToCartRequestDTO request,
                                                  @RequestHeader("Authorization") String authHeader) {
@@ -143,11 +130,9 @@ public class CustomerController {
         // Inject customerId from token
         request.setCustomerId(userId);
 
-        CartDTO updatedCart = cartClient.addItemsToCart(request);
+        CartDTO updatedCart = cartClient.addItemsToCart(request,authHeader);
         return ResponseEntity.ok(updatedCart);
     }
-
-
 
     //Delete an item from a cart
     @PostMapping("/cart/remove-item")
@@ -155,15 +140,11 @@ public class CustomerController {
                                                       @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         String userId = jwtUtil.extractUserId(token);
-
         // Inject customerId from token
         dto.setCustomerId(userId);
-
-        CartDTO updatedCart = cartClient.removeItemFromCart(dto);
+        CartDTO updatedCart = cartClient.removeItemFromCart(dto,authHeader);
         return ResponseEntity.ok(updatedCart);
     }
-
-
 
     //view a cart with its items details
     @GetMapping("/cart/details")
@@ -174,9 +155,6 @@ public class CustomerController {
         return ResponseEntity.ok(cart);
     }
 
-
-
-
     //view cart wiht no items details
     @GetMapping("/cart/ids-only")
     public ResponseEntity<CartDTO> getCartWithIdsOnly(@RequestHeader("Authorization") String authHeader) {
@@ -185,9 +163,6 @@ public class CustomerController {
         CartDTO cart = cartClient.getCartWithIdsOnly(userId);
         return ResponseEntity.ok(cart);
     }
-
-
-
 
     //delete a cart
     @DeleteMapping("/cart")
@@ -198,9 +173,6 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-
-
-
     @PostMapping("/cart/submit/{cartId}/paymentMethod")
     public ResponseEntity<CreateOrderDTO> submitOrder(@PathVariable String cartId,
                                                       @RequestParam String paymentMethod,
@@ -210,9 +182,6 @@ public class CustomerController {
         CreateOrderDTO order = cartClient.submitOrder(cartId, paymentMethod);
         return ResponseEntity.ok(order);
     }
-
-
-
 
 
 }
