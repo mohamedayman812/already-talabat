@@ -3,7 +3,7 @@ package com.example.alreadytalbt.aspects;
 
 
 import com.example.alreadytalbt.User.auth.JwtUtil;
-import com.example.alreadytalbt.security.UserDetailsServiceImpl;
+import com.example.alreadytalbt.User.auth.security.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;

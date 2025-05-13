@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.security;
+package com.example.alreadytalbt.User.auth.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

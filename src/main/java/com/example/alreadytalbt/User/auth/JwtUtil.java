@@ -1,6 +1,6 @@
 package com.example.alreadytalbt.User.auth;
 
-import com.example.alreadytalbt.security.UserDetail;
+import com.example.alreadytalbt.User.auth.security.UserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

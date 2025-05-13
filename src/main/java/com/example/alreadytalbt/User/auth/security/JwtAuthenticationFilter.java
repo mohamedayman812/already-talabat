@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.security;
+package com.example.alreadytalbt.User.auth.security;
 
 import com.example.alreadytalbt.User.auth.JwtUtil;
 import jakarta.servlet.FilterChain;

@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.security;
+package com.example.alreadytalbt.User.auth.security;
 
 import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.repo.UserRepo;
