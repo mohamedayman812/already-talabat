@@ -1,6 +1,6 @@
-package com.example.alreadytalbt.Notifications.repo;
+package com.example.alreadytalbt.User.Notifications.repo;
 
-import com.example.alreadytalbt.Notifications.model.Notification;
+import com.example.alreadytalbt.User.Notifications.model.Notification;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

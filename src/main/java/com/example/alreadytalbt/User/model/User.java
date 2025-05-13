@@ -10,6 +10,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Document(collection = "users")
 @TypeAlias("user")
@@ -37,6 +40,9 @@ public class User {
 
     @NotNull(message = "Phone number is required")
     private String phone;
+
+
+    private List<String> notificationId = new ArrayList<>();
 
     public User() {}
 
@@ -107,5 +113,13 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public List<String> getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(List<String> notificationId) {
+        this.notificationId = notificationId;
     }
 }
