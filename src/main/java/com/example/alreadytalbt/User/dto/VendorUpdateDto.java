@@ -11,8 +11,6 @@ public class VendorUpdateDto {
     @Email(message = "Email should be valid")
     private String email;
 
-    @Size(min = 6, max = 100)
-    private String password;
 
     private String address;
 
@@ -39,13 +37,7 @@ public class VendorUpdateDto {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getAddress() {
         return address;

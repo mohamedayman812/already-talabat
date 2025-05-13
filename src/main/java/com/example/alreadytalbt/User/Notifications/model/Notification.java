@@ -1,4 +1,4 @@
-package com.example.alreadytalbt.Notifications.model;
+package com.example.alreadytalbt.User.Notifications.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

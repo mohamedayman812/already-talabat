@@ -1,6 +1,6 @@
 package com.example.alreadytalbt.User.auth;
 
-import com.example.alreadytalbt.security.UserDetail;
+import com.example.alreadytalbt.User.auth.security.UserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -77,9 +77,6 @@ public class JwtUtil {
     public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-//    public String extractUserId(String token) {
-//        Claims claims = extractAllClaims(token);
-//        return claims.getSubject(); // Assuming you stored user ID as the subject
-//    }
+
 
 }

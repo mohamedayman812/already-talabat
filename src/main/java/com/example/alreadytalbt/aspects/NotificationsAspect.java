@@ -1,7 +1,7 @@
 
 package com.example.alreadytalbt.aspects;
 
-import com.example.alreadytalbt.Notifications.Service.NotificationService;
+import com.example.alreadytalbt.User.Notifications.Service.NotificationService;
 import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.Repositories.OrderRepository;
 import org.aspectj.lang.JoinPoint;

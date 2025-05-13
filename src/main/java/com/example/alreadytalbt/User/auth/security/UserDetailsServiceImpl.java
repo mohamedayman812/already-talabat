@@ -1,16 +1,13 @@
-package com.example.alreadytalbt.security;
+package com.example.alreadytalbt.User.auth.security;
 
 import com.example.alreadytalbt.User.model.User;
 import com.example.alreadytalbt.User.repo.UserRepo;
-import com.example.alreadytalbt.User.repo.UserRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
