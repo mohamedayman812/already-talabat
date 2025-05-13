@@ -10,6 +10,7 @@ import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
 import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.service.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,90 +89,82 @@ public class CustomerController {
     }
 
     //RESTRAUNT RELATED STUFF
-    //view all restraunts..it shows all the restraunts and the menu items inside it
+
+
+    //view all restraunts. it shows all the restraunts and the menu items inside it
+    //tested
     @GetMapping("/restaurants")
-    public ResponseEntity<List<RestaurantResponseDTO>> viewAllRestaurants(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        // optionally validate token
-        List<RestaurantResponseDTO> restaurants = restaurantClient.getAllRestaurants();
-        return ResponseEntity.ok(restaurants);
+    public ResponseEntity<List<RestaurantResponseDTO>> viewAllRestaurants(
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "").trim();
+        return ResponseEntity.ok(customerService.viewAllRestaurants(token));
     }
+
 
     // view a specific restraunt
+    //tested
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<RestaurantResponseDTO> getRestaurantById(@PathVariable String restaurantId,
-                                                                   @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        jwtUtil.extractUserId(token); // just to confirm it's a valid token
-        return ResponseEntity.ok(restaurantClient.getRestaurantById(restaurantId));
+    public ResponseEntity<RestaurantResponseDTO> getRestaurantById(
+            @PathVariable String restaurantId,
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "").trim();
+        return ResponseEntity.ok(customerService.getRestaurantById(restaurantId,  token));
     }
 
-    //NOT WORKING IDK HWYYY  12/5
+
     //view a specific menu item
+    //tested
     @GetMapping("/menu/{id}")
     public ResponseEntity<MenuItemDTO> menuitemById(@PathVariable String id,
                                                     @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        jwtUtil.extractUserId(token); // optional: to validate token
-        MenuItemDTO menuItem = restaurantClient.getMenuItemById(id);
-        return ResponseEntity.ok(menuItem);
+        String token = authHeader.replace("Bearer ", "").trim();
+        return ResponseEntity.ok(customerService.getMenuItemById(id, token));
     }
 
 
     ///CART RELATED STUFF
     /// add item to a cart
-
+    /// tested
     @PostMapping("/cart/add-item")
-    public ResponseEntity<CartDTO> addItemToCart(@RequestBody AddToCartRequestDTO request,
+    public ResponseEntity<CartDTO> addItemToCart(@Valid @RequestBody AddToCartRequestDTO request,
                                                  @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
-
-        // Inject customerId from token
-        request.setCustomerId(userId);
-
-        CartDTO updatedCart = cartClient.addItemsToCart(request,authHeader);
+        CartDTO updatedCart = customerService.handleAddToCart(request, token);
         return ResponseEntity.ok(updatedCart);
     }
 
     //Delete an item from a cart
+    //
     @PostMapping("/cart/remove-item")
-    public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto,
+    public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO request,
                                                       @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
-        // Inject customerId from token
-        dto.setCustomerId(userId);
-        CartDTO updatedCart = cartClient.removeItemFromCart(dto,authHeader);
+        CartDTO updatedCart = customerService.removeItemFromCart(request, token);
         return ResponseEntity.ok(updatedCart);
     }
 
     //view a cart with its items details
-    @GetMapping("/cart/details")
-    public ResponseEntity<CartWithItemsDTO> getCartWithDetails(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
-        CartWithItemsDTO cart = cartClient.getCartByCustomerIdwithdetails(userId);
-        return ResponseEntity.ok(cart);
-    }
-
-    //view cart wiht no items details
     @GetMapping("/cart/ids-only")
     public ResponseEntity<CartDTO> getCartWithIdsOnly(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
-        CartDTO cart = cartClient.getCartWithIdsOnly(userId);
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(customerService.getCartWithIdsOnly(token));
     }
 
-    //delete a cart
-    @DeleteMapping("/cart")
+    @GetMapping("/cart/details")
+    public ResponseEntity<CartWithItemsDTO> getCartWithDetails(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return ResponseEntity.ok(customerService.getCartWithDetails(token ));
+    }
+
+    //delete cart
+    @DeleteMapping("/cart/remove")
     public ResponseEntity<Void> deleteCart(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
-        cartClient.deleteCart(userId);
+        customerService.handleDeleteCart(token);
         return ResponseEntity.noContent().build();
     }
+
+
 
     @PostMapping("/cart/submit/{cartId}/paymentMethod")
     public ResponseEntity<CreateOrderDTO> submitOrder(@PathVariable String cartId,

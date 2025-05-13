@@ -1,7 +1,14 @@
 package com.example.alreadytalbt.User.service;
 
+import com.example.alreadytalbt.Order.dto.AddToCartRequestDTO;
+import com.example.alreadytalbt.Order.dto.CartDTO;
+import com.example.alreadytalbt.Order.dto.CartWithItemsDTO;
+import com.example.alreadytalbt.Order.dto.RemoveFromCartRequestDTO;
+import com.example.alreadytalbt.Restaurant.Service.RestaurantService;
+import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.Restaurant.dto.RestaurantResponseDTO;
 import com.example.alreadytalbt.User.Enums.Role;
+import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.auth.JwtUtil;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
@@ -34,6 +41,10 @@ public class CustomerService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private OrderFeignClient cartClient;
+    ;
 
     public CustomerResponseDTO createCustomerFromToken(CreateCustomerDTO dto, String token) {
         String userId = jwtUtil.extractUserId(token);
@@ -97,11 +108,22 @@ public class CustomerService {
     }
 
 
+    ///RESTAURANT RELATED STUFF
+    public List<RestaurantResponseDTO> viewAllRestaurants(String token) {
 
-
-    public List<RestaurantResponseDTO> viewAllRestaurants() {
-        return restaurantClient.getAllRestaurants();
+        String userId = jwtUtil.extractUserId(token);
+        return restaurantClient.getAllRestaurants(); // no auth required here
     }
+
+    public RestaurantResponseDTO getRestaurantById(String restaurantId, String token) {
+        String userId = jwtUtil.extractUserId(token);
+        return restaurantClient.getRestaurantById(restaurantId);
+    }
+
+
+
+
+
 
     private CustomerResponseDTO mapToResponse(Customer customer) {
         User user = userRepo.findById(customer.getUserId())
@@ -125,5 +147,59 @@ public class CustomerService {
 
         return dto;
     }
+
+    public CartDTO handleAddToCart(AddToCartRequestDTO request, String token) {
+        String userId = jwtUtil.extractUserId(token); // Validate & extract user ID
+
+        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
+
+        request.setCustomerId(customer.getId().toString()); // Inject real customer ID
+
+        return cartClient.addItemsToCart(request); // No token needed
+    }
+
+
+    public CartDTO removeItemFromCart(RemoveFromCartRequestDTO request, String token) {
+        String userId = jwtUtil.extractUserId(token);
+        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
+        request.setCustomerId(customer.getId().toString());
+        return cartClient.removeItemFromCart(request);
+    }
+
+
+    public RestaurantResponseDTO getRestaurantById(String restaurantId) {
+        return restaurantClient.getRestaurantById(restaurantId); // No authHeader needed
+    }
+
+    public MenuItemDTO getMenuItemById(String menuItemId, String token) {
+        String userId = jwtUtil.extractUserId(token); // Just to validate the token
+        return restaurantClient.getMenuItemById(menuItemId);
+    }
+
+
+    public CartDTO getCartWithIdsOnly(String token) {
+        String userId = jwtUtil.extractUserId(token);
+        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
+        return cartClient.getCartWithIdsOnly(customer.getId().toString());
+    }
+
+    public CartWithItemsDTO getCartWithDetails(String token) {
+        String userId = jwtUtil.extractUserId(token);
+        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
+        return cartClient.getCartByCustomerIdwithdetails(customer.getId().toString());
+    }
+
+    
+    public void handleDeleteCart(String token) {
+        String userId = jwtUtil.extractUserId(token);
+        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
+                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
+        cartClient.deleteCart(customer.getId().toString());
+    }
+
 
 }

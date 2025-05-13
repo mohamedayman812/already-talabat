@@ -40,11 +40,11 @@ public class CartController {
     }
 
     @PostMapping("/add-items")
-    public ResponseEntity<CartDTO> addItemsToCart(@RequestBody AddToCartRequestDTO dto,
-                                                  @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(cartService.addItemsToCart(dto, token));
+    public ResponseEntity<CartDTO> addItemsToCart(@RequestBody AddToCartRequestDTO dto) {
+        return ResponseEntity.ok(cartService.addItemsToCart(dto));
     }
+
+
 
 
     @PostMapping("/remove-item")

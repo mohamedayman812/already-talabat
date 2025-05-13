@@ -23,6 +23,12 @@ public class CartService {
     private CartRepo cartRepository;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private RestrauntClient menuItemClient;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private CustomerRepo customerRepo;
 
 //    public CartDTO createCart(CreateCartDTO dto) {
 //        Cart cart = new Cart();
@@ -36,27 +42,15 @@ public class CartService {
 //        return toDTO(cartRepository.save(cart));
 //    }
 
-
-
-    @Autowired
-    private RestrauntClient menuItemClient;
-
-
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private CustomerRepo customerRepo;
-
-    public CartDTO addItemsToCart(AddToCartRequestDTO dto, String token) {
-        // Extract userId from token
-        String userId = jwtUtil.extractUserId(token);
-
-        // Find the corresponding customer
-        Customer customer = customerRepo.findByUserId(new ObjectId(userId))
-                .orElseThrow(() -> new RuntimeException("Customer not found for user"));
-
-        ObjectId customerId = customer.getId();
+    public CartDTO addItemsToCart(AddToCartRequestDTO dto) {
+        ObjectId customerId;
         ObjectId restaurantId;
+
+        try {
+            customerId = new ObjectId(dto.getCustomerId());
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException("Invalid customerId format");
+        }
 
         try {
             restaurantId = new ObjectId(dto.getRestaurantId());
@@ -64,7 +58,10 @@ public class CartService {
             throw new RuntimeException("Invalid restaurantId format");
         }
 
-        // Fetch or create cart
+        if (dto.getMenuItemIds() == null || dto.getMenuItemIds().isEmpty()) {
+            throw new RuntimeException("Menu item list cannot be empty.");
+        }
+
         Cart cart = cartRepository.findByCustomerId(customerId);
         if (cart == null) {
             cart = new Cart();
@@ -73,12 +70,11 @@ public class CartService {
             cart.setRestaurantId(restaurantId);
         }
 
-        // Add menu items
         for (String menuItemIdStr : dto.getMenuItemIds()) {
             ObjectId menuItemId;
 
             try {
-                menuItemClient.getMenuItemById(menuItemIdStr); // validate item exists
+                menuItemClient.getMenuItemById(menuItemIdStr); // validate item
                 menuItemId = new ObjectId(menuItemIdStr);
             } catch (Exception ex) {
                 throw new RuntimeException("Invalid menu item: " + menuItemIdStr);
@@ -93,7 +89,6 @@ public class CartService {
 
         return toDTO(cartRepository.save(cart));
     }
-
 
 
     //get cart with all the item details inside it
@@ -155,15 +150,11 @@ public class CartService {
         if (cart == null) {
             throw new RuntimeException("Cart not found for customer ID: " + dto.getCustomerId());
         }
-
         ObjectId itemId = new ObjectId(dto.getMenuItemId());
-
         if (!cart.getMenuItemIds().contains(itemId)) {
             throw new RuntimeException("Item not found in cart: " + dto.getMenuItemId());
         }
-
         cart.getMenuItemIds().remove(itemId);
-
         return toDTO(cartRepository.save(cart));
     }
 

@@ -64,8 +64,6 @@ public class DeliveryGuyService {
 
     public OrderResponseDTO updateOrderStatus(String orderId, String newStatus, String token) {
         System.out.println("new staus: "+newStatus);
-
-
         return orderFeignClient.updateOrderStatus(orderId, newStatus);
     }
 

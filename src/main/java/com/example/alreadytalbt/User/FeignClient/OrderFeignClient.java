@@ -1,10 +1,7 @@
 package com.example.alreadytalbt.User.FeignClient;
-
-import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.dto.*;
 import org.bson.types.ObjectId;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -13,18 +10,18 @@ public interface OrderFeignClient {
 
     @PutMapping("/api/orders/{orderId}/status")
     OrderResponseDTO updateOrderStatus(@PathVariable("orderId") String orderId,
-                            @RequestParam("status") String status);
-
-
+                                       @RequestParam("status") String status);
 
 
     //Order-related
     @PutMapping("/api/orders/assign-order/{orderId}/to-delivery/{deliveryGuyId}")
-        void assignOrderToDeliveryGuy(@PathVariable("orderId") ObjectId orderId,
-                                      @PathVariable("deliveryGuyId") ObjectId deliveryGuyId);
+    void assignOrderToDeliveryGuy(@PathVariable("orderId") ObjectId orderId,
+                                  @PathVariable("deliveryGuyId") ObjectId deliveryGuyId);
 
     @GetMapping("/api/orders/summary")
     List<OrderSummaryDTO> getOrderSummaries();
+
+
 
     @GetMapping("/api/orders/customer/{customerId}")
     List<UpdateOrderDTO> getOrdersByCustomerId(@PathVariable("customerId") ObjectId customerId);
@@ -35,6 +32,12 @@ public interface OrderFeignClient {
 
     @PostMapping("/api/carts/add-items")
     CartDTO addItemsToCart(@RequestBody AddToCartRequestDTO dto);
+
+
+    @PostMapping("/api/carts/remove-item")
+    CartDTO removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto);
+
+
 
     @GetMapping("/api/carts/{customerId}")
     CartWithItemsDTO getCartByCustomerIdwithdetails(@PathVariable("customerId") String customerId);
@@ -50,10 +53,6 @@ public interface OrderFeignClient {
     void deleteCart(@PathVariable("customerId") String customerId);
 
 
-    @PostMapping("/api/carts/remove-item")
-    CartDTO removeItemFromCart(@RequestBody RemoveFromCartRequestDTO dto);
-
-
     @PostMapping("/api/carts/submit/{cartId}")
     CreateOrderDTO submitOrder(@PathVariable("cartId") String cartId,
                                @RequestParam("paymentMethod") String paymentMethod);
@@ -65,5 +64,4 @@ public interface OrderFeignClient {
     OrderResponseDTO getOrderById(@PathVariable String id);
 
 }
-
 

@@ -13,8 +13,8 @@ public class CustomerAccessController {
     @PreAuthorize("hasRole('CUSTOMER')")
     public String testCustomerAccess() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("👤 User: " + auth.getName());
-        System.out.println("🎭 Authorities: " + auth.getAuthorities());
+        System.out.println("User: " + auth.getName());
+        System.out.println("Authorities: " + auth.getAuthorities());
         return "✅ You have CUSTOMER access!";
     }
 }

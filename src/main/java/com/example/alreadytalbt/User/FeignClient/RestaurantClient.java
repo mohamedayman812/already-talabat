@@ -1,10 +1,7 @@
 package com.example.alreadytalbt.User.FeignClient;
-
-
 import com.example.alreadytalbt.Restaurant.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +34,8 @@ public interface RestaurantClient {
     @DeleteMapping("/api/menu-items/{id}")
     void deleteMenuItems(@PathVariable String id);
 
-    @GetMapping("/api/menu-items/{menuItemId}")
-    MenuItemDTO getMenuItemById(@PathVariable("menuItemId") String menuItemId);
+    @GetMapping("/api/menu-items/{id}")
+    MenuItemDTO getMenuItemById(@PathVariable("id") String id);
+
 
 }

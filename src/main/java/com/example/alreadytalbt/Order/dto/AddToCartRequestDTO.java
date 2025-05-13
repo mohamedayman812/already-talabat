@@ -1,4 +1,6 @@
 package com.example.alreadytalbt.Order.dto;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -6,7 +8,9 @@ public class AddToCartRequestDTO {
 
     private String customerId;
 
+    @NotBlank(message = "Restaurant ID is required")
     private String restaurantId;
+    @NotEmpty(message = "Menu item list cannot be empty")
     private List<String> menuItemIds;
 
     public AddToCartRequestDTO() {

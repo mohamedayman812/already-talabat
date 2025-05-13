@@ -3,9 +3,7 @@ package com.example.alreadytalbt.Order.dto;
 public class RemoveFromCartRequestDTO {
     private String customerId;
     private String menuItemId;
-
     private String restaurantId;
-
     // Constructors (optional)
     public RemoveFromCartRequestDTO() {}
 
