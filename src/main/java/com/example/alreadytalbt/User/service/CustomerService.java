@@ -46,8 +46,8 @@ public class CustomerService {
     private OrderFeignClient cartClient;
     ;
 
-    public CustomerResponseDTO createCustomerFromToken(CreateCustomerDTO dto, String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public CustomerResponseDTO createCustomerFromToken(CreateCustomerDTO dto, String userId) {
+
 
         User user = userRepo.findById(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -83,40 +83,46 @@ public class CustomerService {
 
 
 
-    public Optional<Customer> updateCustomerFromToken(UpdateCustomerDTO dto, String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public Optional<Customer> updateCustomerFromToken(UpdateCustomerDTO dto, String userId) {
+
 
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
+        User user = userRepo.findById(customer.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found for vendor"));
+
+        if (dto.getName() != null) user.setUsername(dto.getName());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        if(dto.getAddress()!=null) user.setAddress(dto.getAddress());
+        userRepo.save(user);
 
         customer.setOrderIds(dto.getOrderIds());
+
         return Optional.of(customerRepo.save(customer));
     }
 
 
 
-    public boolean deleteCustomerFromToken(String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public boolean deleteCustomerFromToken(String userId) {
+
 
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         customerRepo.deleteById(customer.getId());
-        userRepo.deleteById(new ObjectId(userId)); // <--- add this line
+        userRepo.deleteById(new ObjectId(userId));
 
         return true;
     }
 
 
     ///RESTAURANT RELATED STUFF
-    public List<RestaurantResponseDTO> viewAllRestaurants(String token) {
-
-        String userId = jwtUtil.extractUserId(token);
+    public List<RestaurantResponseDTO> viewAllRestaurants() {
         return restaurantClient.getAllRestaurants(); // no auth required here
     }
 
-    public RestaurantResponseDTO getRestaurantById(String restaurantId, String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public RestaurantResponseDTO getRestaurantById(String restaurantId, String userId) {
+       // String userId = jwtUtil.extractUserId(token);
         return restaurantClient.getRestaurantById(restaurantId);
     }
 
@@ -148,8 +154,8 @@ public class CustomerService {
         return dto;
     }
 
-    public CartDTO handleAddToCart(AddToCartRequestDTO request, String token) {
-        String userId = jwtUtil.extractUserId(token); // Validate & extract user ID
+    public CartDTO handleAddToCart(AddToCartRequestDTO request, String userId) {
+       // String userId = jwtUtil.extractUserId(token); // Validate & extract user ID
 
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found for user"));
@@ -160,8 +166,8 @@ public class CustomerService {
     }
 
 
-    public CartDTO removeItemFromCart(RemoveFromCartRequestDTO request, String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public CartDTO removeItemFromCart(RemoveFromCartRequestDTO request, String userId) {
+        //String userId = jwtUtil.extractUserId(token);
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found for user"));
         request.setCustomerId(customer.getId().toString());
@@ -173,29 +179,28 @@ public class CustomerService {
         return restaurantClient.getRestaurantById(restaurantId); // No authHeader needed
     }
 
-    public MenuItemDTO getMenuItemById(String menuItemId, String token) {
-        String userId = jwtUtil.extractUserId(token); // Just to validate the token
+    public MenuItemDTO getMenuItemById(String menuItemId) {
         return restaurantClient.getMenuItemById(menuItemId);
     }
 
 
-    public CartDTO getCartWithIdsOnly(String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public CartDTO getCartWithIdsOnly(String userId) {
+       // String userId = jwtUtil.extractUserId(token);
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found for user"));
         return cartClient.getCartWithIdsOnly(customer.getId().toString());
     }
 
-    public CartWithItemsDTO getCartWithDetails(String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public CartWithItemsDTO getCartWithDetails(String userId) {
+     //   String userId = jwtUtil.extractUserId(token);
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found for user"));
         return cartClient.getCartByCustomerIdwithdetails(customer.getId().toString());
     }
 
     
-    public void handleDeleteCart(String token) {
-        String userId = jwtUtil.extractUserId(token);
+    public void handleDeleteCart(String userId) {
+        //String userId = jwtUtil.extractUserId(token);
         Customer customer = customerRepo.findByUserId(new ObjectId(userId))
                 .orElseThrow(() -> new RuntimeException("Customer not found for user"));
         cartClient.deleteCart(customer.getId().toString());

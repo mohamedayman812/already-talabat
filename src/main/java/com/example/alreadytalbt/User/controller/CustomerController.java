@@ -5,11 +5,13 @@ import com.example.alreadytalbt.Restaurant.dto.MenuItemDTO;
 import com.example.alreadytalbt.User.FeignClient.RestaurantClient;
 import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 import com.example.alreadytalbt.User.auth.JwtUtil;
+import com.example.alreadytalbt.User.auth.RequireAuthentication;
 import com.example.alreadytalbt.User.dto.CreateCustomerDTO;
 import com.example.alreadytalbt.User.dto.CustomerResponseDTO;
 import com.example.alreadytalbt.User.dto.UpdateCustomerDTO;
 import com.example.alreadytalbt.User.model.Customer;
 import com.example.alreadytalbt.User.service.CustomerService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,11 +36,13 @@ public class CustomerController {
 
     // CREATE
     @PostMapping("/me")
+    @RequireAuthentication
     public ResponseEntity<?> createCustomer(@RequestBody CreateCustomerDTO dto,
-                                            @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
+                                           HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         try {
-            CustomerResponseDTO customer = customerService.createCustomerFromToken(dto, token);
+            CustomerResponseDTO customer = customerService.createCustomerFromToken(dto, userId);
             return ResponseEntity.ok(customer);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
@@ -53,9 +57,10 @@ public class CustomerController {
 //    }
 
     @GetMapping("/me")
-    public ResponseEntity<CustomerResponseDTO> getMyCustomerProfile(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
+    @RequireAuthentication
+    public ResponseEntity<CustomerResponseDTO> getMyCustomerProfile(HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         return customerService.getCustomerByUserId(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -63,11 +68,13 @@ public class CustomerController {
 
     // UPDATE
     @PutMapping("/me")
+    @RequireAuthentication
     public ResponseEntity<?> updateCustomer(@RequestBody UpdateCustomerDTO dto,
-                                            @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
+                                           HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         try {
-            Customer updated = customerService.updateCustomerFromToken(dto, token)
+            Customer updated = customerService.updateCustomerFromToken(dto, userId)
                     .orElseThrow(() -> new RuntimeException("Customer not found"));
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
@@ -77,10 +84,12 @@ public class CustomerController {
 
     // DELETE
     @DeleteMapping("/me")
-    public ResponseEntity<?> deleteCustomer(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
+    @RequireAuthentication
+    public ResponseEntity<?> deleteCustomer(HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
         try {
-            boolean deleted = customerService.deleteCustomerFromToken(token);
+            boolean deleted = customerService.deleteCustomerFromToken(userId);
             if (deleted) return ResponseEntity.noContent().build();
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
@@ -94,31 +103,37 @@ public class CustomerController {
     //view all restraunts. it shows all the restraunts and the menu items inside it
     //tested
     @GetMapping("/restaurants")
+    @RequireAuthentication
     public ResponseEntity<List<RestaurantResponseDTO>> viewAllRestaurants(
-            @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "").trim();
-        return ResponseEntity.ok(customerService.viewAllRestaurants(token));
+           HttpServletRequest request) {
+        //String token = authHeader.replace("Bearer ", "").trim();
+       // String userId = (String) request.getAttribute("userId");
+        return ResponseEntity.ok(customerService.viewAllRestaurants());
     }
 
 
     // view a specific restraunt
     //tested
     @GetMapping("/restaurant/{restaurantId}")
+    @RequireAuthentication
     public ResponseEntity<RestaurantResponseDTO> getRestaurantById(
             @PathVariable String restaurantId,
-            @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "").trim();
-        return ResponseEntity.ok(customerService.getRestaurantById(restaurantId,  token));
+           HttpServletRequest request) {
+        //String token = authHeader.replace("Bearer ", "").trim();
+        String userId = (String) request.getAttribute("userId");
+        return ResponseEntity.ok(customerService.getRestaurantById(restaurantId,  userId));
     }
 
 
     //view a specific menu item
     //tested
     @GetMapping("/menu/{id}")
+    @RequireAuthentication
     public ResponseEntity<MenuItemDTO> menuitemById(@PathVariable String id,
-                                                    @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "").trim();
-        return ResponseEntity.ok(customerService.getMenuItemById(id, token));
+                                                   HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "").trim();
+        String userId = (String) request.getAttribute("userId");
+        return ResponseEntity.ok(customerService.getMenuItemById(id));
     }
 
 
@@ -126,51 +141,62 @@ public class CustomerController {
     /// add item to a cart
     /// tested
     @PostMapping("/cart/add-item")
-    public ResponseEntity<CartDTO> addItemToCart(@Valid @RequestBody AddToCartRequestDTO request,
-                                                 @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        CartDTO updatedCart = customerService.handleAddToCart(request, token);
+    @RequireAuthentication
+    public ResponseEntity<CartDTO> addItemToCart(@Valid @RequestBody AddToCartRequestDTO req,
+                                                HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
+        CartDTO updatedCart = customerService.handleAddToCart(req, userId);
         return ResponseEntity.ok(updatedCart);
     }
 
     //Delete an item from a cart
     //
     @PostMapping("/cart/remove-item")
-    public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO request,
-                                                      @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        CartDTO updatedCart = customerService.removeItemFromCart(request, token);
+    @RequireAuthentication
+    public ResponseEntity<CartDTO> removeItemFromCart(@RequestBody RemoveFromCartRequestDTO req,
+                                                     HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
+        CartDTO updatedCart = customerService.removeItemFromCart(req, userId);
         return ResponseEntity.ok(updatedCart);
     }
 
     //view a cart with its items details
     @GetMapping("/cart/ids-only")
-    public ResponseEntity<CartDTO> getCartWithIdsOnly(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(customerService.getCartWithIdsOnly(token));
+    @RequireAuthentication
+    public ResponseEntity<CartDTO> getCartWithIdsOnly( HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
+        return ResponseEntity.ok(customerService.getCartWithIdsOnly(userId));
     }
 
     @GetMapping("/cart/details")
-    public ResponseEntity<CartWithItemsDTO> getCartWithDetails(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(customerService.getCartWithDetails(token ));
+    @RequireAuthentication
+    public ResponseEntity<CartWithItemsDTO> getCartWithDetails( HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
+        return ResponseEntity.ok(customerService.getCartWithDetails(userId ));
     }
 
     //delete cart
     @DeleteMapping("/cart/remove")
-    public ResponseEntity<Void> deleteCart(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        customerService.handleDeleteCart(token);
+    @RequireAuthentication
+    public ResponseEntity<Void> deleteCart(HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
+        String userId = (String) request.getAttribute("userId");
+        customerService.handleDeleteCart(userId);
         return ResponseEntity.noContent().build();
     }
 
 
 
     @PostMapping("/cart/submit/{cartId}/paymentMethod")
+    @RequireAuthentication
     public ResponseEntity<CreateOrderDTO> submitOrder(@PathVariable String cartId,
                                                       @RequestParam String paymentMethod,
-                                                      @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
+                                                     HttpServletRequest request) {
+       // String token = authHeader.replace("Bearer ", "");
         // optionally validate user before placing order
         CreateOrderDTO order = cartClient.submitOrder(cartId, paymentMethod);
         return ResponseEntity.ok(order);
