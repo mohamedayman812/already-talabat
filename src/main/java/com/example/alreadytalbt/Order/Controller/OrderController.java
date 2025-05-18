@@ -92,7 +92,7 @@ public class OrderController {
     }
 
     @GetMapping("/summary")
-    public List<OrderSummaryDTO> getOrderSummaries() {
+    public List<OrderResponseDTO> getOrderSummaries() {
         return orderService.getAllOrderSummaries(); // returns List<OrderSummaryDTO>
     }
 

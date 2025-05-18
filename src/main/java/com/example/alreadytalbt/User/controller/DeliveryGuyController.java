@@ -90,7 +90,7 @@ public class DeliveryGuyController {
 
     @GetMapping("/summary")
     @RequireAuthentication
-    public ResponseEntity<List<OrderSummaryDTO>> getAllOrderSummaries( HttpServletRequest request) {
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrderSummaries( HttpServletRequest request) {
         return ResponseEntity.ok(deliveryGuyService.getAllOrdersForDeliveryGuy());
     }
 

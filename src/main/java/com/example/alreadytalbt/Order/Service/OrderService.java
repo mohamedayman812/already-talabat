@@ -139,10 +139,14 @@ public class OrderService {
         return convertToDto(updatedOrder);
     }
 
-    public List<OrderSummaryDTO> getAllOrderSummaries() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(order -> new OrderSummaryDTO(order.getId().toHexString(), order.getStatus()))
+    public List<OrderResponseDTO> getAllOrderSummaries() {
+        System.out.println(orderRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList()).toString());
+       return orderRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 

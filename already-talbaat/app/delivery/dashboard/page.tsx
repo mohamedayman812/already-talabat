@@ -1,347 +1,357 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
+import { API_URL } from "@/lib/utils"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-// Mock data
-const mockDeliveryGuy = {
-  id: "1",
-  name: "John Smith",
-  totalDeliveries: 156,
-  activeDeliveries: 2,
-  completedToday: 8,
+type OrderStatus = 'Prepared' | 'placed' | 'out_for_delivery' | 'delivered'
+
+interface Order {
+  id: string
+  customerId: string
+  restaurantId: string
+  deliveryGuyId?: string | null
+  status: OrderStatus
+  paymentMethod: string
+  items: string[] 
 }
 
-const mockOrders = [
-  {
-    id: "ORD-001",
-    date: "2023-05-18T14:30:00",
-    customer: {
-      name: "Alice Johnson",
-      address: "123 Main St, Apt 4B, City",
-      phone: "+1234567890",
-    },
-    restaurant: {
-      name: "Pasta Paradise",
-      address: "456 Oak Ave, City",
-    },
-    items: [
-      { name: "Spaghetti Carbonara", quantity: 1 },
-      { name: "Tiramisu", quantity: 1 },
-    ],
-    total: 23.97,
-    status: "ready_for_pickup",
-  },
-  {
-    id: "ORD-002",
-    date: "2023-05-18T13:45:00",
-    customer: {
-      name: "Bob Williams",
-      address: "789 Pine Rd, City",
-      phone: "+1987654321",
-    },
-    restaurant: {
-      name: "Burger Bliss",
-      address: "101 Elm St, City",
-    },
-    items: [
-      { name: "Cheeseburger", quantity: 2 },
-      { name: "French Fries", quantity: 1 },
-      { name: "Chocolate Shake", quantity: 1 },
-    ],
-    total: 30.96,
-    status: "out_for_delivery",
-  },
-  {
-    id: "ORD-003",
-    date: "2023-05-18T12:15:00",
-    customer: {
-      name: "Charlie Brown",
-      address: "202 Maple Dr, City",
-      phone: "+1122334455",
-    },
-    restaurant: {
-      name: "Sushi Sensation",
-      address: "303 Cedar Ln, City",
-    },
-    items: [
-      { name: "California Roll", quantity: 1 },
-      { name: "Salmon Nigiri", quantity: 2 },
-      { name: "Miso Soup", quantity: 1 },
-    ],
-    total: 26.96,
-    status: "delivered",
-  },
-  {
-    id: "ORD-004",
-    date: "2023-05-17T19:30:00",
-    customer: {
-      name: "Diana Evans",
-      address: "404 Birch Blvd, City",
-      phone: "+1567891234",
-    },
-    restaurant: {
-      name: "Pizza Palace",
-      address: "505 Walnut Way, City",
-    },
-    items: [
-      { name: "Pepperoni Pizza", quantity: 1 },
-      { name: "Garlic Bread", quantity: 1 },
-      { name: "Soda", quantity: 2 },
-    ],
-    total: 25.96,
-    status: "delivered",
-  },
-]
+interface Restaurant {
+  id: string
+  name: string
+}
 
-export default function DeliveryDashboard() {
-  const [deliveryGuy, setDeliveryGuy] = useState(null)
-  const [orders, setOrders] = useState([])
+interface MenuItem {
+  id: string
+  name: string
+  price: number
+}
+
+export default function DeliveryOrders() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [restaurants, setRestaurants] = useState<Record<string, Restaurant>>({})
+  const [items, setMenuItems] = useState<Record<string, MenuItem>>({})
+  const [orderPrices, setOrderPrices] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
 
-  useEffect(() => {
-    // Check if user is logged in and is a delivery person
-    const token = localStorage.getItem("auth-token")
-    const role = localStorage.getItem("user-role")
+  // Fetch menu item details with enhanced error handling
+  const fetchMenuItem = async (id: string, token: string): Promise<MenuItem | null> => {
+    if (!id) {
+      console.error('Empty menu item ID')
+      return null
+    }
 
-    if (!token || role !== "DELIVERY") {
-      toast({
-        title: "Access denied",
-        description: "You must be logged in as a delivery person to access this page.",
-        variant: "destructive",
+    try {
+      const res = await fetch(`${API_URL}/api/menu-items/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
       })
-      // In a real app, you would redirect to login page
+      
+      if (!res.ok) {
+        console.error(`Failed to fetch menu item ${id}:`, res.status)
+        return null
+      }
+      
+      const data = await res.json()
+      
+      if (!data?.id || typeof data?.price !== 'number') {
+        console.error('Invalid menu item data:', data)
+        return null
+      }
+      
+      return data
+    } catch (error) {
+      console.error(`Error fetching menu item ${id}:`, error)
+      return null
+    }
+  }
+
+  // Fetch all data with proper sequencing
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("auth-token")
+      if (!token) {
+        toast({
+          title: "Authentication required",
+          description: "Please login to access orders",
+          variant: "destructive"
+        })
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        // 1. Fetch orders
+        const ordersRes = await fetch(`${API_URL}/api/delivery/summary`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        
+        if (!ordersRes.ok) throw new Error(`Failed to fetch orders: ${ordersRes.status}`)
+        
+        const ordersData: Order[] = await ordersRes.json()
+        console.log('Fetched orders:', ordersData)
+
+        // 2. Get all unique menu item IDs from orders
+        const allMenuItemIds = ordersData.flatMap(order => 
+          Array.isArray(order.items) ? order.items : []
+        ).filter(id => id && typeof id === 'string')
+        
+        const uniqueMenuItemIds = [...new Set(allMenuItemIds)]
+        console.log('Unique menu item IDs:', uniqueMenuItemIds)
+
+        // 3. Fetch all menu items first
+        const menuItemPromises = uniqueMenuItemIds.map(id => fetchMenuItem(id, token))
+        const menuItemsResults = await Promise.all(menuItemPromises)
+        const validMenuItems = menuItemsResults.filter(Boolean) as MenuItem[]
+        
+        const menuItemsMap = validMenuItems.reduce((acc, item) => {
+          acc[item.id] = item
+          return acc
+        }, {} as Record<string, MenuItem>)
+        
+        console.log('Menu items map:', menuItemsMap)
+        setMenuItems(menuItemsMap)
+
+        // 4. Now calculate prices with the populated menuItemsMap
+        const pricesMap = ordersData.reduce((acc, order) => {
+          const validItems = Array.isArray(order.items) ? order.items : []
+          acc[order.id] = validItems.reduce((sum, itemId) => {
+            const itemPrice = menuItemsMap[itemId]?.price || 0
+            console.log(`Item ${itemId} price: ${itemPrice}`)
+            return sum + itemPrice
+          }, 0)
+          return acc
+        }, {} as Record<string, number>)
+        
+        console.log('Calculated prices:', pricesMap)
+        setOrderPrices(pricesMap)
+
+        // 5. Fetch restaurants
+        const restaurantIds = [...new Set(ordersData.map(order => order.restaurantId))]
+        const validRestaurantIds = restaurantIds.filter(id => id && typeof id === 'string')
+        
+        const restaurantPromises = validRestaurantIds.map(id =>
+          fetch(`${API_URL}/api/restaurants/single/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).then(res => res.ok ? res.json() : null)
+        )
+        
+        const restaurantsData = await Promise.all(restaurantPromises)
+        const restaurantsMap = restaurantsData.reduce((acc, restaurant) => {
+          if (restaurant?.id) acc[restaurant.id] = restaurant
+          return acc
+        }, {} as Record<string, Restaurant>)
+        
+        setRestaurants(restaurantsMap)
+        setOrders(ordersData)
+
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive"
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchData()
+  }, [toast])
+  // Assign order to current delivery guy
+  const assignOrder = async (orderId: string) => {
+    const token = localStorage.getItem("auth-token")
+    if (!token) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to accept orders",
+        variant: "destructive"
+      })
       return
     }
 
-    // In a real app, you would fetch delivery guy info and orders from your API
-    // Simulate API call
-    setTimeout(() => {
-      setDeliveryGuy(mockDeliveryGuy)
-      setOrders(mockOrders)
-      setIsLoading(false)
-    }, 1000)
-  }, [toast])
+    try {
+      const assignRes = await fetch(
+        `${API_URL}/api/delivery/assign-order/${orderId}/to-deliveryGuy`,
+        { method: "PUT", headers: { Authorization: `Bearer ${token}` } }
+      )
+      
+      if (!assignRes.ok) throw new Error(`Assignment failed: ${assignRes.status}`)
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "ready_for_pickup":
-        return <Badge variant="outline">Ready for Pickup</Badge>
-      case "out_for_delivery":
-        return <Badge variant="secondary">Out for Delivery</Badge>
-      case "delivered":
-        return <Badge variant="default">Delivered</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, deliveryGuyId: "current-user" } : order
+      ))
+
+      toast({ title: "Success", description: "Order assigned to you!" })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to assign order"
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      })
     }
   }
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date)
+  // Update order status
+  const updateStatus = async (orderId: string, newStatus: OrderStatus) => {
+    const token = localStorage.getItem("auth-token")
+    if (!token) {
+      toast({
+        title: "Authentication required",
+        description: "Please login to update status",
+        variant: "destructive"
+      })
+      return
+    }
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/delivery/${orderId}/status?status=${newStatus}`,
+        { method: "PUT", headers: { Authorization: `Bearer ${token}` } }
+      )
+      
+      if (!res.ok) throw new Error(`Status update failed: ${res.status}`)
+
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ))
+
+      toast({
+        title: "Updated",
+        description: `Status changed to ${newStatus.replace(/_/g, ' ')}`
+      })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update status"
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      })
+    }
   }
 
-  const updateOrderStatus = (orderId, newStatus) => {
-    // In a real app, you would call your API to update the order status
-    setOrders(orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)))
+  if (isLoading) return <div>Loading orders...</div>
 
-    toast({
-      title: "Order status updated",
-      description: `Order #${orderId} has been marked as ${newStatus.replace("_", " ")}.`,
-    })
-  }
+  const availableOrders = orders.filter(order => order.deliveryGuyId !== "current-user")
+  const myOrders = orders.filter(order => order.deliveryGuyId === "current-user")
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <p>Loading dashboard...</p>
-      </div>
-    )
-  }
+   return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Delivery Orders</h1>
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Delivery Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Deliveries</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{deliveryGuy.activeDeliveries}</div>
-            <p className="text-xs text-muted-foreground mt-1">Orders in progress</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Completed Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{deliveryGuy.completedToday}</div>
-            <p className="text-xs text-muted-foreground mt-1">Deliveries completed today</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Deliveries</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{deliveryGuy.totalDeliveries}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time deliveries</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Orders</h2>
-        <Link href="/delivery/orders">
-          <Button variant="outline">View All Orders</Button>
-        </Link>
-      </div>
-
-      <Tabs defaultValue="active">
-        <TabsList className="mb-6">
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active" className="space-y-6">
-          {orders.filter((order) => order.status !== "delivered").length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">No active orders at the moment.</p>
-          ) : (
-            orders
-              .filter((order) => order.status !== "delivered")
-              .map((order) => (
-                <Card key={order.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">Order #{order.id}</CardTitle>
-                        <CardDescription>{formatDate(order.date)}</CardDescription>
-                      </div>
-                      {getStatusBadge(order.status)}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Available Orders */}
+        <div>
+          <h2 className="text-xl font-bold mb-4">Available Orders</h2>
+          {availableOrders.length > 0 ? (
+            availableOrders.map(order => {
+              const validMenuItems = Array.isArray(order.items) ? order.items : []
+              return (
+                <Card key={order.id} className="mb-4">
+                  <CardHeader>
+                    <CardTitle>Order #{order.id}</CardTitle>
+                    <div className="flex gap-2 items-center">
+                      <Badge>{order.status}</Badge>
+                    
+                      <Badge variant="secondary">${orderPrices[order.id]?.toFixed(2) || '0.00'}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Restaurant</h3>
-                          <p className="text-sm">{order.restaurant.name}</p>
-                          <p className="text-xs text-muted-foreground">{order.restaurant.address}</p>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Customer</h3>
-                          <p className="text-sm">{order.customer.name}</p>
-                          <p className="text-xs text-muted-foreground">{order.customer.address}</p>
-                          <p className="text-xs text-muted-foreground">{order.customer.phone}</p>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-sm mb-1">Items</h3>
-                        <ul className="text-sm space-y-1">
-                          {order.items.map((item, index) => (
-                            <li key={index}>
-                              {item.quantity} x {item.name}
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="flex justify-between font-semibold mt-2 pt-2 border-t text-sm">
-                          <span>Total</span>
-                          <span>${order.total.toFixed(2)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        {order.status === "ready_for_pickup" ? (
-                          <Button onClick={() => updateOrderStatus(order.id, "out_for_delivery")}>Pick Up Order</Button>
-                        ) : order.status === "out_for_delivery" ? (
-                          <Button onClick={() => updateOrderStatus(order.id, "delivered")}>Mark as Delivered</Button>
-                        ) : null}
-
-                        <Link href={`/delivery/orders/${order.id}`}>
-                          <Button variant="outline">View Details</Button>
-                        </Link>
-                      </div>
+                    <p>Restaurant: {restaurants[order.restaurantId]?.name || 'Loading...'}</p>
+                    <p>Payment Method: {order.paymentMethod}</p>
+                    <div className="mt-2">
+                      <p className="font-semibold">Items:</p>
+                      <ul className="list-disc pl-5">
+                        {validMenuItems.map(itemId => (
+                          <li key={itemId}>
+                            {items[itemId]?.name || 'Loading...'} - 
+                            ${items[itemId]?.price?.toFixed(2) || '0.00'}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
+                    <Button 
+                      onClick={() => assignOrder(order.id)}
+                      className="mt-4 w-full"
+                      disabled={order.status !== 'Prepared'}
+                      variant={order.status === 'Prepared' ? 'default' : 'outline'}
+                    >
+                      {order.status === 'Prepared' ? 'Assign to Me' : 'Waiting for preparation'}
+                    </Button>
                   </CardContent>
                 </Card>
-              ))
-          )}
-        </TabsContent>
-
-        <TabsContent value="completed" className="space-y-6">
-          {orders.filter((order) => order.status === "delivered").length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">No completed orders to display.</p>
+              )
+            })
           ) : (
-            orders
-              .filter((order) => order.status === "delivered")
-              .map((order) => (
-                <Card key={order.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">Order #{order.id}</CardTitle>
-                        <CardDescription>{formatDate(order.date)}</CardDescription>
-                      </div>
-                      {getStatusBadge(order.status)}
+            <p className="text-muted-foreground">No available orders</p>
+          )}
+        </div>
+
+        {/* My Assigned Orders */}
+        <div>
+          <h2 className="text-xl font-bold mb-4">My Orders</h2>
+          {myOrders.length > 0 ? (
+            myOrders.map(order => {
+              const validMenuItems = Array.isArray(order.items) ? order.items : []
+              return (
+                <Card key={order.id} className="mb-4">
+                  <CardHeader>
+                    <CardTitle>Order #{order.id}</CardTitle>
+                    <div className="flex gap-2 items-center">
+                      <Badge>{order.status}</Badge>
+                      <Badge variant="secondary">${orderPrices[order.id]?.toFixed(2) || '0.00'}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Restaurant</h3>
-                          <p className="text-sm">{order.restaurant.name}</p>
-                          <p className="text-xs text-muted-foreground">{order.restaurant.address}</p>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Customer</h3>
-                          <p className="text-sm">{order.customer.name}</p>
-                          <p className="text-xs text-muted-foreground">{order.customer.address}</p>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="font-semibold text-sm mb-1">Items</h3>
-                        <ul className="text-sm space-y-1">
-                          {order.items.map((item, index) => (
-                            <li key={index}>
-                              {item.quantity} x {item.name}
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="flex justify-between font-semibold mt-2 pt-2 border-t text-sm">
-                          <span>Total</span>
-                          <span>${order.total.toFixed(2)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end">
-                        <Link href={`/delivery/orders/${order.id}`}>
-                          <Button variant="outline">View Details</Button>
-                        </Link>
-                      </div>
+                    <div className="flex items-center gap-4 mb-4">
+                      <Select
+                        value={order.status}
+                        onValueChange={(value) => updateStatus(order.id, value as OrderStatus)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Prepared">Prepared</SelectItem>
+                          <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
+                          <SelectItem value="delivered">Delivered</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p>Restaurant: {restaurants[order.restaurantId]?.name || 'Loading...'}</p>
+                    <p>Payment Method: {order.paymentMethod}</p>
+                    <div className="mt-2">
+                      <p className="font-semibold">Items:</p>
+                      <ul className="list-disc pl-5">
+                        {validMenuItems.map(itemId => (
+                          <li key={itemId}>
+                            {items[itemId]?.name || 'Loading...'} - 
+                            ${items[itemId]?.price?.toFixed(2) || '0.00'}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </CardContent>
                 </Card>
-              ))
+              )
+            })
+          ) : (
+            <p className="text-muted-foreground">No assigned orders</p>
           )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   )
 }
