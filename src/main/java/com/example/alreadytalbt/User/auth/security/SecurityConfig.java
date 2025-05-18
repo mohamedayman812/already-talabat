@@ -1,9 +1,4 @@
-package com.example.alreadytalbt.security;
-
-import com.example.alreadytalbt.User.auth.security.AuthEntryPointJwt;
-import com.example.alreadytalbt.User.auth.security.CustomAccessDeniedHandler;
-import com.example.alreadytalbt.User.auth.security.JwtAuthenticationFilter;
-import com.example.alreadytalbt.User.auth.security.UserDetailsServiceImpl;
+package com.example.alreadytalbt.User.auth.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +12,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 @Configuration
@@ -66,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/menu-items/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/menu-items/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/carts/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/carts/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/carts/**").permitAll()

@@ -13,6 +13,16 @@ public class MenuItemCreateDTO {
 
     private String description;
 
+    @Override
+    public String toString() {
+        return "MenuItemCreateDTO{" +
+                "name='" + name + '\'' +
+                ", price=" + price +
+                ", description='" + description + '\'' +
+                ", restaurantId='" + restaurantId + '\'' +
+                '}';
+    }
+
     private String restaurantId;
 
     //Getters and Setters

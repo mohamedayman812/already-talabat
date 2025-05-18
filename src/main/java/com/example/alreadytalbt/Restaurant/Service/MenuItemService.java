@@ -39,7 +39,7 @@ public class MenuItemService {
         MenuItem savedItem = menuItemRepo.save(item);
         restaurant.getMenuItems().add(savedItem.getId());
         restaurantRepo.save(restaurant);
-
+        System.out.println(savedItem.toString());
         return toDTO(savedItem);
     }
 
