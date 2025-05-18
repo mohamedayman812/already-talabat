@@ -14,8 +14,7 @@ interface Restaurant {
   name: string
   address: string
   businessHours?: string
-  // if you add 'cuisine' server-side, uncomment this:
-  // cuisine?: string
+
 }
 
 export default function RestaurantsPage() {

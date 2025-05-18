@@ -13,7 +13,6 @@ public class OrderResponseDTO {
     private String restaurantId;
     @Field("deliveryGuyId")
     private String deliveryGuyId;
-
     private String cartId;
     private List<String> items;  //i think list of strings maybe ?
     private String status;
@@ -82,4 +81,5 @@ public class OrderResponseDTO {
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
+
 }

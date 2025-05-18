@@ -7,7 +7,6 @@ import com.example.alreadytalbt.Order.dto.OrderResponseDTO;
 import com.example.alreadytalbt.Order.dto.OrderSummaryDTO;
 import com.example.alreadytalbt.Order.dto.UpdateOrderDTO;
 //import com.example.alreadytalbt.Order.feign.DeliveryGuyFeignClient;
-import com.example.alreadytalbt.User.FeignClient.OrderFeignClient;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
@@ -16,8 +15,6 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.beans.PropertyDescriptor;
@@ -166,8 +163,10 @@ public class OrderService {
         return dto;
     }
 
+
     private OrderResponseDTO convertToDto(Order order) {
         OrderResponseDTO dto = new OrderResponseDTO();
+
         dto.setId(order.getId().toHexString());
         dto.setRestaurantId(order.getRestaurantId().toHexString());
         dto.setCustomerId(order.getCustomerId().toHexString());
