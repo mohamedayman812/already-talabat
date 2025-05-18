@@ -18,12 +18,13 @@ export default function VendorMenuPage() {
 
   /* ------------------------------------------------ state */
   const [restaurantId, setRestaurantId] = useState("")
-  const [menuItems, setMenuItems]     = useState<MenuItemDTO[]>([])
-  const [isLoading,  setIsLoading]    = useState(true)
+  const [menuItems, setMenuItems] = useState<MenuItemDTO[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const [isAdding, setIsAdding] = useState(false)
   const [newItem, setNewItem] = useState({ name: "", description: "", price: "", restaurantId: "" })
 
+  const [isEditing, setIsEditing] = useState(false)
   const [editItem, setEditItem] = useState<MenuItemDTO | null>(null)
 
   /* ---------------------------------------------- bootstrap */
@@ -68,13 +69,18 @@ export default function VendorMenuPage() {
 
       const created:MenuItemDTO = await res.json()
       setMenuItems(prev=>[ ...prev, created ])
-      setNewItem({ name:"", description:"", price:"" , restaurantId:"" })
+      setNewItem({ name:"", description:"", price:"", restaurantId:"" })
       setIsAdding(false)
       toast({ title:"Added", description:`"${created.name}" created.` })
     } catch(e:any) { toast({ title:"Error", description:e.message, variant:"destructive" }) }
   }
 
   /* ----------------------------------------------- EDIT */
+  const handleEditClick = (item: MenuItemDTO) => {
+    setEditItem(item)
+    setIsEditing(true)
+  }
+
   const handleSaveEdit = async () => {
     if (!editItem) return
     try {
@@ -87,6 +93,7 @@ export default function VendorMenuPage() {
       if (!res.ok) throw new Error(await res.text() || `HTTP ${res.status}`)
       const updated:MenuItemDTO = await res.json()
       setMenuItems(prev => prev.map(mi => mi.id===updated.id ? updated : mi))
+      setIsEditing(false)
       setEditItem(null)
       toast({ title:"Saved", description:`"${updated.name}" updated.` })
     } catch(e:any) { toast({ title:"Error", description:e.message, variant:"destructive" }) }
@@ -114,15 +121,28 @@ export default function VendorMenuPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Menu Management</h1>
         <Dialog open={isAdding} onOpenChange={setIsAdding}>
-          <DialogTrigger asChild><Button variant="outline" className="gap-2"><Plus size={18}/>Add item</Button></DialogTrigger>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Plus size={18}/>Add item
+            </Button>
+          </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Add new item</DialogTitle><DialogDescription>Create a menu entry.</DialogDescription></DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Add new item</DialogTitle>
+              <DialogDescription>Create a menu entry.</DialogDescription>
+            </DialogHeader>
             <div className="space-y-4 py-4">
-              <Label>Name</Label><Input value={newItem.name} onChange={e=>setNewItem({...newItem,name:e.target.value})}/>
-              <Label>Description</Label><Textarea value={newItem.description} onChange={e=>setNewItem({...newItem,description:e.target.value})}/>
-              <Label>Price ($)</Label><Input type="number" step="0.01" value={newItem.price} onChange={e=>setNewItem({...newItem,price:e.target.value})}/>
+              <Label>Name</Label>
+              <Input value={newItem.name} onChange={e=>setNewItem({...newItem,name:e.target.value})}/>
+              <Label>Description</Label>
+              <Textarea value={newItem.description} onChange={e=>setNewItem({...newItem,description:e.target.value})}/>
+              <Label>Price ($)</Label>
+              <Input type="number" step="0.01" value={newItem.price} onChange={e=>setNewItem({...newItem,price:e.target.value})}/>
             </div>
-            <DialogFooter><Button variant="outline" onClick={()=>setIsAdding(false)}>Cancel</Button><Button onClick={handleAddItem}>Add</Button></DialogFooter>
+            <DialogFooter>
+              <Button variant="outline" onClick={()=>setIsAdding(false)}>Cancel</Button>
+              <Button onClick={handleAddItem}>Add</Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
@@ -137,23 +157,64 @@ export default function VendorMenuPage() {
               <p className="font-medium">${item.price.toFixed(2)}</p>
             </CardContent>
             <CardFooter className="justify-end gap-2">
-              {/* edit */}
-              <Dialog open={editItem?.id===item.id} onOpenChange={()=>setEditItem(null)}>
-                <DialogTrigger asChild><Button size="icon" variant="outline" onClick={()=>setEditItem(item)}><Edit size={16}/></Button></DialogTrigger>
-                {editItem && (
-                  <DialogContent>
-                    <DialogHeader><DialogTitle>Edit item</DialogTitle></DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <Label>Name</Label><Input value={editItem.name} onChange={e=>setEditItem({...editItem,name:e.target.value})}/>
-                      <Label>Description</Label><Textarea value={editItem.description} onChange={e=>setEditItem({...editItem,description:e.target.value})}/>
-                      <Label>Price ($)</Label><Input type="number" step="0.01" value={editItem.price} onChange={e=>setEditItem({...editItem,price:parseFloat(e.target.value)})}/>
-                    </div>
-                    <DialogFooter><Button variant="outline" onClick={()=>setEditItem(null)}>Cancel</Button><Button onClick={handleSaveEdit}>Save</Button></DialogFooter>
-                  </DialogContent>
-                )}
+              {/* edit dialog */}
+              <Dialog open={isEditing && editItem?.id === item.id} onOpenChange={(open) => {
+                if (!open) {
+                  setIsEditing(false)
+                  setEditItem(null)
+                }
+              }}>
+                <Button 
+                  size="icon" 
+                  variant="outline" 
+                  onClick={() => handleEditClick(item)}
+                >
+                  <Edit size={16}/>
+                </Button>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit item</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <Label>Name</Label>
+                    <Input 
+                      value={editItem?.name || ''} 
+                      onChange={e => editItem && setEditItem({...editItem, name:e.target.value})}
+                    />
+                    <Label>Description</Label>
+                    <Textarea 
+                      value={editItem?.description || ''} 
+                      onChange={e => editItem && setEditItem({...editItem, description:e.target.value})}
+                    />
+                    <Label>Price ($)</Label>
+                    <Input 
+                      type="number" 
+                      step="0.01" 
+                      value={editItem?.price || 0} 
+                      onChange={e => editItem && setEditItem({...editItem, price:parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => {
+                      setIsEditing(false)
+                      setEditItem(null)
+                    }}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSaveEdit}>Save</Button>
+                  </DialogFooter>
+                </DialogContent>
               </Dialog>
-              {/* delete */}
-              <Button size="icon" variant="ghost" className="text-red-600 hover:text-red-800" onClick={()=>remove(item.id,item.name)}><Trash2 size={16}/></Button>
+              
+              {/* delete button */}
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="text-red-600 hover:text-red-800" 
+                onClick={()=>remove(item.id,item.name)}
+              >
+                <Trash2 size={16}/>
+              </Button>
             </CardFooter>
           </Card>
         ))}

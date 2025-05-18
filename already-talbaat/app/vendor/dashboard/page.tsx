@@ -1,319 +1,233 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { API_URL } from "@/lib/utils";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock data
-const mockRestaurant = {
-  id: "1",
-  name: "Pasta Paradise",
-  address: "123 Main St, City, Country",
-  totalOrders: 156,
-  pendingOrders: 3,
-  totalRevenue: 4250.75,
-}
+type OrderDTO = {
+  id: string;
+  status: string;
+  createdAt?: string;
+  paymentMethod: string;
+};
 
-const mockOrders = [
-  {
-    id: "ORD-001",
-    date: "2023-05-18T14:30:00",
-    customer: "John Doe",
-    items: [
-      { name: "Spaghetti Carbonara", quantity: 1, price: 12.99 },
-      { name: "Tiramisu", quantity: 1, price: 7.99 },
-    ],
-    total: 23.97,
-    status: "pending",
-  },
-  {
-    id: "ORD-002",
-    date: "2023-05-18T13:45:00",
-    customer: "Jane Smith",
-    items: [
-      { name: "Fettuccine Alfredo", quantity: 1, price: 11.99 },
-      { name: "Garlic Bread", quantity: 1, price: 4.99 },
-    ],
-    total: 18.98,
-    status: "pending",
-  },
-  {
-    id: "ORD-003",
-    date: "2023-05-18T12:15:00",
-    customer: "Mike Johnson",
-    items: [
-      { name: "Penne Arrabbiata", quantity: 1, price: 10.99 },
-      { name: "Caesar Salad", quantity: 1, price: 8.99 },
-      { name: "Soda", quantity: 1, price: 2.99 },
-    ],
-    total: 24.97,
-    status: "pending",
-  },
-  {
-    id: "ORD-004",
-    date: "2023-05-17T19:30:00",
-    customer: "Sarah Williams",
-    items: [
-      { name: "Margherita Pizza", quantity: 1, price: 14.99 },
-      { name: "Tiramisu", quantity: 1, price: 7.99 },
-    ],
-    total: 24.98,
-    status: "completed",
-  },
-  {
-    id: "ORD-005",
-    date: "2023-05-17T18:20:00",
-    customer: "David Brown",
-    items: [
-      { name: "Lasagna", quantity: 1, price: 13.99 },
-      { name: "Garlic Bread", quantity: 1, price: 4.99 },
-      { name: "Soda", quantity: 2, price: 2.99 },
-    ],
-    total: 26.96,
-    status: "completed",
-  },
-]
+type VendorDTO = {
+  vendorId: string;
+  userId: string;
+  name: string;
+  email: string;
+  restaurantId: string;
+  restaurantName: string;
+  restaurantAddress: string;
+};
 
-export default function VendorDashboard() {
-  const [restaurant, setRestaurant] = useState(null)
-  const [orders, setOrders] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
+export default function VendorDashboardPage() {
+  const { toast } = useToast();
+  const [vendor, setVendor] = useState<VendorDTO | null>(null);
+  const [orders, setOrders] = useState<OrderDTO[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const tokenHeader = () => ({ Authorization: `Bearer ${localStorage.getItem("auth-token")}` });
 
   useEffect(() => {
-    // Check if user is logged in and is a vendor
-    const token = localStorage.getItem("auth-token")
-    const role = localStorage.getItem("user-role")
+    (async () => {
+      try {
+        setIsLoading(true);
+        
+        // 1️⃣ Get vendor details
+        const vRes = await fetch(`${API_URL}/api/vendors`, { headers: tokenHeader() });
+        if (!vRes.ok) throw new Error(await vRes.text());
+        const vendorData = await vRes.json();
+        setVendor(vendorData);
 
-    if (!token || role !== "VENDOR") {
-      toast({
-        title: "Access denied",
-        description: "You must be logged in as a vendor to access this page.",
-        variant: "destructive",
-      })
-      // In a real app, you would redirect to login page
-      return
-    }
+        // 2️⃣ Fetch restaurant's orders
+        const oRes = await fetch(
+          `${API_URL}/api/orders/restaurant/${vendorData.restaurantId}`,
+          { headers: tokenHeader() }
+        );
+        if (!oRes.ok) throw new Error(await oRes.text());
+        setOrders(await oRes.json());
 
-    // In a real app, you would fetch restaurant and orders from your API
-    // Simulate API call
-    setTimeout(() => {
-      setRestaurant(mockRestaurant)
-      setOrders(mockOrders)
-      setIsLoading(false)
-    }, 1000)
-  }, [toast])
+      } catch (err: any) {
+        toast({ 
+          title: "Error loading dashboard", 
+          description: err.message, 
+          variant: "destructive" 
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [toast]);
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "pending":
-        return <Badge>Pending</Badge>
-      case "preparing":
-        return <Badge variant="secondary">Preparing</Badge>
-      case "ready":
-        return <Badge variant="outline">Ready for Delivery</Badge>
-      case "completed":
-        return <Badge variant="default">Completed</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
-    }
-  }
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date)
-  }
-
-  const updateOrderStatus = (orderId, newStatus) => {
-    // In a real app, you would call your API to update the order status
-    setOrders(orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)))
-
-    toast({
-      title: "Order status updated",
-      description: `Order #${orderId} has been marked as ${newStatus}.`,
-    })
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <p>Loading dashboard...</p>
+  if (isLoading) return (
+    <div className="container mx-auto py-8 space-y-6">
+      <Skeleton className="h-10 w-64" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(5)].map((_, i) => (
+          <Skeleton key={i} className="h-36 rounded-lg" />
+        ))}
       </div>
-    )
-  }
+    </div>
+  );
+
+  // Calculate stats
+  const totalOrders = orders.length;
+  const todayOrders = orders.filter(order => {
+    if (!order.createdAt) return false;
+    const orderDate = new Date(order.createdAt);
+    const today = new Date();
+    return orderDate.toDateString() === today.toDateString();
+  }).length;
+
+  const statusCounts = orders.reduce<Record<string, number>>((acc, order) => {
+    acc[order.status] = (acc[order.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const paymentMethods = orders.reduce<Record<string, number>>((acc, order) => {
+    acc[order.paymentMethod] = (acc[order.paymentMethod] || 0) + 1;
+    return acc;
+  }, {});
+
+  const uniqueStatuses = Object.keys(statusCounts);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Vendor Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Restaurant</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{restaurant.name}</div>
-            <p className="text-xs text-muted-foreground mt-1">{restaurant.address}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{restaurant.totalOrders}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time orders</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{restaurant.pendingOrders}</div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting preparation</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${restaurant.totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time revenue</p>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto py-8 space-y-6">
+      {/* Restaurant Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">{vendor?.restaurantName}</h1>
+            <div className="mt-2 space-y-1 text-gray-600 dark:text-gray-300">
+              <p>{vendor?.restaurantAddress}</p>
+              <p>Managed by: {vendor?.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Vendor ID: {vendor?.vendorId}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/vendor/orders">View All Orders</Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Recent Orders</h2>
-        <Link href="/vendor/orders">
-          <Button variant="outline">View All Orders</Button>
-        </Link>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-blue-200 dark:border-blue-800">
+          <CardHeader>
+            <CardTitle>Total Orders</CardTitle>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold">{totalOrders}</CardContent>
+          <CardFooter>
+            <Link href="/vendor/orders" className="text-blue-600 dark:text-blue-400 hover:underline">
+              View all orders
+            </Link>
+          </CardFooter>
+        </Card>
+
+        <Card className="border-green-200 dark:border-green-800">
+          <CardHeader>
+            <CardTitle>Today's Orders</CardTitle>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold">{todayOrders}</CardContent>
+          <CardFooter className="text-sm text-green-600 dark:text-green-400">
+            {new Date().toLocaleDateString()}
+          </CardFooter>
+        </Card>
+
+        {uniqueStatuses.map((status) => (
+          <Card key={status} className={
+            status === 'COMPLETED' ? 'border-green-200 dark:border-green-800' :
+            status === 'CANCELLED' ? 'border-red-200 dark:border-red-800' :
+            'border-yellow-200 dark:border-yellow-800'
+          }>
+            <CardHeader>
+              <CardTitle>{status}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-4xl font-bold">{statusCounts[status]}</CardContent>
+            <CardFooter>
+              <Link 
+                href={`/vendor/orders?status=${status}`} 
+                className="text-sm hover:underline"
+              >
+                View {status.toLowerCase()} orders
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
 
-      <Tabs defaultValue="pending">
-        <TabsList className="mb-6">
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-        </TabsList>
+      {/* Payment Methods Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment Methods</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {Object.entries(paymentMethods).map(([method, count]) => (
+              <div key={method} className="border rounded-lg p-4">
+                <p className="font-medium capitalize">{method}</p>
+                <p className="text-2xl font-bold mt-2">{count}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="pending" className="space-y-6">
-          {orders.filter((order) => order.status === "pending").length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">No pending orders at the moment.</p>
+      {/* Recent Orders Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Recent Orders</CardTitle>
+            <Button variant="outline" asChild>
+              <Link href="/vendor/orders">View All</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {orders.slice(0, 5).length > 0 ? (
+            <div className="space-y-4">
+              {orders.slice(0, 5).map(order => (
+                <div key={order.id} className="flex justify-between items-center p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Order #{order.id.slice(-6)}</p>
+                    {order.createdAt && (
+                      <p className="text-sm text-gray-500">
+                        {new Date(order.createdAt).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                      order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {order.status}
+                    </span>
+                    <span className="text-sm capitalize text-gray-500">
+                      {order.paymentMethod}
+                    </span>
+                    <Link href={`/vendor/orders/${order.id}`} className="text-sm text-blue-600 hover:underline">
+                      Details
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            orders
-              .filter((order) => order.status === "pending")
-              .map((order) => (
-                <Card key={order.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">Order #{order.id}</CardTitle>
-                        <CardDescription>
-                          {formatDate(order.date)} • {order.customer}
-                        </CardDescription>
-                      </div>
-                      {getStatusBadge(order.status)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span>
-                              {item.quantity} x {item.name}
-                            </span>
-                            <span>${(item.price * item.quantity).toFixed(2)}</span>
-                          </div>
-                        ))}
-
-                        <div className="flex justify-between font-semibold pt-2 border-t">
-                          <span>Total</span>
-                          <span>${order.total.toFixed(2)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <Button variant="outline" size="sm" onClick={() => updateOrderStatus(order.id, "preparing")}>
-                          Start Preparing
-                        </Button>
-
-                        <Link href={`/vendor/orders/${order.id}`}>
-                          <Button variant="ghost" size="sm">
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+            <p className="text-center text-gray-500 py-6">No recent orders found</p>
           )}
-        </TabsContent>
-
-        <TabsContent value="completed" className="space-y-6">
-          {orders.filter((order) => order.status === "completed").length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">No completed orders to display.</p>
-          ) : (
-            orders
-              .filter((order) => order.status === "completed")
-              .map((order) => (
-                <Card key={order.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">Order #{order.id}</CardTitle>
-                        <CardDescription>
-                          {formatDate(order.date)} • {order.customer}
-                        </CardDescription>
-                      </div>
-                      {getStatusBadge(order.status)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span>
-                              {item.quantity} x {item.name}
-                            </span>
-                            <span>${(item.price * item.quantity).toFixed(2)}</span>
-                          </div>
-                        ))}
-
-                        <div className="flex justify-between font-semibold pt-2 border-t">
-                          <span>Total</span>
-                          <span>${order.total.toFixed(2)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end">
-                        <Link href={`/vendor/orders/${order.id}`}>
-                          <Button variant="ghost" size="sm">
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-          )}
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }
