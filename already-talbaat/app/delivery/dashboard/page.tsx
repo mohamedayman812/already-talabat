@@ -274,8 +274,8 @@ export default function DeliveryOrders() {
                     <div className="mt-2">
                       <p className="font-semibold">Items:</p>
                       <ul className="list-disc pl-5">
-                        {validMenuItems.map(itemId => (
-                          <li key={itemId}>
+                        {validMenuItems.map((itemId, idx) => (
+                          <li key={`${itemId}-${idx}`}>
                             {items[itemId]?.name || 'Loading...'} - 
                             ${items[itemId]?.price?.toFixed(2) || '0.00'}
                           </li>
@@ -335,8 +335,8 @@ export default function DeliveryOrders() {
                     <div className="mt-2">
                       <p className="font-semibold">Items:</p>
                       <ul className="list-disc pl-5">
-                        {validMenuItems.map(itemId => (
-                          <li key={itemId}>
+                        {validMenuItems.map((itemId, idx) => (
+                          <li key={`${itemId}-${idx}`}>
                             {items[itemId]?.name || 'Loading...'} - 
                             ${items[itemId]?.price?.toFixed(2) || '0.00'}
                           </li>
