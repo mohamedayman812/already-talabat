@@ -83,27 +83,9 @@ export default function RestaurantsPage() {
       </div>
 
       <Tabs defaultValue="all" onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">All</TabsTrigger>
-          {/* 
-            Once you add a `cuisine` property server-side, uncomment these:
-          <TabsTrigger value="italian">Italian</TabsTrigger>
-          <TabsTrigger value="mexican">Mexican</TabsTrigger>
-          */}
-        </TabsList>
-
         <TabsContent value="all" className="mt-0">
           <Grid restaurants={filtered} />
         </TabsContent>
-
-        {/*
-          If you enable cuisines:
-        {["italian","mexican"].map(c => (
-          <TabsContent key={c} value={c} className="mt-0">
-            <Grid restaurants={filtered.filter(r => r.cuisine?.toLowerCase()===c)} />
-          </TabsContent>
-        ))}
-        */}
       </Tabs>
     </div>
   )

@@ -1,10 +1,9 @@
 package com.example.alreadytalbt.Order.Controller;
 
-import com.example.alreadytalbt.Order.Model.Order;
 import com.example.alreadytalbt.Order.dto.*;
 import com.example.alreadytalbt.Order.Service.CartService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +18,14 @@ public class CartController {
     @GetMapping("/{customerId}")
     public ResponseEntity<CartWithItemsDTO> getCartByCustomerIdwithdetails(@PathVariable String customerId) {
         return ResponseEntity.ok(cartService.getCartByCustomerIdwithdetails(customerId));
+    }
+
+    @PostMapping
+    public ResponseEntity<CartDTO> createCart(@RequestBody CreateCartDTO dto) {
+        CartDTO created = cartService.createCart(dto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(created);
     }
 
     @GetMapping("/{customerId}/ids-only")

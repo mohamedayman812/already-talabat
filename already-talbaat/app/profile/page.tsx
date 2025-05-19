@@ -46,18 +46,16 @@ export default function ProfilePage() {
     confirmPassword: "",
   })
 
-  // Vendor / Restaurant state
+  // Vendor / Restaurant state (no businessHours)
   const [restaurant, setRestaurant] = useState<{
     id: string
     name: string
     address: string
-    businessHours: string
-  }>({ id: "", name: "", address: "", businessHours: "" })
+  }>({ id: "", name: "", address: "" })
   const [isRestEditing, setIsRestEditing] = useState(false)
   const [restForm, setRestForm] = useState({
     name: "",
     address: "",
-    businessHours: "",
   })
 
   const router = useRouter()
@@ -93,23 +91,33 @@ export default function ProfilePage() {
 
         // 2) Vendor‐specific
         if (u.role === "VENDOR") {
-          const vRes = await fetch(`${API_URL}/api/vendors/me`, {
+          // Fetch current vendor
+          const vRes = await fetch(`${API_URL}/api/vendors`, {
             headers: { Authorization: `Bearer ${token}` },
           })
           if (!vRes.ok) throw new Error("Failed to fetch vendor data")
-          const v = await vRes.json()
+          const v = await vRes.json() as { restaurantId: string }
 
+          // Fetch restaurant details
           const rRes = await fetch(
-            `${API_URL}/api/restaurants/${v.restaurantId}`,
+            `${API_URL}/api/restaurants/single/${v.restaurantId}`,
             { headers: { Authorization: `Bearer ${token}` } }
           )
           if (!rRes.ok) throw new Error("Failed to fetch restaurant data")
-          const r = await rRes.json()
-          setRestaurant(r)
+          const r = await rRes.json() as {
+            id: string
+            name: string
+            address: string
+          }
+
+          setRestaurant({
+            id: r.id,
+            name: r.name,
+            address: r.address,
+          })
           setRestForm({
             name: r.name,
             address: r.address,
-            businessHours: r.businessHours || "",
           })
         }
       } catch (err: any) {
@@ -134,11 +142,13 @@ export default function ProfilePage() {
       ...prev,
       [e.target.name]: e.target.value,
     }))
+
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setPasswordForm((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }))
+
   const handleRestChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) =>
@@ -159,17 +169,11 @@ export default function ProfilePage() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        username: profileForm.username,
-        email: profileForm.email,
-        address: profileForm.address,
-        phone: profileForm.phone,
-      }),
+      body: JSON.stringify(profileForm),
     })
 
     if (!res.ok) {
       const errText = await res.text()
-      console.error("Profile update failed:", res.status, errText)
       toast({
         title: "Error",
         description: errText || `HTTP ${res.status}`,
@@ -190,7 +194,7 @@ export default function ProfilePage() {
     toast({ title: "Saved", description: "Profile updated." })
   }
 
-  // Save password (unchanged)…
+  // Save password
   const savePassword = async (e: React.FormEvent) => {
     e.preventDefault()
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
@@ -222,7 +226,7 @@ export default function ProfilePage() {
     toast({ title: "Saved", description: "Password updated." })
   }
 
-  // Save restaurant (unchanged)…
+  // Save restaurant
   const saveRestaurant = async (e: React.FormEvent) => {
     e.preventDefault()
     const token = localStorage.getItem("auth-token")
@@ -257,152 +261,145 @@ export default function ProfilePage() {
             <TabsList className="mb-4">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
-              {user.role === "VENDOR" && (
-                <TabsTrigger value="vendor">Vendor Settings</TabsTrigger>
-              )}
+              {user.role === "VENDOR" && <TabsTrigger value="vendor">Vendor Settings</TabsTrigger>}
             </TabsList>
 
             {/* PROFILE TAB */}
             <TabsContent value="profile">
-              <Card as="form" onSubmit={saveProfile}>
-                <CardHeader>
-                  <CardTitle>Profile Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Label>Username</Label>
-                  <Input
-                    name="username"
-                    value={profileForm.username}
-                    onChange={handleProfileChange}
-                    disabled={!isProfileEditing}
-                  />
-                  <Label>Email</Label>
-                  <Input
-                    name="email"
-                    type="email"
-                    value={profileForm.email}
-                    onChange={handleProfileChange}
-                    disabled={!isProfileEditing}
-                  />
-                  <Label>Address</Label>
-                  <Textarea
-                    name="address"
-                    value={profileForm.address}
-                    onChange={handleProfileChange}
-                    disabled={!isProfileEditing}
-                  />
-                  <Label>Phone</Label>
-                  <Input
-                    name="phone"
-                    value={profileForm.phone}
-                    onChange={handleProfileChange}
-                    disabled={!isProfileEditing}
-                  />
-                </CardContent>
-                <CardFooter>
-                  {/** ← Conditional Edit vs Save/Cancel */}
-                  {isProfileEditing ? (
-                    <>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsProfileEditing(false)}
-                      >
-                        Cancel
+              <form onSubmit={saveProfile}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Profile Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Label>Username</Label>
+                    <Input
+                      name="username"
+                      value={profileForm.username}
+                      onChange={handleProfileChange}
+                      disabled={!isProfileEditing}
+                    />
+                    <Label>Email</Label>
+                    <Input
+                      name="email"
+                      type="email"
+                      value={profileForm.email}
+                      onChange={handleProfileChange}
+                      disabled={!isProfileEditing}
+                    />
+                    <Label>Address</Label>
+                    <Textarea
+                      name="address"
+                      value={profileForm.address}
+                      onChange={handleProfileChange}
+                      disabled={!isProfileEditing}
+                    />
+                    <Label>Phone</Label>
+                    <Input
+                      name="phone"
+                      value={profileForm.phone}
+                      onChange={handleProfileChange}
+                      disabled={!isProfileEditing}
+                    />
+                  </CardContent>
+                  <CardFooter>
+                    {isProfileEditing ? (
+                      <>
+                        <Button type="button" variant="outline" onClick={() => setIsProfileEditing(false)}>
+                          Cancel
+                        </Button>
+                        <Button type="submit">Save</Button>
+                      </>
+                    ) : (
+                      <Button type="button" onClick={() => setIsProfileEditing(true)}>
+                        Edit Profile
                       </Button>
-                      <Button type="submit">Save</Button>
-                    </>
-                  ) : (
-                    <Button
-                      type="button"
-                      onClick={() => setIsProfileEditing(true)}
-                    >
-                      Edit Profile
-                    </Button>
-                  )}
-                </CardFooter>
-              </Card>
+                    )}
+                  </CardFooter>
+                </Card>
+              </form>
             </TabsContent>
 
             {/* SECURITY TAB */}
             <TabsContent value="security">
-              <Card as="form" onSubmit={savePassword}>
-                <CardHeader>
-                  <CardTitle>Security</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Label>Current Password</Label>
-                  <Input
-                    name="currentPassword"
-                    type="password"
-                    value={passwordForm.currentPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                  <Label>New Password</Label>
-                  <Input
-                    name="newPassword"
-                    type="password"
-                    value={passwordForm.newPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                  <Label>Confirm New Password</Label>
-                  <Input
-                    name="confirmPassword"
-                    type="password"
-                    value={passwordForm.confirmPassword}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit">Update Password</Button>
-                </CardFooter>
-              </Card>
+              <form onSubmit={savePassword}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Security</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Label>Current Password</Label>
+                    <Input
+                      name="currentPassword"
+                      type="password"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                    <Label>New Password</Label>
+                    <Input
+                      name="newPassword"
+                      type="password"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                    <Label>Confirm New Password</Label>
+                    <Input
+                      name="confirmPassword"
+                      type="password"
+                      value={passwordForm.confirmPassword}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                  </CardContent>
+                  <CardFooter>
+                    <Button type="submit">Update Password</Button>
+                  </CardFooter>
+                </Card>
+              </form>
             </TabsContent>
 
             {/* VENDOR SETTINGS */}
             {user.role === "VENDOR" && (
               <TabsContent value="vendor">
-                <Card as="form" onSubmit={saveRestaurant}>
-                  <CardHeader>
-                    <CardTitle>Vendor Settings</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Label>Restaurant Name</Label>
-                    <Input
-                      name="name"
-                      value={restForm.name}
-                      onChange={handleRestChange}
-                      disabled={!isRestEditing}
-                    />
-                    <Label>Restaurant Address</Label>
-                    <Textarea
-                      name="address"
-                      value={restForm.address}
-                      onChange={handleRestChange}
-                      disabled={!isRestEditing}
-                    />
-                    <Label>Business Hours</Label>
-                    <Input
-                      name="businessHours"
-                      value={restForm.businessHours}
-                      onChange={handleRestChange}
-                      disabled={!isRestEditing}
-                    />
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsRestEditing(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Save Restaurant</Button>
-                  </CardFooter>
-                </Card>
+                <form onSubmit={saveRestaurant}>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Vendor Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Label>Restaurant Name</Label>
+                      <Input
+                        name="name"
+                        value={restForm.name}
+                        onChange={handleRestChange}
+                        disabled={!isRestEditing}
+                      />
+                      <Label>Restaurant Address</Label>
+                      <Textarea
+                        name="address"
+                        value={restForm.address}
+                        onChange={handleRestChange}
+                        disabled={!isRestEditing}
+                      />
+                    </CardContent>
+                    <CardFooter>
+                      {isRestEditing ? (
+                        <>
+                          <Button type="button" variant="outline" onClick={() => setIsRestEditing(false)}>
+                            Cancel
+                          </Button>
+                          <Button type="submit">Save Restaurant</Button>
+                        </>
+                      ) : (
+                        <Button type="button" onClick={() => setIsRestEditing(true)}>
+                          Edit Restaurant
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                </form>
               </TabsContent>
             )}
           </Tabs>
@@ -426,17 +423,11 @@ export default function ProfilePage() {
               </p>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
-              <Button
-                variant="outline"
-                onClick={() => router.push("/orders")}
-              >
+              <Button variant="outline" onClick={() => router.push("/orders")}>
                 View Orders
               </Button>
               {user.role === "VENDOR" && (
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/vendor/dashboard")}
-                >
+                <Button variant="outline" onClick={() => router.push("/vendor/dashboard")}>
                   Vendor Dashboard
                 </Button>
               )}

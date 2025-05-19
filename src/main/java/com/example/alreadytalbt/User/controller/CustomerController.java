@@ -136,10 +136,6 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getMenuItemById(id));
     }
 
-
-    ///CART RELATED STUFF
-    /// add item to a cart
-    /// tested
     @PostMapping("/cart/add-item")
     @RequireAuthentication
     public ResponseEntity<CartDTO> addItemToCart(@Valid @RequestBody AddToCartRequestDTO req,

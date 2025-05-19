@@ -30,17 +30,18 @@ public class CartService {
     @Autowired
     private CustomerRepo customerRepo;
 
-//    public CartDTO createCart(CreateCartDTO dto) {
-//        Cart cart = new Cart();
-//        cart.setCustomerId(new ObjectId(dto.getCustomerId()));
-//
-//        List<ObjectId> ids = dto.getMenuItemIds() != null
-//                ? dto.getMenuItemIds().stream().map(ObjectId::new).toList()
-//                : List.of();
-//
-//        cart.setMenuItemIds(ids);
-//        return toDTO(cartRepository.save(cart));
-//    }
+    public CartDTO createCart(CreateCartDTO dto) {
+        Cart cart = new Cart();
+        cart.setCustomerId(new ObjectId(dto.getCustomerId()));
+        if (dto.getRestaurantId() != null) {
+            cart.setRestaurantId(new ObjectId(dto.getRestaurantId()));
+        }
+        List<ObjectId> ids = dto.getMenuItemIds() != null
+                ? dto.getMenuItemIds().stream().map(ObjectId::new).toList()
+                : List.of();
+        cart.setMenuItemIds(ids);
+        return toDTO(cartRepository.save(cart));
+    }
 
     public CartDTO addItemsToCart(AddToCartRequestDTO dto) {
         ObjectId customerId;
