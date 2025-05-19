@@ -17,6 +17,7 @@ public class CartController {
 
     @GetMapping("/{customerId}")
     public ResponseEntity<CartWithItemsDTO> getCartByCustomerIdwithdetails(@PathVariable String customerId) {
+
         return ResponseEntity.ok(cartService.getCartByCustomerIdwithdetails(customerId));
     }
 

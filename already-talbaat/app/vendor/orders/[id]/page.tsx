@@ -7,23 +7,34 @@ import { API_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type OrderDetailDTO = {
   id: string;
+  customerId: string;
+  restaurantId: string;
+  deliveryGuyId?: string;
+  cartId: string;
+  items: string[]; // Array of menu item IDs
   status: string;
-  total: number;
-  customer: {
-    id: string;
-    username: string;
-    name: string;
-  };
-  items: {
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
-  }[];
+  paymentMethod: string;
 };
+
+type MenuItemDetails = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+};
+
+// Define order status flow
+const ORDER_STATUS = {
+  PLACED: 'PLACED',
+  PREPARING: 'PREPARING',
+  PREPARED: 'PREPARED',
+  COMPLETED: 'COMPLETED'
+} as const;
 
 export default function OrderDetailPage() {
   const { toast } = useToast();
@@ -31,30 +42,67 @@ export default function OrderDetailPage() {
   const router = useRouter();
 
   const [order, setOrder] = useState<OrderDetailDTO | null>(null);
+  const [menuItems, setMenuItems] = useState<MenuItemDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const tokenHeader = () => ({ Authorization: `Bearer ${localStorage.getItem("auth-token")}` });
+  const tokenHeader = () => ({ 
+    Authorization: `Bearer ${localStorage.getItem("auth-token")}`,
+    "Content-Type": "application/json"
+  });
 
+  // Fetch order details and menu items
   useEffect(() => {
     if (!id) return;
-    (async () => {
+
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/orders/${id}`, {
+        setIsLoading(true);
+        
+        // 1. Fetch the order itself
+        const orderRes = await fetch(`${API_URL}/api/orders/${id}`, {
           headers: tokenHeader(),
         });
-        if (!res.ok) throw new Error(await res.text());
-        setOrder(await res.json());
+        
+        if (!orderRes.ok) throw new Error("Failed to fetch order");
+        const orderData: OrderDetailDTO = await orderRes.json();
+        setOrder(orderData);
+
+        // 2. Fetch menu items one by one
+        const itemsPromises = orderData.items.map(itemId => 
+          fetch(`${API_URL}/api/menu-items/${itemId}`, {
+            headers: tokenHeader(),
+          }).then(res => res.ok ? res.json() : null)
+        );
+
+        const itemsResults = await Promise.all(itemsPromises);
+        const validItems = itemsResults.filter(item => item !== null) as MenuItemDetails[];
+        setMenuItems(validItems);
+
       } catch (err: any) {
-        toast({ title: "Error loading order", description: err.message, variant: "destructive" });
-        // Optionally navigate back if the order doesn't exist:
-        // router.push("/vendor/orders");
+        toast({ 
+          title: "Error loading order details", 
+          description: err.message, 
+          variant: "destructive" 
+        });
       } finally {
         setIsLoading(false);
       }
-    })();
+    };
+
+    fetchData();
   }, [id, toast]);
 
-  if (isLoading) return <p className="p-8">Loading order…</p>;
+  if (isLoading) return (
+    <div className="container mx-auto py-8 space-y-4">
+      <Skeleton className="h-8 w-24" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    </div>
+  );
+
   if (!order) return <p className="p-8">Order not found.</p>;
 
   return (
@@ -69,26 +117,91 @@ export default function OrderDetailPage() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p><strong>Status:</strong> {order.status}</p>
-          <p><strong>Customer:</strong> {order.customer.name} ({order.customer.username})</p>
-          <p><strong>Total:</strong> ${order.total.toFixed(2)}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-semibold mb-2">Order Information</h3>
+              <p><strong>Status:</strong> {order.status}</p>
+              <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
+            </div>
+          </div>
 
-          <div>
-            <h3 className="font-semibold mb-2">Items</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {order.items.map(item => (
-                <li key={item.id}>
-                  {item.name} — Qty: {item.quantity} @ ${item.price.toFixed(2)} each
-                </li>
-              ))}
-            </ul>
+          <div className="mt-4">
+            <h3 className="font-semibold mb-2">Order Items</h3>
+            {menuItems.length > 0 ? (
+              <ul className="space-y-2">
+                {menuItems.map(item => (
+                  <li key={item.id} className="border-b pb-2 last:border-b-0">
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        {item.description && <p className="text-sm text-gray-500">{item.description}</p>}
+                      </div>
+                      <p className="text-sm text-gray-600">${item.price.toFixed(2)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No items found in this order</p>
+            )}
           </div>
         </CardContent>
 
-        <CardFooter>
-          {/* Example: you could add a “Mark as Delivered” or “Cancel” button here */}
+        <CardFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => router.push("/vendor/orders")}>
+            Back
+          </Button>
+          
+          {/* Status progression buttons */}
+          {order.status === ORDER_STATUS.PLACED && (
+            <Button onClick={() => handleStatusChange(ORDER_STATUS.PREPARED)}>
+              Mark as Prepared
+            </Button>
+          )}
+          
+          {/* {order.status === ORDER_STATUS.PREPARING && (
+            <Button onClick={() => handleStatusChange(ORDER_STATUS.PREPARED)}>
+              Mark as Prepared
+            </Button>
+          )} */}
+          
+          {/* {order.status === ORDER_STATUS.PREPARED && (
+            <Button onClick={() => handleStatusChange(ORDER_STATUS.COMPLETED)}>
+              Complete Order
+            </Button>
+          )} */}
         </CardFooter>
       </Card>
     </div>
   );
+
+  async function handleStatusChange(newStatus: string) {
+    try {
+
+      const res = await fetch(`${API_URL}/api/vendors/status/${order?.id}`, {
+        method: 'PUT',  
+        headers: tokenHeader(),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update order status");
+      }
+      
+      const updatedOrder = await res.json();
+      setOrder(updatedOrder);
+      toast({ 
+        title: "Success", 
+        description: `Order status updated to ${newStatus}`,
+        variant: "default"
+      });
+      
+    } catch (err: any) {
+      toast({
+        title: "Update Failed",
+        description: err.message,
+        variant: "destructive"
+      });
+    }
+  }
 }

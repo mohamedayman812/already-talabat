@@ -19,7 +19,7 @@ public interface OrderFeignClient {
                                   @PathVariable("deliveryGuyId") ObjectId deliveryGuyId);
 
     @GetMapping("/api/orders/summary")
-    List<OrderSummaryDTO> getOrderSummaries();
+    List<OrderResponseDTO> getOrderSummaries();
 
 
 

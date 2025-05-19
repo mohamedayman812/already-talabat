@@ -179,7 +179,7 @@ public class DeliveryGuyService {
 
     }
 
-    public List<OrderSummaryDTO> getAllOrdersForDeliveryGuy() {
+    public List<OrderResponseDTO> getAllOrdersForDeliveryGuy() {
         return orderFeignClient.getOrderSummaries();
     }
 
